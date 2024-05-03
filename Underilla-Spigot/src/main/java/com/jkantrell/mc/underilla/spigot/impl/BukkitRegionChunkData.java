@@ -1,20 +1,20 @@
 package com.jkantrell.mc.underilla.spigot.impl;
 
+import org.bukkit.block.data.BlockData;
+import org.bukkit.generator.LimitedRegion;
 import com.jkantrell.mc.underilla.core.api.Biome;
 import com.jkantrell.mc.underilla.core.api.Block;
 import com.jkantrell.mc.underilla.core.api.ChunkData;
 import com.jkantrell.mc.underilla.core.vector.VectorIterable;
-import org.bukkit.block.data.BlockData;
-import org.bukkit.generator.LimitedRegion;
 
 public class BukkitRegionChunkData implements ChunkData {
 
-    //FIELDS
+    // FIELDS
     private final LimitedRegion region_;
     private final int minHeight_, maxHeight_, chunkX_, chunkZ_, absX_, absZ_;
 
 
-    //CONSTRUCTORS
+    // CONSTRUCTORS
     public BukkitRegionChunkData(LimitedRegion region, int chunkX, int chunkZ, int minHeight, int maxHeight) {
         this.region_ = region;
         this.minHeight_ = minHeight;
@@ -26,23 +26,19 @@ public class BukkitRegionChunkData implements ChunkData {
     }
 
 
-    //GETTERS
-    public LimitedRegion getRegion() {
-        return this.region_;
-    }
+    // GETTERS
+    public LimitedRegion getRegion() { return this.region_; }
 
 
-    //IMPLEMENTATIONS
+    // IMPLEMENTATIONS
     @Override
-    public int getMaxHeight() {
-        return this.maxHeight_;
-    }
+    public int getMaxHeight() { return this.maxHeight_; }
     @Override
-    public int getMinHeight() {
-        return this.minHeight_;
-    }
+    public int getMinHeight() { return this.minHeight_; }
     @Override
     public Block getBlock(int x, int y, int z) {
+        // TODO also save state of block if needed (for structure chests).
+        // this.region_.getBlockState(this.absX_ + x, y, this.absZ_ + z);
         BlockData d = this.region_.getBlockData(this.absX_ + x, y, this.absZ_ + z);
         return new BukkitBlock(d);
     }
@@ -57,12 +53,16 @@ public class BukkitRegionChunkData implements ChunkData {
     }
     @Override
     public void setBlock(int x, int y, int z, Block block) {
-        if (!(block instanceof BukkitBlock bukkitBlock)) { return; }
+        if (!(block instanceof BukkitBlock bukkitBlock)) {
+            return;
+        }
         this.region_.setBlockData(this.absX_ + x, y, this.absZ_ + z, bukkitBlock.getBlockData());
     }
     @Override
     public void setBiome(int x, int y, int z, Biome biome) {
-        if (!(biome instanceof BukkitBiome bukkitBiome)) { return; }
+        if (!(biome instanceof BukkitBiome bukkitBiome)) {
+            return;
+        }
         this.region_.setBiome(this.absX_ + x, y, this.absZ_ + z, bukkitBiome.getBiome());
     }
 }
