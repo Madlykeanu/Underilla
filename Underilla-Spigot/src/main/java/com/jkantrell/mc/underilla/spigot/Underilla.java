@@ -14,7 +14,6 @@ import jakarta.annotation.Nullable;
 
 public final class Underilla extends JavaPlugin {
 
-    private static Underilla plugin;
     public static final Config CONFIG = new Config("");
     private BukkitWorldReader worldReader_ = null;
     private @Nullable BukkitWorldReader worldCavesReader_ = null;
@@ -32,7 +31,6 @@ public final class Underilla extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        plugin = this;
         // Setting default config
         this.saveResource("config.yml", false);
 
@@ -82,5 +80,5 @@ public final class Underilla extends JavaPlugin {
         }
     }
 
-    public static Underilla getPlugin() { return plugin; }
+    public static Underilla getInstance() { return getPlugin(Underilla.class); }
 }

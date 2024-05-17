@@ -146,7 +146,7 @@ public class UnderillaChunkGenerator extends ChunkGenerator {
         }
 
 
-        // OVERWRITES
+        // OVERRITES
         @Override
         public void populate(WorldInfo worldInfo, Random random, int chunkX, int chunkZ, LimitedRegion limitedRegion) {
             if (!CONFIG.generateCaves) {
@@ -166,12 +166,18 @@ public class UnderillaChunkGenerator extends ChunkGenerator {
 
         @Override
         public @Nonnull Biome getBiome(@Nonnull WorldInfo worldInfo, int x, int y, int z) {
+            // Read biome from the custom world
             BukkitBiome biome = (BukkitBiome) worldReader_.biomeAt(x, y, z).orElse(null);
+            // Read biome from the caves world
             if (worldCavesReader_ != null) {
                 BukkitBiome cavesBiome = (BukkitBiome) worldCavesReader_.biomeAt(x, y, z).orElse(null);
                 if (cavesBiome != null && CONFIG.transferCavesWorldBiomes.contains(cavesBiome.getBiome())) {
                     return cavesBiome.getBiome();
                 }
+                // read biome from the generating world
+            } else {
+                // TODO It might be possible to keep default generator on Bukkit.yml then enforce Underilla generator and delegate some
+                // action to default generator
             }
             return biome == null ? Biome.PLAINS : biome.getBiome();
         }

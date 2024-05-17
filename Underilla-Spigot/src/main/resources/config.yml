@@ -1,3 +1,5 @@
+# # The world to merge the terrain into
+# world: "world"
 
 # The world to copy the terrain from
 reference_world: "world_base"

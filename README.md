@@ -91,5 +91,7 @@ If you're going to plug your custom WorldPainter world into Underilla, consider 
 Create a working jar with `./gradlew buildDependents`
 
 ## TODO
-Build-in pre-generation system.
-Allow to generate the 2nd world on the fly.
+- Build-in pre-generation system.
+- Allow to generate the 2nd world on the fly.
+- Feature generation filter.
+- Transfer custom biomes.
