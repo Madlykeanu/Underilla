@@ -1,7 +1,7 @@
 plugins {
     `java-library`
     id("io.github.goooler.shadow") version "8.1.7"
-    id("io.papermc.paperweight.userdev") version "1.7.0" // paperweight // Check for new versions at https://plugins.gradle.org/plugin/io.papermc.paperweight.userdev
+    id("io.papermc.paperweight.userdev") version "1.7.1" // paperweight // Check for new versions at https://plugins.gradle.org/plugin/io.papermc.paperweight.userdev
 }
 
 group = "com.Jkantrell.mc"
@@ -19,7 +19,7 @@ repositories {
 
 dependencies {
     // compileOnly("io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT") // without paperweight
-    paperweight.paperDevBundle("1.20.4-R0.1-SNAPSHOT") // paperweight
+    paperweight.paperDevBundle("1.20.6-R0.1-SNAPSHOT") // paperweight
     implementation("com.jkantrell:Yamlizer:main-SNAPSHOT")
     implementation(project(":Underilla-Core"))
 }
