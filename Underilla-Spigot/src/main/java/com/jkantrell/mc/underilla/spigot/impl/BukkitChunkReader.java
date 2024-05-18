@@ -3,7 +3,6 @@ package com.jkantrell.mc.underilla.spigot.impl;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import com.jkantrell.mc.underilla.core.api.Biome;
 import com.jkantrell.mc.underilla.core.api.Block;
@@ -48,28 +47,29 @@ public class BukkitChunkReader extends ChunkReader {
     }
     @Override
     public Optional<Biome> biomeFromTag(StringTag tag) {
-        String[] raw = tag.getValue().split(":");
-        String name = raw.length > 1 ? raw[1] : raw[0];
-        if (customBiomes.containsKey(name)) {
-            Biome biome = new BukkitBiome(customBiomes.get(name));
-            return Optional.of(biome);
-        }
-        try {
-            org.bukkit.block.Biome nativeBiome = org.bukkit.block.Biome.valueOf(name.toUpperCase());
-            Biome biome = new BukkitBiome(nativeBiome);
-            return Optional.of(biome);
-        } catch (IllegalArgumentException e) {
-            Bukkit.getLogger().warning("Could not resolve biome '" + name + "' try to create a custom biome from it");
-            org.bukkit.block.Biome customBiome = customBiomes.computeIfAbsent(name, b -> org.bukkit.block.Biome.PLAINS);
-            // CustomBiome customBiome = customBiomes.computeIfAbsent(name, CustomBiome::new);
-            Biome biome = new BukkitBiome(customBiome);
-            return Optional.of(biome);
-        }
+        return Optional.of(new BukkitBiome(tag.getValue()));
+        // String[] raw = tag.getValue().split(":");
+        // String name = raw.length > 1 ? raw[1] : raw[0];
+        // if (customBiomes.containsKey(name)) {
+        // Biome biome = new BukkitBiome(tag.getValue());
+        // return Optional.of(biome);
+        // }
+        // try {
+        // org.bukkit.block.Biome nativeBiome = org.bukkit.block.Biome.valueOf(name.toUpperCase());
+        // Biome biome = new BukkitBiome(nativeBiome);
+        // return Optional.of(biome);
+        // } catch (IllegalArgumentException e) {
+        // Bukkit.getLogger().warning("Could not resolve biome '" + name + "' try to create a custom biome from it");
+        // org.bukkit.block.Biome customBiome = customBiomes.computeIfAbsent(name, b -> org.bukkit.block.Biome.PLAINS);
+        // // CustomBiome customBiome = customBiomes.computeIfAbsent(name, CustomBiome::new);
+        // Biome biome = new BukkitBiome(customBiome);
+        // return Optional.of(biome);
+        // }
     }
-    public class CustomBiome implements Biome {
-        private final String name;
-        public CustomBiome(String name) { this.name = name; }
-        @Override
-        public String getName() { return name; }
-    }
+    // public class CustomBiome implements Biome {
+    // private final String name;
+    // public CustomBiome(String name) { this.name = name; }
+    // @Override
+    // public String getName() { return name; }
+    // }
 }

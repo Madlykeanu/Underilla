@@ -45,7 +45,7 @@ public class BukkitRegionChunkData implements ChunkData {
     @Override
     public Biome getBiome(int x, int y, int z) {
         org.bukkit.block.Biome b = this.region_.getBiome(this.absX_ + x, y, this.absZ_ + z);
-        return new BukkitBiome(b);
+        return new BukkitBiome(b.name());
     }
     @Override
     public void setRegion(int xMin, int yMin, int zMin, int xMax, int yMax, int zMax, Block block) {
@@ -63,6 +63,7 @@ public class BukkitRegionChunkData implements ChunkData {
         if (!(biome instanceof BukkitBiome bukkitBiome)) {
             return;
         }
-        this.region_.setBiome(this.absX_ + x, y, this.absZ_ + z, bukkitBiome.getBiome());
+        // this.region_.setBiome(this.absX_ + x, y, this.absZ_ + z, bukkitBiome.getBiome());
+        BiomeHelper.setCustomBiome(bukkitBiome.getName(), this.absX_ + x, y, this.absZ_ + z);
     }
 }

@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
-import org.bukkit.Bukkit;
 import org.bukkit.HeightMap;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
@@ -15,11 +14,9 @@ import org.bukkit.generator.LimitedRegion;
 import org.bukkit.generator.WorldInfo;
 import com.jkantrell.mc.underilla.core.api.HeightMapType;
 import com.jkantrell.mc.underilla.core.generation.Generator;
-import com.jkantrell.mc.underilla.core.generation.MergeStrategy;
 import com.jkantrell.mc.underilla.core.reader.ChunkReader;
 import com.jkantrell.mc.underilla.core.reader.WorldReader;
 import com.jkantrell.mc.underilla.spigot.Underilla;
-import com.jkantrell.mc.underilla.spigot.impl.BukkitBiome;
 import com.jkantrell.mc.underilla.spigot.impl.BukkitChunkData;
 import com.jkantrell.mc.underilla.spigot.impl.BukkitRegionChunkData;
 import com.jkantrell.mc.underilla.spigot.impl.BukkitWorldInfo;
@@ -118,16 +115,17 @@ public class UnderillaChunkGenerator extends ChunkGenerator {
 
     @Override
     public BiomeProvider getDefaultBiomeProvider(@Nonnull WorldInfo worldInfo) {
-        // if biome need to be transfered from the custom world add a custom biome provider
-        // (For MergeStrategy.RELATIVE, kept underground biomes are transfered in the mergeBiomes method not here)
-        if (CONFIG.transferBiomes && (!CONFIG.mergeStrategy.equals(MergeStrategy.RELATIVE) || CONFIG.keptUndergroundBiomes.isEmpty())) {
-            Bukkit.getLogger()
-                    .info("Underilla Use the custom biome provider from file data. Structures will be generate in the right biome.");
-            return new BiomeProviderFromFile();
-        } else {
-            Bukkit.getLogger().info("Underilla Use the default biome provider. Structures will be generate in bad biomes.");
-            return null;
-        }
+        // // if biome need to be transfered from the custom world add a custom biome provider
+        // // (For MergeStrategy.RELATIVE, kept underground biomes are transfered in the mergeBiomes method not here)
+        // if (CONFIG.transferBiomes && (!CONFIG.mergeStrategy.equals(MergeStrategy.RELATIVE) || CONFIG.keptUndergroundBiomes.isEmpty())) {
+        // Bukkit.getLogger()
+        // .info("Underilla Use the custom biome provider from file data. Structures will be generate in the right biome.");
+        // return new BiomeProviderFromFile();
+        // } else {
+        // Bukkit.getLogger().info("Underilla Use the default biome provider. Structures will be generate in bad biomes.");
+        // return null;
+        // }
+        return null;
     }
 
 
@@ -166,20 +164,21 @@ public class UnderillaChunkGenerator extends ChunkGenerator {
 
         @Override
         public @Nonnull Biome getBiome(@Nonnull WorldInfo worldInfo, int x, int y, int z) {
-            // Read biome from the custom world
-            BukkitBiome biome = (BukkitBiome) worldReader_.biomeAt(x, y, z).orElse(null);
-            // Read biome from the caves world
-            if (worldCavesReader_ != null) {
-                BukkitBiome cavesBiome = (BukkitBiome) worldCavesReader_.biomeAt(x, y, z).orElse(null);
-                if (cavesBiome != null && CONFIG.transferCavesWorldBiomes.contains(cavesBiome.getBiome())) {
-                    return cavesBiome.getBiome();
-                }
-                // read biome from the generating world
-            } else {
-                // TODO It might be possible to keep default generator on Bukkit.yml then enforce Underilla generator and delegate some
-                // action to default generator
-            }
-            return biome == null ? Biome.PLAINS : biome.getBiome();
+            // // Read biome from the custom world
+            // BukkitBiome biome = (BukkitBiome) worldReader_.biomeAt(x, y, z).orElse(null);
+            // // Read biome from the caves world
+            // if (worldCavesReader_ != null) {
+            // BukkitBiome cavesBiome = (BukkitBiome) worldCavesReader_.biomeAt(x, y, z).orElse(null);
+            // if (cavesBiome != null && CONFIG.transferCavesWorldBiomes.contains(cavesBiome.getBiome())) {
+            // return cavesBiome.getBiome();
+            // }
+            // // read biome from the generating world
+            // } else {
+            // // TODO It might be possible to keep default generator on Bukkit.yml then enforce Underilla generator and delegate some
+            // // action to default generator
+            // }
+            // return biome == null ? Biome.PLAINS : biome.getBiome();
+            return Biome.PLAINS;
         }
 
         @Override

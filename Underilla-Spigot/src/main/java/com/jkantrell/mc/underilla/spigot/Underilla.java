@@ -65,6 +65,7 @@ public final class Underilla extends JavaPlugin {
         if (CONFIG.generateStructures) {
             this.getServer().getPluginManager().registerEvents(new StructureEventListener(CONFIG.structureBlackList), this);
         }
+        this.getServer().getPluginManager().registerEvents(new com.jkantrell.mc.underilla.spigot.generation.WorldInitListener(), this);
     }
 
     @Override
