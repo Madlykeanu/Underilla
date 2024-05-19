@@ -1,6 +1,9 @@
 package com.jkantrell.mc.underilla.spigot.impl;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
+import javax.annotation.Nonnull;
 import com.jkantrell.mc.underilla.spigot.Underilla;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.Holder;
@@ -11,8 +14,20 @@ import net.minecraft.world.level.biome.Climate.Sampler;
 
 public class CustomBiomeSource extends BiomeSource {
     private final BiomeSource vanillaBiomeSource;
+    private final BukkitWorldReader worldSurfaceReader;
+    private final BukkitWorldReader worldCavesReader;
+    private final Map<String, Long> biomesPlaced;
+    private long lastInfoPrinted = 0;
+    private long lastWarnningPrinted = 0;
 
-    public CustomBiomeSource(BiomeSource vanillaBiomeSource) { this.vanillaBiomeSource = vanillaBiomeSource; }
+    public CustomBiomeSource(BiomeSource vanillaBiomeSource, BukkitWorldReader worldSurfaceReader, BukkitWorldReader worldCavesReader) {
+        this.vanillaBiomeSource = vanillaBiomeSource;
+        this.worldSurfaceReader = worldSurfaceReader;
+        this.worldCavesReader = worldCavesReader;
+        this.biomesPlaced = new ConcurrentHashMap<>();
+    }
+
+    public Map<String, Long> getBiomesPlaced() { return biomesPlaced; }
 
     @Override
     protected MapCodec<? extends BiomeSource> codec() { throw new UnsupportedOperationException("Not supported"); }
@@ -26,17 +41,65 @@ public class CustomBiomeSource extends BiomeSource {
     }
 
     @Override
-    public Holder<Biome> getNoiseBiome(int x, int y, int z, Sampler noise) {
+    public Holder<Biome> getNoiseBiome(int x, int y, int z, @Nonnull Sampler noise) {
+        // Keep biome from vanilla noise biome generation if it's in the list of keptUndergroundBiomes.
         Holder<Biome> vanillaBiome = vanillaBiomeSource.getNoiseBiome(x, y, z, noise);
-        if (vanillaBiome != null && Underilla.CONFIG.keptUndergroundBiomes.contains(vanillaBiome.getRegisteredName())) {
-            Underilla.getInstance().getLogger().info("Use vanillaBiome because it's a keptUndergroundBiomes: "
-                    + vanillaBiome.getRegisteredName() + " at " + x + ", " + y + ", " + z);
+        // Edit value to mach actual world coordinates.
+        x = x << 2;
+        y = y << 2;
+        z = z << 2;
+        if (vanillaBiome != null && (!Underilla.CONFIG.transferBiomes
+                || Underilla.CONFIG.keptUndergroundBiomes.contains(vanillaBiome.getRegisteredName()))) {
+            info("Use vanillaBiome because we don't transfer biome or it's a keptUndergroundBiomes: " + vanillaBiome.getRegisteredName()
+                    + " at " + x + ", " + y + ", " + z);
+            // biomesPlaced.put("noise:" + vanillaBiome.getRegisteredName(),
+            // biomesPlaced.getOrDefault(vanillaBiome.getRegisteredName(), 0L) + 1);
             return vanillaBiome;
         }
-        // TODO get key from custom surface world.
-        String biomeKey = "mvndi:baltic_coast";
-        // Underilla.getInstance().getLogger().info("Getting noise biome: " + x + ", " + y + ", " + z + ": " + biomeKey);
-        return NMSBiomeUtils.getBiomeRegistry().wrapAsHolder(NMSBiomeUtils.getBiome(biomeKey));
+
+        // Get biome from cave world if it's in the list of keptUndergroundBiomes.
+        if (Underilla.CONFIG.transferWorldFromCavesWorld && worldCavesReader != null) {
+            BukkitBiome cavesBiome = (BukkitBiome) worldCavesReader.biomeAt(x, y, z).orElse(null);
+            if (cavesBiome != null && Underilla.CONFIG.transferCavesWorldBiomes.contains(cavesBiome.getName())) {
+                info("Use cavesBiome because it's a transferedCavesWorldBiomes: " + cavesBiome.getName() + " at " + x + ", " + y + ", "
+                        + z);
+                // biomesPlaced.put("caves:" + cavesBiome.getName(), biomesPlaced.getOrDefault(cavesBiome.getName(), 0L) + 1);
+                return NMSBiomeUtils.getBiomeRegistry().wrapAsHolder(NMSBiomeUtils.getBiome(cavesBiome.getName()));
+            }
+        }
+
+        // Get biome from surface world.
+        BukkitBiome surfaceBiome = (BukkitBiome) worldSurfaceReader.biomeAt(x, y, z).orElse(null);
+        if (surfaceBiome != null) {
+            info("Use surfaceBiome: " + surfaceBiome.getName() + " at " + x + ", " + y + ", " + z);
+            biomesPlaced.put("surface:" + surfaceBiome.getName(), biomesPlaced.getOrDefault(surfaceBiome.getName(), 0L) + 1);
+            return NMSBiomeUtils.getBiomeRegistry().wrapAsHolder(NMSBiomeUtils.getBiome(surfaceBiome.getName()));
+        }
+
+        // If no other biome found, use plain biome.
+        warning("Use vanilla because no other biome found at " + x + ", " + y + ", " + z);
+        if (vanillaBiome != null) {
+            // biomesPlaced.put("notfound:", biomesPlaced.getOrDefault(vanillaBiome.getRegisteredName(), 0L) + 1);
+            return vanillaBiome;
+        } else {
+            // biomesPlaced.put("error:", biomesPlaced.getOrDefault("plains", 0L) + 1);
+            return NMSBiomeUtils.getBiomeRegistry().wrapAsHolder(NMSBiomeUtils.getBiome("minecraft:plains"));
+        }
+    }
+
+    private synchronized void info(String message) {
+        long currentTime = System.currentTimeMillis();
+        if (currentTime - lastInfoPrinted > 1000) {
+            Underilla.getInstance().getLogger().info(message);
+            lastInfoPrinted = currentTime;
+        }
+    }
+    private synchronized void warning(String message) {
+        long currentTime = System.currentTimeMillis();
+        if (currentTime - lastWarnningPrinted > 1000) {
+            Underilla.getInstance().getLogger().warning(message);
+            lastWarnningPrinted = currentTime;
+        }
     }
 
 }

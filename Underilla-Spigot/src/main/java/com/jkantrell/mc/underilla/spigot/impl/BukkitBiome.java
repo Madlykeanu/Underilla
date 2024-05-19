@@ -41,5 +41,5 @@ public class BukkitBiome implements Biome {
     }
 
     @Override
-    public String toString() { return "BukkitBiome{" + "biome_=" + name + '}'; }
+    public String toString() { return "BukkitBiome{" + name + '}'; }
 }

@@ -15,18 +15,19 @@ import jakarta.annotation.Nullable;
 public final class Underilla extends JavaPlugin {
 
     public static final Config CONFIG = new Config("");
-    private BukkitWorldReader worldReader_ = null;
-    private @Nullable BukkitWorldReader worldCavesReader_ = null;
+    private BukkitWorldReader worldSurfaceReader;
+    private @Nullable BukkitWorldReader worldCavesReader;
+    private com.jkantrell.mc.underilla.spigot.generation.WorldInitListener worldInitListener;
 
 
     @Override
     public ChunkGenerator getDefaultWorldGenerator(String worldName, String id) {
-        if (this.worldReader_ == null) {
+        if (this.worldSurfaceReader == null) {
             this.getServer().getLogger().warning("No world with name '" + Underilla.CONFIG.referenceWorldName + "' found");
             return super.getDefaultWorldGenerator(worldName, id);
         }
         this.getServer().getLogger().info("Using Underilla as world generator!");
-        return new UnderillaChunkGenerator(this.worldReader_, this.worldCavesReader_);
+        return new UnderillaChunkGenerator(this.worldSurfaceReader, this.worldCavesReader);
     }
 
     @Override
@@ -44,7 +45,7 @@ public final class Underilla extends JavaPlugin {
 
         // Loading reference world
         try {
-            this.worldReader_ = new BukkitWorldReader(Underilla.CONFIG.referenceWorldName);
+            this.worldSurfaceReader = new BukkitWorldReader(Underilla.CONFIG.referenceWorldName);
             this.getServer().getLogger().info("World + '" + Underilla.CONFIG.referenceWorldName + "' found.");
         } catch (NoSuchFieldException e) {
             this.getServer().getLogger().warning("No world with name '" + Underilla.CONFIG.referenceWorldName + "' found");
@@ -54,7 +55,7 @@ public final class Underilla extends JavaPlugin {
         if (Underilla.CONFIG.transferWorldFromCavesWorld) {
             try {
                 this.getServer().getLogger().info("Loading caves world");
-                this.worldCavesReader_ = new BukkitWorldReader(Underilla.CONFIG.cavesWorldName);
+                this.worldCavesReader = new BukkitWorldReader(Underilla.CONFIG.cavesWorldName);
             } catch (NoSuchFieldException e) {
                 this.getServer().getLogger().warning("No world with name '" + Underilla.CONFIG.cavesWorldName + "' found");
                 e.printStackTrace();
@@ -65,7 +66,8 @@ public final class Underilla extends JavaPlugin {
         if (CONFIG.generateStructures) {
             this.getServer().getPluginManager().registerEvents(new StructureEventListener(CONFIG.structureBlackList), this);
         }
-        this.getServer().getPluginManager().registerEvents(new com.jkantrell.mc.underilla.spigot.generation.WorldInitListener(), this);
+        worldInitListener = new com.jkantrell.mc.underilla.spigot.generation.WorldInitListener(worldSurfaceReader, worldCavesReader);
+        this.getServer().getPluginManager().registerEvents(worldInitListener, this);
     }
 
     @Override
@@ -76,8 +78,11 @@ public final class Underilla extends JavaPlugin {
                 this.getServer().getLogger()
                         .info(entry.getKey() + " took " + entry.getValue() + "ms (" + (entry.getValue() * 100 / totalTime) + "%)");
             }
+            this.getServer().getLogger().info("Map of chunks: " + worldInitListener.getCustomBiomeSource().getBiomesPlaced().entrySet()
+                    .stream().sorted().map(entry -> entry.getKey() + ": " + entry.getValue()).reduce((a, b) -> a + ", " + b).orElse(""));
         } catch (Exception e) {
-            this.getServer().getLogger().info("Fail to print times");
+            this.getServer().getLogger().info("Fail to print times or biomes placed.");
+            e.printStackTrace();
         }
     }
 
