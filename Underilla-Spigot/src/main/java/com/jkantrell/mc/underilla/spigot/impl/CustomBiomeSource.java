@@ -63,9 +63,9 @@ public class CustomBiomeSource extends BiomeSource {
         if (vanillaBiome != null && (!Underilla.CONFIG.transferBiomes
                 || Underilla.CONFIG.keptUndergroundBiomes.contains(vanillaBiome.getRegisteredName()))) {
             info("Use vanillaBiome because we don't transfer biome or it's a keptUndergroundBiomes: " + vanillaBiome.getRegisteredName()
-                    + " at " + x + ", " + y + ", " + z);
-            // biomesPlaced.put("noise:" + vanillaBiome.getRegisteredName(),
-            // biomesPlaced.getOrDefault(vanillaBiome.getRegisteredName(), 0L) + 1);
+                    + " at " + x + " " + y + " " + z);
+            String key = "noise:" + vanillaBiome.getRegisteredName();
+            biomesPlaced.put(key, biomesPlaced.getOrDefault(key, 0L) + 1);
             return vanillaBiome;
         }
 
@@ -73,9 +73,9 @@ public class CustomBiomeSource extends BiomeSource {
         if (Underilla.CONFIG.transferWorldFromCavesWorld && worldCavesReader != null) {
             BukkitBiome cavesBiome = (BukkitBiome) worldCavesReader.biomeAt(x, y, z).orElse(null);
             if (cavesBiome != null && Underilla.CONFIG.transferCavesWorldBiomes.contains(cavesBiome.getName())) {
-                info("Use cavesBiome because it's a transferedCavesWorldBiomes: " + cavesBiome.getName() + " at " + x + ", " + y + ", "
-                        + z);
-                // biomesPlaced.put("caves:" + cavesBiome.getName(), biomesPlaced.getOrDefault(cavesBiome.getName(), 0L) + 1);
+                info("Use cavesBiome because it's a transferedCavesWorldBiomes: " + cavesBiome.getName() + " at " + x + " " + y + " " + z);
+                String key = "caves:" + cavesBiome.getName();
+                biomesPlaced.put(key, biomesPlaced.getOrDefault(key, 0L) + 1);
                 return NMSBiomeUtils.getBiomeRegistry().wrapAsHolder(NMSBiomeUtils.getBiome(cavesBiome.getName()));
             }
         }
@@ -83,18 +83,20 @@ public class CustomBiomeSource extends BiomeSource {
         // Get biome from surface world.
         BukkitBiome surfaceBiome = (BukkitBiome) worldSurfaceReader.biomeAt(x, y, z).orElse(null);
         if (surfaceBiome != null) {
-            info("Use surfaceBiome: " + surfaceBiome.getName() + " at " + x + ", " + y + ", " + z);
-            biomesPlaced.put("surface:" + surfaceBiome.getName(), biomesPlaced.getOrDefault(surfaceBiome.getName(), 0L) + 1);
+            info("Use surfaceBiome: " + surfaceBiome.getName() + " at " + x + " " + y + " " + z);
+            biomesPlaced.put("surface:" + surfaceBiome.getName(), biomesPlaced.getOrDefault("surface:" + surfaceBiome.getName(), 0L) + 1);
             return NMSBiomeUtils.getBiomeRegistry().wrapAsHolder(NMSBiomeUtils.getBiome(surfaceBiome.getName()));
         }
 
         // If no other biome found, use plain biome.
-        warning("Use vanilla because no other biome found at " + x + ", " + y + ", " + z);
+        warning("Use vanilla because no other biome found at " + x + " " + y + " " + z);
         if (vanillaBiome != null) {
-            // biomesPlaced.put("notfound:", biomesPlaced.getOrDefault(vanillaBiome.getRegisteredName(), 0L) + 1);
+            String key = "notfound:" + vanillaBiome.getRegisteredName();
+            biomesPlaced.put(key, biomesPlaced.getOrDefault(key, 0L) + 1);
             return vanillaBiome;
         } else {
-            // biomesPlaced.put("error:", biomesPlaced.getOrDefault("plains", 0L) + 1);
+            String key = "error:plains";
+            biomesPlaced.put(key, biomesPlaced.getOrDefault(key, 0L) + 1);
             return NMSBiomeUtils.getBiomeRegistry().wrapAsHolder(NMSBiomeUtils.getBiome("minecraft:plains"));
         }
     }
