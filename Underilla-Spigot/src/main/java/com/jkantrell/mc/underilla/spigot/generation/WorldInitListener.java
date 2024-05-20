@@ -1,6 +1,5 @@
 package com.jkantrell.mc.underilla.spigot.generation;
 
-import java.lang.reflect.Field;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -36,14 +35,7 @@ public class WorldInitListener implements Listener {
         BiomeSource vanillaBiomeSource = vanilla.getBiomeSource();
         customBiomeSource = new CustomBiomeSource(vanillaBiomeSource, worldSurfaceReader, worldCavesReader);
 
-        try {
-            Field biomeSourceField = ChunkGenerator.class.getDeclaredField("biomeSource");
-            biomeSourceField.setAccessible(true);
-            biomeSourceField.set(serverLevel.getChunkSource().chunkMap.generator, customBiomeSource);
-            Underilla.getInstance().getLogger().info("Successfully injected custom biome source.");
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            Underilla.getInstance().getLogger().warning("Failed to inject custom biome source.");
-            e.printStackTrace();
-        }
+        serverLevel.getChunkSource().chunkMap.generator = new NMSExtendedChunkGenerator(vanilla, customBiomeSource);
     }
+
 }

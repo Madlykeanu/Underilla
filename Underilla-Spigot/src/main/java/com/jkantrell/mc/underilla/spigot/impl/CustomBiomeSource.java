@@ -1,5 +1,7 @@
 package com.jkantrell.mc.underilla.spigot.impl;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
@@ -30,7 +32,17 @@ public class CustomBiomeSource extends BiomeSource {
     public Map<String, Long> getBiomesPlaced() { return biomesPlaced; }
 
     @Override
-    protected MapCodec<? extends BiomeSource> codec() { throw new UnsupportedOperationException("Not supported"); }
+    protected MapCodec<? extends BiomeSource> codec() {
+        try {
+            Method method = BiomeSource.class.getDeclaredMethod("codec");
+            method.setAccessible(true);
+            return (MapCodec<? extends BiomeSource>) method.invoke(vanillaBiomeSource);
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            Underilla.getInstance().getLogger().warning("Failed to get codec field from BiomeSource");
+            e.printStackTrace();
+            return null;
+        }
+    }
 
     @Override
     protected Stream<Holder<Biome>> collectPossibleBiomes() {
