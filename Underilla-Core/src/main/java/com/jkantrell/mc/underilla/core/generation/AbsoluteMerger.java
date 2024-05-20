@@ -96,7 +96,7 @@ class AbsoluteMerger implements Merger {
     /** return the 1st block mergeDepth_ blocks under surface or heigth_ */
     private int getLowerBlockToRemove(Reader reader, int x, int z, Block defaultBlock) {
         int lbtr = this.height_ + mergeDepth_;
-        while (!reader.blockAt(x, lbtr, z).orElse(defaultBlock).isSolid() && lbtr > -64) {
+        while (!reader.blockAt(x, lbtr, z).orElse(defaultBlock).isSolidAndSurfaceBlock() && lbtr > -64) {
             lbtr--;
         }
         return lbtr - mergeDepth_;

@@ -56,6 +56,13 @@ relative_and_surface:
   depth: 6
 
 
+ignored_block_for_surface_calculation:
+  - .*LEAVES
+  - .*LOG
+  - .*WOOD
+  - .*PLANKS
+  - .*FENCE
+
 # The range the transition between vanilla and reference worlds takes, the wider, the smoother.
 # <= 0 results in a sharp transition.
 blend_range: 8

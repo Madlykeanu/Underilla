@@ -67,6 +67,9 @@ public class Config extends AbstractYamlConfig {
     @ConfigField(path = "surface_and_absolute.limit")
     public int mergeLimit = 22;
 
+    @ConfigField(path = "ignored_block_for_surface_calculation")
+    public List<String> ignoredBlockForSurfaceCalculation = List.of("LEAVES", "LOGS");
+
     @ConfigField(path = "blend_range")
     public int mergeBlendRange = 8;
 
