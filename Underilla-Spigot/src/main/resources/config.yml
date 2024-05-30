@@ -62,6 +62,7 @@ ignored_block_for_surface_calculation:
   - .*WOOD
   - .*PLANKS
   - .*FENCE
+  - ICE
 
 # The range the transition between vanilla and reference worlds takes, the wider, the smoother.
 # <= 0 results in a sharp transition.
