@@ -3,10 +3,12 @@ package com.jkantrell.mc.underilla.spigot.impl;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Waterlogged;
+import org.bukkit.entity.EntityType;
 import com.jkantrell.mc.underilla.core.api.Block;
 import com.jkantrell.mc.underilla.spigot.Underilla;
 
@@ -15,10 +17,14 @@ public class BukkitBlock implements Block {
 
     // FIELDS
     private BlockData blockData_;
+    private Optional<EntityType> spawnedType;
 
 
     // CONSTRUCTORS
-    public BukkitBlock(BlockData blockData) { this.blockData_ = blockData; }
+    public BukkitBlock(BlockData blockData) {
+        this.blockData_ = blockData;
+        this.spawnedType = Optional.empty();
+    }
 
 
     // GETTERS
@@ -31,6 +37,11 @@ public class BukkitBlock implements Block {
                     .collect(Collectors.toSet());
         }
         return ignoredBlockForSurfaceCalculation;
+    }
+
+    public Optional<EntityType> getSpawnedType() { return this.spawnedType; }
+    public void setSpawnedType(String spawnedType) {
+        this.spawnedType = Optional.ofNullable(EntityType.valueOf(spawnedType.replace("minecraft:", "").toUpperCase()));
     }
 
     // IMPLEMENTATIONS

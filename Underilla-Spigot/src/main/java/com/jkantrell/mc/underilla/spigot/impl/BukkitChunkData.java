@@ -2,10 +2,13 @@ package com.jkantrell.mc.underilla.spigot.impl;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.block.CreatureSpawner;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.craftbukkit.CraftWorld;
+import org.bukkit.entity.EntityType;
 import com.jkantrell.mc.underilla.core.api.Block;
 import com.jkantrell.mc.underilla.core.api.ChunkData;
+import com.jkantrell.mc.underilla.spigot.Underilla;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 
@@ -63,6 +66,11 @@ public class BukkitChunkData implements ChunkData {
             return;
         }
         this.chunkData.setBlock(x, y, z, bukkitBlock.getBlockData());
+        if (world.getBlockAt(x, y, z) instanceof CreatureSpawner creatureSpawner) {
+            creatureSpawner.setSpawnedType(bukkitBlock.getSpawnedType().orElse(EntityType.ZOMBIE));
+            creatureSpawner.update();
+            Underilla.getInstance().getLogger().info("setBlock: Spawner type set to " + creatureSpawner.getSpawnedType());
+        }
     }
 
     @Override

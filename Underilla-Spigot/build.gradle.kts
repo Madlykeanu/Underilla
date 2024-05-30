@@ -2,10 +2,13 @@ plugins {
     `java-library`
     id("io.github.goooler.shadow") version "8.1.7"
     id("io.papermc.paperweight.userdev") version "1.7.1" // paperweight // Check for new versions at https://plugins.gradle.org/plugin/io.papermc.paperweight.userdev
+    `maven-publish` // Add ./gradlew publishToMavenLocal
+    id("xyz.jpenilla.run-paper") version "2.3.0"
 }
 
-group = "com.Jkantrell.mc"
-version = "1.5.0"
+group = "com.jkantrell.mc.underilla.spigot"
+version = "1.5.1"
+description="Generate vanilla cave in custom world."
 
 repositories {
     mavenLocal()
@@ -27,6 +30,11 @@ dependencies {
 // tasks.build.dependsOn tasks.reobfJar // paperweight
 // tasks.build.dependsOn tasks.shadowJar // without paperweight
 
+java {
+    // Configure the java toolchain. This allows gradle to auto-provision JDK 17 on systems that only have JDK 8 installed for example.
+    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
+}
+
 tasks {
     shadowJar {
         minimize()
@@ -45,10 +53,30 @@ tasks {
         dependsOn(reobfJar)
     }
 
-    compileJava {
-        // Set the release flag. This configures what version bytecode the compiler will emit, as well as what JDK APIs are usable.
-        // See https://openjdk.java.net/jeps/247 for more information.
-        options.release.set(21)
+    processResources {
+        val props = mapOf(
+            "name" to project.name,
+            "version" to project.version,
+            "description" to project.description,
+            "apiVersion" to "1.20",
+            "group" to project.group
+        )
+        inputs.properties(props)
+        filesMatching("plugin.yml") {
+            expand(props)
+        }
+    }
+    runServer {
+        // Configure the Minecraft version for our task.
+        // This is the only required configuration besides applying the plugin.
+        // Your plugin's jar (or shadowJar if present) will be used automatically.
+        minecraftVersion("1.20.6")
+    }
+}
+
+publishing {
+    publications.create<MavenPublication>("maven") {
+        from(components["java"])
     }
 }
 
