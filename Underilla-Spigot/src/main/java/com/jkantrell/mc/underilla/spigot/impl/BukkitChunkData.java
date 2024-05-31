@@ -5,7 +5,8 @@ import org.bukkit.World;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.craftbukkit.CraftWorld;
-import org.bukkit.entity.EntityType;
+import org.bukkit.craftbukkit.block.CraftBlock;
+import org.bukkit.craftbukkit.block.CraftBlockState;
 import com.jkantrell.mc.underilla.core.api.Block;
 import com.jkantrell.mc.underilla.core.api.ChunkData;
 import com.jkantrell.mc.underilla.spigot.Underilla;
@@ -65,12 +66,37 @@ public class BukkitChunkData implements ChunkData {
         if (!(block instanceof BukkitBlock bukkitBlock)) {
             return;
         }
+
+
         this.chunkData.setBlock(x, y, z, bukkitBlock.getBlockData());
-        if (world.getBlockAt(x, y, z) instanceof CreatureSpawner creatureSpawner) {
-            creatureSpawner.setSpawnedType(bukkitBlock.getSpawnedType().orElse(EntityType.ZOMBIE));
-            creatureSpawner.update();
-            Underilla.getInstance().getLogger().info("setBlock: Spawner type set to " + creatureSpawner.getSpawnedType());
+
+        if (bukkitBlock.getMaterial().equals(org.bukkit.Material.SPAWNER)) {
+            // CraftBlock craftBlock = ((CraftBlock) world.getBlockAt(x, y, z));
+            // world.getBlockAt(x, y, z).getState().update();
+            org.bukkit.block.Block bblock = world.getBlockAt(x, y, z);
+            bblock.getState().setType(org.bukkit.Material.SPAWNER);
+            bblock.getState().update(true, true);
+            CraftBlock craftBlock = (CraftBlock) bblock;
+            CraftBlockState blockState = (CraftBlockState) craftBlock.getState();
+
+
+            Underilla.getInstance().getLogger()
+                    .info("setBlock: Spawner block detected at " + x + ", " + y + ", " + z + " with class " + bblock.getClass()
+                            + ", material " + bblock.getType() + ", state " + bblock.getState() + ", blockData " + bblock.getBlockData()
+                            + ", blockData class " + bblock.getBlockData().getClass() + ", blockData material "
+                            + bblock.getBlockData().getMaterial() + ", blockData class " + bblock.getBlockData().getClass());
+            // CreatureSpawner creatureSpawner = new CraftCreatureSpawner(world,
+            // new SpawnerBlockEntity(craftBlock.getPosition(), craftBlock.getState()));
+            // creatureSpawner.
+
+            // TODO it's not a CreatureSpawner, it's stay at the previous block type (Deepslate, mostly).
+            if (bblock.getState() instanceof CreatureSpawner creatureSpawner) {
+                creatureSpawner.setSpawnedType(bukkitBlock.getSpawnedType().orElse(org.bukkit.entity.EntityType.ZOMBIE));
+                // creatureSpawner.update();
+                Underilla.getInstance().getLogger().info("setBlock: Spawner type set to " + creatureSpawner.getSpawnedType());
+            }
         }
+
     }
 
     @Override

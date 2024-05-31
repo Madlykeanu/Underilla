@@ -84,6 +84,7 @@ public class BukkitBlock implements Block {
 
     @Override
     public String getName() { return this.blockData_.getMaterial().toString().toLowerCase(); }
+    public Material getMaterial() { return this.blockData_.getMaterial(); }
 
     @Override
     public String getNameSpace() { return null; }
