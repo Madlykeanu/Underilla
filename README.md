@@ -59,6 +59,7 @@ Underilla is currently only implemented as a Paper plugin, so it runs only on Pa
 
 ### Pregenerate
 Underilla is significantly slower than the vanilla generator, as it doesn't relly on noise generation but on reading the reference world's region `nbt` files and analyzing its patterns to 'clone' its surface to a vanilla world. So, if your world is intended for heavy duty in a big server. It's recommended to pre-generate the whole reference world area with a chunk generator plugin, such as [Chunky](https://hangar.papermc.io/pop4959/Chunky). I'm planning adding a build-in pre-generation system in the future.
+To increase generation speed you should edit `worker-threads` in your `config/paper-global.yml` to match your number of CPU cores, else paper won't use all CPU cores aviables. Using your number of core instead of default value usually double speed generation.
 
 ### Performances
 Huge map generation can takes hours or even days, here is some stats about performance to help you choose your configuration settings.
