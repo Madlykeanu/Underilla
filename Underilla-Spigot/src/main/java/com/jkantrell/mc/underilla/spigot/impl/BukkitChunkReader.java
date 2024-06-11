@@ -64,13 +64,13 @@ public class BukkitChunkReader extends ChunkReader {
             // System.out.println("Loaded Block Entities: " + blockEntity);
             // if it's a spawner or a chest
             if (blockEntity.getString("id").equals("minecraft:mob_spawner")) {
-                Underilla.getInstance().getLogger().info("Interesting Spawner: " + blockEntity);
+                // Underilla.getInstance().getLogger().info("Interesting Spawner: " + blockEntity);
                 String spawnedType = blockEntity.getCompoundTag("SpawnData").getCompoundTag("entity").getString("id");
                 // System.out.println("Spawner Type: " + spawnedType);
                 if (block.get() instanceof BukkitBlock bukkitBlock) {
                     // bukkitBlock.setBlockData(Material.SPAWNER.createBlockData());
                     bukkitBlock.setSpawnedType(spawnedType);
-                    Underilla.getInstance().getLogger().info("blockFromTag: " + bukkitBlock.getSpawnedType());
+                    // Underilla.getInstance().getLogger().info("blockFromTag: " + bukkitBlock.getSpawnedType());
                 }
 
                 // } else if (blockEntity.getString("id").equals("minecraft:chest")) {
