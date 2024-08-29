@@ -4,7 +4,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.WorldGenRegion;
@@ -59,10 +58,9 @@ public class NMSExtendedChunkGenerator extends ChunkGenerator {
     public int getGenDepth() { return vanillaChunkGenerator.getGenDepth(); }
 
     @Override
-    public CompletableFuture<ChunkAccess> fillFromNoise(Executor executor, Blender blender, RandomState noiseConfig,
-            StructureManager structureAccessor, ChunkAccess chunk) {
-
-        return vanillaChunkGenerator.fillFromNoise(executor, blender, noiseConfig, structureAccessor, chunk);
+    public CompletableFuture<ChunkAccess> fillFromNoise(Blender blender, RandomState noiseConfig, StructureManager structureAccessor,
+            ChunkAccess chunk) {
+        return vanillaChunkGenerator.fillFromNoise(blender, noiseConfig, structureAccessor, chunk);
     }
 
     @Override

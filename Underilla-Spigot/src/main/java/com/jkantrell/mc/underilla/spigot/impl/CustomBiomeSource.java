@@ -1,8 +1,7 @@
 package com.jkantrell.mc.underilla.spigot.impl;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 import javax.annotation.Nonnull;
@@ -14,7 +13,7 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.biome.Climate.Sampler;
 
-public class CustomBiomeSource extends BiomeSource {
+public class CustomBiomeSource extends BiomeSource implements java.util.function.Supplier {
     private final BiomeSource vanillaBiomeSource;
     private final BukkitWorldReader worldSurfaceReader;
     private final BukkitWorldReader worldCavesReader;
@@ -31,18 +30,20 @@ public class CustomBiomeSource extends BiomeSource {
 
     public Map<String, Long> getBiomesPlaced() { return biomesPlaced; }
 
+    // @Override
+    // protected MapCodec<? extends BiomeSource> codec() {
+    // try {
+    // Method method = BiomeSource.class.getDeclaredMethod("codec");
+    // method.setAccessible(true);
+    // return (MapCodec<? extends BiomeSource>) method.invoke(vanillaBiomeSource);
+    // } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+    // Underilla.getInstance().getLogger().warning("Failed to get codec field from BiomeSource");
+    // e.printStackTrace();
+    // return null;
+    // }
+    // }
     @Override
-    protected MapCodec<? extends BiomeSource> codec() {
-        try {
-            Method method = BiomeSource.class.getDeclaredMethod("codec");
-            method.setAccessible(true);
-            return (MapCodec<? extends BiomeSource>) method.invoke(vanillaBiomeSource);
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-            Underilla.getInstance().getLogger().warning("Failed to get codec field from BiomeSource");
-            e.printStackTrace();
-            return null;
-        }
-    }
+    protected MapCodec<? extends BiomeSource> codec() { throw new UnsupportedOperationException("Not supported"); }
 
     @Override
     protected Stream<Holder<Biome>> collectPossibleBiomes() {
@@ -55,6 +56,7 @@ public class CustomBiomeSource extends BiomeSource {
     @Override
     public Holder<Biome> getNoiseBiome(int x, int y, int z, @Nonnull Sampler noise) {
         // Keep biome from vanilla noise biome generation if it's in the list of keptUndergroundBiomes.
+        // TODO find a fix for cave biomes that are never kept here. (probably because Minecraft generate them in a different way)
         Holder<Biome> vanillaBiome = vanillaBiomeSource.getNoiseBiome(x, y, z, noise);
         // Edit value to mach actual world coordinates.
         x = x << 2;
@@ -115,5 +117,11 @@ public class CustomBiomeSource extends BiomeSource {
             lastWarnningPrinted = currentTime;
         }
     }
+
+    /**
+     * I don't understand why BiomeSource need to extend Supplier, but it's needed to work with paper.
+     */
+    @Override
+    public Set<Holder<Biome>> get() { return collectPossibleBiomes().distinct().collect(java.util.stream.Collectors.toSet()); }
 
 }

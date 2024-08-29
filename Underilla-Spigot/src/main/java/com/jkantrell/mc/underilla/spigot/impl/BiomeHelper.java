@@ -10,7 +10,6 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.WritableRegistry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
@@ -31,12 +30,11 @@ public class BiomeHelper {
     public static void setCustomBiome(String newBiomeName, Chunk chunk) {
         WritableRegistry<Biome> registryWritable = (WritableRegistry<Biome>) dedicatedServer.registryAccess().registry(Registries.BIOME)
                 .get();
-        ResourceKey<Biome> key = ResourceKey.create(Registries.BIOME, new ResourceLocation(newBiomeName.toLowerCase()));
+        ResourceKey<Biome> key = ResourceKey.create(Registries.BIOME, NMSBiomeUtils.resourceLocation(newBiomeName));
         Biome base = registryWritable.get(key);
         if (base == null) {
             if (newBiomeName.contains(":")) {
-                ResourceKey<Biome> newKey = ResourceKey.create(Registries.BIOME,
-                        new ResourceLocation(newBiomeName.split(":")[0].toLowerCase(), newBiomeName.split(":")[1].toLowerCase()));
+                ResourceKey<Biome> newKey = ResourceKey.create(Registries.BIOME, NMSBiomeUtils.resourceLocation(newBiomeName));
                 base = registryWritable.get(newKey);
                 if (base == null) {
                     return;
@@ -68,12 +66,11 @@ public class BiomeHelper {
         Biome base;
         WritableRegistry<Biome> registrywritable = (WritableRegistry<Biome>) dedicatedServer.registryAccess().registry(Registries.BIOME)
                 .get();
-        ResourceKey<Biome> key = ResourceKey.create(Registries.BIOME, new ResourceLocation(newBiomeName.toLowerCase()));
+        ResourceKey<Biome> key = ResourceKey.create(Registries.BIOME, NMSBiomeUtils.resourceLocation(newBiomeName));
         base = registrywritable.get(key);
         if (base == null) {
             if (newBiomeName.contains(":")) {
-                ResourceKey<Biome> newKey = ResourceKey.create(Registries.BIOME,
-                        new ResourceLocation(newBiomeName.split(":")[0].toLowerCase(), newBiomeName.split(":")[1].toLowerCase()));
+                ResourceKey<Biome> newKey = ResourceKey.create(Registries.BIOME, NMSBiomeUtils.resourceLocation(newBiomeName));
                 base = registrywritable.get(newKey);
                 if (base == null) {
                     return false;

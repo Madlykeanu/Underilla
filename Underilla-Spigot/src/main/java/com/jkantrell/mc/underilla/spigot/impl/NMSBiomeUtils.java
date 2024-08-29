@@ -18,7 +18,7 @@ public class NMSBiomeUtils {
         return ((CraftServer) Bukkit.getServer()).getServer().registryAccess().registryOrThrow(Registries.BIOME);
     }
 
-    public static Biome getBiome(String key) { return getBiomeRegistry().get(new ResourceLocation(key)); }
+    public static Biome getBiome(String key) { return getBiomeRegistry().get(resourceLocation(key)); }
     public static Biome getBiome(Location location) {
         return getBiome(location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld());
     }
@@ -32,6 +32,11 @@ public class NMSBiomeUtils {
     public static ResourceLocation getBiomeKey(Location location) { return getBiomeRegistry().getKey(getBiome(location)); }
     public static ResourceLocation getBiomeKey(int x, int y, int z, World bukkitWorld) {
         return getBiomeRegistry().getKey(getBiome(x, y, z, bukkitWorld));
+    }
+
+    public static ResourceLocation resourceLocation(String name) {
+        String[] t = name.split(":");
+        return ResourceLocation.fromNamespaceAndPath(t[0], t[1]);
     }
 
     // public static org.bukkit.block.Biome getBukkitBiome(String key) {

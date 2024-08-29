@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "com.jkantrell.mc.underilla.spigot"
-version = "1.5.2"
+version = "1.5.3"
 description="Generate vanilla cave in custom world."
 
 repositories {
@@ -22,7 +22,7 @@ repositories {
 
 dependencies {
     // compileOnly("io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT") // without paperweight
-    paperweight.paperDevBundle("1.20.6-R0.1-SNAPSHOT") // paperweight
+    paperweight.paperDevBundle("1.21.1-R0.1-SNAPSHOT") // paperweight
     implementation("com.jkantrell:Yamlizer:main-SNAPSHOT")
     implementation(project(":Underilla-Core"))
 }
@@ -34,6 +34,7 @@ java {
     // Configure the java toolchain. This allows gradle to auto-provision JDK 21 on systems that only have JDK 8 installed for example.
     toolchain.languageVersion.set(JavaLanguageVersion.of(21))
 }
+
 
 tasks {
     shadowJar {
@@ -58,7 +59,7 @@ tasks {
             "name" to project.name,
             "version" to project.version,
             "description" to project.description,
-            "apiVersion" to "1.20",
+            "apiVersion" to "1.21",
             "group" to project.group
         )
         inputs.properties(props)
@@ -70,7 +71,7 @@ tasks {
         // Configure the Minecraft version for our task.
         // This is the only required configuration besides applying the plugin.
         // Your plugin's jar (or shadowJar if present) will be used automatically.
-        minecraftVersion("1.20.6")
+        minecraftVersion("1.21.1")
     }
 }
 
