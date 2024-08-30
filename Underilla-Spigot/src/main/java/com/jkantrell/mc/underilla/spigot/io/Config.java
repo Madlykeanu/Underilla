@@ -50,7 +50,7 @@ public class Config extends AbstractYamlConfig {
     public boolean customBiomeEnabled = false;
 
     @ConfigField(path = "strategy")
-    public MergeStrategy mergeStrategy = MergeStrategy.RELATIVE;
+    public MergeStrategy mergeStrategy = MergeStrategy.SURFACE;
 
     @ConfigField(path = "relative.upper_limit")
     public int mergeUpperLimit = 320;

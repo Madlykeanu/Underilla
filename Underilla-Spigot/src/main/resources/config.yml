@@ -27,8 +27,9 @@ custom_biome_enabled: false
 
 
 # How to merge vanilla and reference worlds.
-#   - RELATIVE: At a given depth based on terrain height and air pockets at every X and Z coordinates. @Deprecated
-#   - SURFACE: At a fixed Y height based on custom world terrain height.
+#   - SURFACE: Generation will be based on the custom word surface. It have a top limits with surface_and_absolute.limit and always generate world at least x blocks below the custom world surface (see relative_and_surface.depth). This is the best choice for most cases.
+#   - RELATIVE: At a given depth based on terrain height and air pockets at every X and Z coordinates. This strategy sometimes results in stone clusters at random places. Use only if you absolutely need to keep your custom world underground caves.
+
 #   - ABSOLUTE: At a fixed Y height.
 #   - NONE: Just... don't merge. Reference world will be re-generated without vanilla underground.
 strategy: "SURFACE"
@@ -46,6 +47,7 @@ relative:
 # Mix strategy exclusive settings
 surface_and_absolute:
   # The Y height dividing reference terrain above and vanilla worlds below.
+  # Increasing this value way above 60 won't have much effect as the caves are only generated in vanilla world.
   limit: 60
 
 # How deep reference world terrain should dig into vanilla word.

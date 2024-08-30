@@ -23,7 +23,7 @@ public class GenerationConfig {
 
     public boolean customBiomeEnabled = false;
 
-    public MergeStrategy mergeStrategy = MergeStrategy.RELATIVE;
+    public MergeStrategy mergeStrategy = MergeStrategy.SURFACE;
 
     public int mergeUpperLimit = 320;
 

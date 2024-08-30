@@ -20,7 +20,7 @@ It's original purpose is adding vanilla caves to custom [WorldPainter](https://w
     - **None:** No actual vanilla underground noise is generated. `generate_noodle_caves` setting can still be on, to generate noodle caves.
     - **Absolute:** A Y coordinate value divides the original world surface and vanilla underground.
     - **Surface:** Mix the original world surface and vanilla underground at a variable y that depends of original & vanilla world surface. It have the best racio generated world quality & performance.
-    - **Relative:** This is the cool one. The reference world's surface will be dynamically carved into vanilla underground; which means there's no actual height-based division.
+    - **Relative:** **This strategie still need improvement, for now you should use Surface**. The reference world's surface will be dynamically carved into vanilla underground; which means there's no actual height-based division.
 - Custom caves also supported. If using Relative merge strategy, every non-solid block and surroundings will be preserved, thus, if the reference world has itself an underground system, it'll be transferred over to the merged world.
 - Heightmap fixed. Underilla re-calculates heightmaps when merging chunks, getting rid of floating and buried structures. Vanilla villagers and other structures are placed at the right height.
 - Biome overwrite. Biomes from the reference world will be transferred and overwrite biomes from de vanilla seed being used. Cave biomes underground will be preserved.
@@ -30,7 +30,7 @@ It's original purpose is adding vanilla caves to custom [WorldPainter](https://w
 
 - Java 21.
 - A pre-generated world to use as a reference (Such as a WorldPainter world).
-- A [Paper](https://papermc.io/software/paper) (or forks) Minecraft Server of version [1.20.5 - 1.20.6]. It might work with upper version, but only 1.20.6 have been tested. Use old release for [1.19 - 1.20.4] compatibility.
+- A [Paper](https://papermc.io/software/paper) (or forks) Minecraft Server of version [1.21 - 1.21.1]. It might work with upper version, but only 1.21.1 have been tested. Use old release for [1.19 - 1.20.6] compatibility.
 
 ### Single player or non-Bukkit
 Underilla is currently only implemented as a Paper plugin, so it runs only on Paper (or fork) servers. If you have a Vanilla, Forge or non Bukkit-based server; or looking for a single player experience; you may [use a local Paper server](https://papermc.io/software/paper) to pre-generate a fully-merged world and then copy the resulting world folder to your actual `saves` folder.
@@ -86,6 +86,13 @@ If you're going to plug your custom WorldPainter world into Underilla, consider 
 - The Populate layer has no effect. Weather all or none of the terrain will be populated based on the above point.
 - If you have custom cave/tunnels layers and want to preserve them during the merge, you'd want to use the Relative merge strategy
 
+## Custom biome
+Cave generation on custom biomes is now working. Features (ores, flowers etc) will be placed according to the custom surface world biome but structures won't.
+If you have a custom world with custom biomes, you should enable custom biome it in the config.
+
+## Feature fiter
+If you want to remove some of the game features, for example the `monster_room` you can create a datapack where you have customine witch feature can spawn in each biome. Underilla will generate feature according to your cusomized biome.
+It can also be used to add feature to some biome. For example a quartz_ore feature if your nether is disabled you you still want your builder to have quartz.
 
 ## Build
 Create a working jar with `./gradlew buildDependents`
@@ -93,5 +100,3 @@ Create a working jar with `./gradlew buildDependents`
 ## TODO
 - Build-in pre-generation system.
 - Allow to generate the 2nd world on the fly.
-- Feature generation filter.
-- Transfer custom biomes.
