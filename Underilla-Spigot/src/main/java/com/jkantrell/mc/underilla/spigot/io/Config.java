@@ -46,6 +46,9 @@ public class Config extends AbstractYamlConfig {
     @ConfigField(path = "transfered_caves_world_biomes")
     public List<String> transferCavesWorldBiomes = List.of("minecraft:deep_dark", "minecraft:dripstone_caves", "minecraft:lush_caves");
 
+    @ConfigField(path = "custom_biome_enabled")
+    public boolean customBiomeEnabled = false;
+
     @ConfigField(path = "strategy")
     public MergeStrategy mergeStrategy = MergeStrategy.RELATIVE;
 
@@ -57,9 +60,6 @@ public class Config extends AbstractYamlConfig {
 
     @ConfigField(path = "relative_and_surface.depth")
     public int mergeDepth = 12;
-
-    @ConfigField(path = "relative.kept_underground_biomes")
-    public List<String> keptUndergroundBiomes = List.of();
 
     @ConfigField(path = "kept_reference_world_blocks")
     public List<String> keptReferenceWorldBlocks = List.of();
@@ -99,7 +99,6 @@ public class Config extends AbstractYamlConfig {
         r.mergeUpperLimit = this.mergeUpperLimit;
         r.mergeLowerLimit = this.mergeLowerLimit;
         r.mergeDepth = this.mergeDepth;
-        r.keptUndergroundBiomes = this.keptUndergroundBiomes.stream().map(BukkitBiome::new).toList();
         r.keptReferenceWorldBlocks = this.keptReferenceWorldBlocks;
         r.preserveBiomes = this.preserveBiomes;
         r.ravinBiomes = this.ravinBiomes;

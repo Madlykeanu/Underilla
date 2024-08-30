@@ -6,6 +6,7 @@ import org.bukkit.World;
 import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.block.CraftBiome;
+import com.jkantrell.mc.underilla.spigot.Underilla;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
@@ -50,4 +51,12 @@ public class NMSBiomeUtils {
         return CraftBiome.bukkitToMinecraftHolder(bukkit);
     }
 
+    public static org.bukkit.block.Biome getBukkitBiome(String name) {
+        try {
+            return org.bukkit.block.Biome.valueOf(name.split(":")[1].toUpperCase());
+        }catch (IllegalArgumentException e) {
+            Underilla.getInstance().getLogger().warning("Failed to get Bukkit biome from " + name);
+            return org.bukkit.block.Biome.PLAINS;
+        }
+    }
 }

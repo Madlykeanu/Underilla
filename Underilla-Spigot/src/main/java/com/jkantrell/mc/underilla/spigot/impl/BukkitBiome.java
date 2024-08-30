@@ -9,7 +9,6 @@ public class BukkitBiome implements Biome {
 
 
     // // CONSTRUCTORS
-    // public BukkitBiome(org.bukkit.block.Biome biome) { this.name = biome.name(); }
     public BukkitBiome(String name) {
         name = name.toLowerCase();
         if (!name.contains(":")) {
@@ -19,8 +18,8 @@ public class BukkitBiome implements Biome {
     }
 
 
-    // // // GETTERS
-    // public org.bukkit.block.Biome getBiome() { return NMSBiomeUtils.getBukkitBiome(this.name); }
+    // GETTERS
+    public org.bukkit.block.Biome getBiome() { return NMSBiomeUtils.getBukkitBiome(this.name); }
 
 
     // IMPLEMENTATIONS

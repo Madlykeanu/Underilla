@@ -66,7 +66,7 @@ public final class Underilla extends JavaPlugin {
         if (CONFIG.generateStructures) {
             this.getServer().getPluginManager().registerEvents(new StructureEventListener(CONFIG.structureBlackList), this);
         }
-        if (CONFIG.transferBiomes) {
+        if (CONFIG.transferBiomes && CONFIG.customBiomeEnabled) {
             worldInitListener = new com.jkantrell.mc.underilla.spigot.generation.WorldInitListener(worldSurfaceReader, worldCavesReader);
             this.getServer().getPluginManager().registerEvents(worldInitListener, this);
         }
@@ -80,12 +80,11 @@ public final class Underilla extends JavaPlugin {
                 this.getServer().getLogger()
                         .info(entry.getKey() + " took " + entry.getValue() + "ms (" + (entry.getValue() * 100 / totalTime) + "%)");
             }
-            if (worldInitListener != null) {
-                this.getServer().getLogger()
-                        .info("Map of chunks: " + worldInitListener.getCustomBiomeSource().getBiomesPlaced().entrySet().stream()
-                                .sorted((a, b) -> Long.compare(b.getValue(), a.getValue()))
-                                .map(entry -> entry.getKey() + ": " + entry.getValue()).reduce((a, b) -> a + ", " + b).orElse(""));
-            }
+            Map<String, Long> biomesPlaced = worldInitListener != null ? worldInitListener.getCustomBiomeSource().getBiomesPlaced()
+                    : UnderillaChunkGenerator.getBiomesPlaced();
+            this.getServer().getLogger()
+                    .info("Map of chunks: " + biomesPlaced.entrySet().stream().sorted((a, b) -> Long.compare(b.getValue(), a.getValue()))
+                            .map(entry -> entry.getKey() + ": " + entry.getValue()).reduce((a, b) -> a + ", " + b).orElse(""));
         } catch (Exception e) {
             this.getServer().getLogger().info("Fail to print times or biomes placed.");
             e.printStackTrace();

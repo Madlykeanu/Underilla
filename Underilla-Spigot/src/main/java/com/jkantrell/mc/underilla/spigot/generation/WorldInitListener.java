@@ -28,7 +28,12 @@ public class WorldInitListener implements Listener {
 
     @EventHandler
     public void onWorldInit(WorldInitEvent event) {
-        Underilla.getInstance().getLogger().info("Preparing to take over the world: " + event.getWorld().getName());
+        if (!Underilla.CONFIG.customBiomeEnabled){
+            Underilla.getInstance().getLogger().info("Custom biome is disabled, no need to take over the world: " + event.getWorld().getName());
+            return;
+        }
+
+        Underilla.getInstance().getLogger().info("Preparing to take over the world: " + event.getWorld().getName()+" to use custom biome source");
         CraftWorld craftWorld = (CraftWorld) event.getWorld();
         ServerLevel serverLevel = craftWorld.getHandle();
 

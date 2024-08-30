@@ -62,8 +62,7 @@ public class CustomBiomeSource extends BiomeSource implements java.util.function
         x = x << 2;
         y = y << 2;
         z = z << 2;
-        if (vanillaBiome != null && (!Underilla.CONFIG.transferBiomes
-                || Underilla.CONFIG.keptUndergroundBiomes.contains(vanillaBiome.getRegisteredName()))) {
+        if (vanillaBiome != null && (!Underilla.CONFIG.transferBiomes)) {
             info("Use vanillaBiome because we don't transfer biome or it's a keptUndergroundBiomes: " + vanillaBiome.getRegisteredName()
                     + " at " + x + " " + y + " " + z);
             String key = "noise:" + vanillaBiome.getRegisteredName();
@@ -71,7 +70,7 @@ public class CustomBiomeSource extends BiomeSource implements java.util.function
             return vanillaBiome;
         }
 
-        // Get biome from cave world if it's in the list of keptUndergroundBiomes.
+        // Get biome from cave world if it's in the list of transferWorldFromCavesWorld.
         if (Underilla.CONFIG.transferWorldFromCavesWorld && worldCavesReader != null) {
             BukkitBiome cavesBiome = (BukkitBiome) worldCavesReader.biomeAt(x, y, z).orElse(null);
             if (cavesBiome != null && Underilla.CONFIG.transferCavesWorldBiomes.contains(cavesBiome.getName())) {
