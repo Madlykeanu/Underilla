@@ -6,11 +6,13 @@ import java.util.Optional;
 import java.util.Random;
 import org.bukkit.HeightMap;
 import org.bukkit.World;
+import org.bukkit.block.Biome;
 import org.bukkit.generator.BiomeProvider;
 import org.bukkit.generator.BlockPopulator;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.generator.LimitedRegion;
 import org.bukkit.generator.WorldInfo;
+import org.jetbrains.annotations.NotNull;
 import com.jkantrell.mc.underilla.core.api.HeightMapType;
 import com.jkantrell.mc.underilla.core.generation.Generator;
 import com.jkantrell.mc.underilla.core.reader.ChunkReader;
@@ -114,7 +116,22 @@ public class UnderillaChunkGenerator extends ChunkGenerator {
 
     // To support custom biomes, we can't use bukkit biome provider. So biome merging is done in CustomBiomeSource.
     @Override
-    public BiomeProvider getDefaultBiomeProvider(@Nonnull WorldInfo worldInfo) { return null; }
+    public BiomeProvider getDefaultBiomeProvider(@Nonnull WorldInfo worldInfo) {
+        // TODO if surface map biome is a vanilla biome, use it there. This way most of the user will have structure well placed.
+        // TODO Mvndi patch, if biome name contains "beach" return beach biome, if biome names contains "ocean" but not "deep" return ocean.
+        // This way we will have shipwrecks well placed.
+        return new BiomeProvider() {
+            @Override
+            public @NotNull Biome getBiome(@NotNull WorldInfo worldInfo, int x, int y, int z) {
+                return Biome.DESERT;
+            }
+
+            @Override
+            public @NotNull List<Biome> getBiomes(@NotNull WorldInfo worldInfo) { 
+                return List.of(Biome.DESERT);
+            }
+        };    
+    }
 
 
     // CLASSES

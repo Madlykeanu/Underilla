@@ -33,9 +33,9 @@ public class GenerationConfig {
 
     public List<String> keptReferenceWorldBlocks = Collections.emptyList();
 
-    public List<? extends Biome> preserveBiomes = Collections.emptyList();
+    public List<String> preserveBiomes = Collections.emptyList();
 
-    public List<? extends Biome> ravinBiomes = Collections.emptyList();
+    public List<String> ravinBiomes = Collections.emptyList();
 
     public int mergeLimit = 22;
 

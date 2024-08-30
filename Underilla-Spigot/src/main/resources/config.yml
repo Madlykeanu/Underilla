@@ -23,13 +23,14 @@ transfered_caves_world_biomes:
   - "DRIPSTONE_CAVES"
   - "DEEP_DARK"
 
+customBiomeEnabled: false
 
 # How to merge vanilla and reference worlds.
-#   - RELATIVE: At a given depth based on terrain height and air pockets at every X and Z coordinates.
+#   - RELATIVE: At a given depth based on terrain height and air pockets at every X and Z coordinates. @Deprecated
 #   - SURFACE: At a fixed Y height based on custom world terrain height.
 #   - ABSOLUTE: At a fixed Y height.
 #   - NONE: Just... don't merge. Reference world will be re-generated without vanilla underground.
-strategy: "RELATIVE"
+strategy: "SURFACE"
 
 # RELATIVE strategy exclusive settings
 relative:

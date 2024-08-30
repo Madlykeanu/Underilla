@@ -14,6 +14,10 @@ public class StructureEventListener implements Listener {
 
     @EventHandler
     public void onStructureSpawn(AsyncStructureSpawnEvent e) {
+        // Location location = e.getWorld().getBlockAt(e.getChunkX() * 16, 0, e.getChunkZ() * 16).getLocation();
+        // String biomeKey = NMSBiomeUtils.getBiomeKey(location).toString();
+        // Underilla.getInstance().getLogger().info("Structure spawned ? " + !this.blackList.contains(e.getStructure()) + " : "
+        //         + e.getStructure().getStructureType().getKey().toString() + " on biome " + biomeKey + " at location " + location);
         if (this.blackList.contains(e.getStructure())) {
             e.setCancelled(true);
         }

@@ -13,7 +13,7 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.biome.Climate.Sampler;
 
-public class CustomBiomeSource extends BiomeSource implements java.util.function.Supplier {
+public class CustomBiomeSource extends BiomeSource implements java.util.function.Supplier<Set<Holder<Biome>>> {
     private final BiomeSource vanillaBiomeSource;
     private final BukkitWorldReader worldSurfaceReader;
     private final BukkitWorldReader worldCavesReader;
@@ -32,18 +32,18 @@ public class CustomBiomeSource extends BiomeSource implements java.util.function
 
     // @Override
     // protected MapCodec<? extends BiomeSource> codec() {
-    // try {
-    // Method method = BiomeSource.class.getDeclaredMethod("codec");
-    // method.setAccessible(true);
-    // return (MapCodec<? extends BiomeSource>) method.invoke(vanillaBiomeSource);
-    // } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-    // Underilla.getInstance().getLogger().warning("Failed to get codec field from BiomeSource");
-    // e.printStackTrace();
-    // return null;
-    // }
+    //     try {
+    //         Method method = BiomeSource.class.getDeclaredMethod("codec");
+    //         method.setAccessible(true);
+    //         return (MapCodec<? extends BiomeSource>) method.invoke(vanillaBiomeSource);
+    //     } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+    //     Underilla.getInstance().getLogger().warning("Failed to get codec field from BiomeSource");
+    //     e.printStackTrace();
+    //     return null;
+    //     }
     // }
     @Override
-    protected MapCodec<? extends BiomeSource> codec() { throw new UnsupportedOperationException("Not supported"); }
+    protected MapCodec<? extends BiomeSource> codec() { return null; }
 
     @Override
     protected Stream<Holder<Biome>> collectPossibleBiomes() {

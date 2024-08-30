@@ -101,8 +101,8 @@ public class Config extends AbstractYamlConfig {
         r.mergeDepth = this.mergeDepth;
         r.keptUndergroundBiomes = this.keptUndergroundBiomes.stream().map(BukkitBiome::new).toList();
         r.keptReferenceWorldBlocks = this.keptReferenceWorldBlocks;
-        r.preserveBiomes = this.preserveBiomes.stream().map(BukkitBiome::new).toList();
-        r.ravinBiomes = this.ravinBiomes.stream().map(BukkitBiome::new).toList();
+        r.preserveBiomes = this.preserveBiomes;
+        r.ravinBiomes = this.ravinBiomes;
         r.mergeLimit = this.mergeLimit;
         r.mergeBlendRange = this.mergeBlendRange;
         r.generateStructures = this.generateStructures;

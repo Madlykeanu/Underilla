@@ -8,11 +8,11 @@ import org.bukkit.event.world.WorldInitEvent;
 import com.jkantrell.mc.underilla.spigot.Underilla;
 import com.jkantrell.mc.underilla.spigot.impl.BukkitWorldReader;
 import com.jkantrell.mc.underilla.spigot.impl.CustomBiomeSource;
+import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.chunk.status.WorldGenContext;
-import sun.misc.Unsafe;
 
 public class WorldInitListener implements Listener {
     private final BukkitWorldReader worldSurfaceReader;
@@ -37,6 +37,7 @@ public class WorldInitListener implements Listener {
         ChunkGenerator vanilla = serverLevel.getChunkSource().getGenerator();
         BiomeSource vanillaBiomeSource = vanilla.getBiomeSource();
         customBiomeSource = new CustomBiomeSource(vanillaBiomeSource, worldSurfaceReader, worldCavesReader);
+        // ChunkGenerator underillaChunkGenerator = new NMSExtendedChunkGenerator(vanilla, customBiomeSource);
 
         // Before 1.21 this was working.
         // serverLevel.getChunkSource().chunkMap.generator = new NMSExtendedChunkGenerator(vanilla, customBiomeSource);
@@ -45,22 +46,57 @@ public class WorldInitListener implements Listener {
         // Next steps is based on :
         // https://github.com/VolmitSoftware/Iris/blob/master/nms/v1_21_R1/src/main/java/com/volmit/iris/core/nms/v1_21_R1/NMSBinding.java#L491
         try {
-            var chunkMap = serverLevel.getChunkSource().chunkMap;
-            var worldGenContextField = getField(chunkMap.getClass(), WorldGenContext.class);
+            // Edit biome source that will be generated at generation chunk step.
+            ChunkMap chunkMap = serverLevel.getChunkSource().chunkMap;
+            Field worldGenContextField = getField(chunkMap.getClass(), WorldGenContext.class);
             worldGenContextField.setAccessible(true);
-            var worldGenContext = (WorldGenContext) worldGenContextField.get(chunkMap);
+            WorldGenContext worldGenContext = (WorldGenContext) worldGenContextField.get(chunkMap);
             Class<?> clazz = worldGenContext.generator().getClass();
-            Field biomeSource = getField(clazz, BiomeSource.class);
-            biomeSource.setAccessible(true);
-            Field unsafeField = Unsafe.class.getDeclaredField("theUnsafe");
-            unsafeField.setAccessible(true);
-            Unsafe unsafe = (Unsafe) unsafeField.get(null);
-            unsafe.putObject(biomeSource.get(worldGenContext.generator()), unsafe.objectFieldOffset(biomeSource), customBiomeSource);
-            biomeSource.set(worldGenContext.generator(), customBiomeSource);
+            Field biomeSourceField = getField(clazz, BiomeSource.class);
+            biomeSourceField.setAccessible(true);
+            sun.misc.Unsafe unsafe = getUnsafe();
+            unsafe.putObject(biomeSourceField.get(worldGenContext.generator()), unsafe.objectFieldOffset(biomeSourceField),
+                    customBiomeSource);
+            biomeSourceField.set(worldGenContext.generator(), customBiomeSource);
+
+            // // Edit biome source that is used by StructureCheck (& StructureManager.structureCheck).
+            // Field structureCheckField = getField(serverLevel.getClass(), StructureCheck.class);
+            // // set public
+            // structureCheckField.setAccessible(true);
+            // StructureCheck structureCheck = (StructureCheck) structureCheckField.get(serverLevel);
+            // Field biomeSourceStructureCheck = getField(structureCheck.getClass(), BiomeSource.class);
+            // // public
+            // biomeSourceStructureCheck.setAccessible(true);
+
+            // // Edit value even if it's final.
+            // unsafe = getUnsafe();
+            // unsafe.putObject(biomeSourceStructureCheck.get(structureCheck), unsafe.objectFieldOffset(biomeSourceStructureCheck),
+            //         customBiomeSource);
+            // biomeSourceStructureCheck.set(structureCheck, customBiomeSource);
+
+            // Field structureManagerField = getField(serverLevel.getClass(), net.minecraft.world.level.StructureManager.class);
+            // structureManagerField.setAccessible(true);
+            // Field structureCheckInStructureManager = getField(structureManagerField.getType(), StructureCheck.class);
+            // structureCheckInStructureManager.setAccessible(true);
+            // unsafe = getUnsafe();
+            // unsafe.putObject(structureCheckInStructureManager.get(structureManagerField.get(serverLevel)),
+            //         unsafe.objectFieldOffset(structureCheckInStructureManager), structureCheck);
+            // structureCheckInStructureManager.set(structureManagerField.get(serverLevel), structureCheck);
+
+
         } catch (Exception e) {
             Underilla.getInstance().getLogger().warning("Failed to set custom biome source");
             e.printStackTrace();
         }
+
+
+    }
+
+    // Helper method to get the Unsafe instance
+    private static sun.misc.Unsafe getUnsafe() throws Exception {
+        Field unsafeField = sun.misc.Unsafe.class.getDeclaredField("theUnsafe");
+        unsafeField.setAccessible(true);
+        return (sun.misc.Unsafe) unsafeField.get(null);
     }
 
     private static Field getField(Class<?> clazz, Class<?> fieldType) throws NoSuchFieldException {

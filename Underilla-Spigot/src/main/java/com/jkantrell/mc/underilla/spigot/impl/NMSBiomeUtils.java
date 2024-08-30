@@ -39,14 +39,6 @@ public class NMSBiomeUtils {
         return ResourceLocation.fromNamespaceAndPath(t[0], t[1]);
     }
 
-    // public static org.bukkit.block.Biome getBukkitBiome(String key) {
-    // try {
-    // // org.bukkit.block.Biome biome = org.bukkit.block.Biome.valueOf(key.split|.toUpperCase());
-    // } catch (Exception e) {
-    // Underilla.getInstance().getLogger().warning("Failed to get Bukkit biome for key: " + key);
-    // return org.bukkit.block.Biome.PLAINS;
-    // }
-    // }
     // Convert between Minecraft and Bukkit biomes
     // minecraft to bukkit don't work with custom biomes.
     public static org.bukkit.block.Biome minecraftToBukkit(Biome minecraft) { return CraftBiome.minecraftToBukkit(minecraft); }
