@@ -1,7 +1,6 @@
 package com.jkantrell.mc.underilla.core.generation;
 
 import java.util.List;
-import com.jkantrell.mc.underilla.core.api.Biome;
 import com.jkantrell.mc.underilla.core.api.Block;
 import com.jkantrell.mc.underilla.core.api.ChunkData;
 import com.jkantrell.mc.underilla.core.reader.ChunkReader;
@@ -16,12 +15,13 @@ class AbsoluteMerger implements Merger {
 
     // FIELDS
     private final int height_;
-    private final List<? extends Biome> preserveBiomes_, ravinBiomes_;
+    private final List<String> preserveBiomes_;
+    private final List<String> ravinBiomes_;
     private final List<String> keptReferenceWorldBlocks_;
     private final int mergeDepth_;
 
     // CONSTRUCTORS
-    AbsoluteMerger(int height, List<? extends Biome> preserveBiomes, List<? extends Biome> ravinBiomes,
+    AbsoluteMerger(int height, List<String> preserveBiomes, List<String> ravinBiomes,
             List<String> keptReferenceWorldBlocks, int mergeDepth) {
         this.height_ = height;
         this.preserveBiomes_ = preserveBiomes;
@@ -32,11 +32,6 @@ class AbsoluteMerger implements Merger {
 
 
     // IMPLEMENTATIONS
-    // @Override
-    // public void merge(ChunkReader reader, ChunkData chunkData) {
-    // this.mergeLand(reader, chunkData);
-    // // this.mergeBiomes(reader, chunkData); // No need to set biome for chunk. It's done by the generator.
-    // }
     @Override
     public void mergeLand(ChunkReader reader, ChunkData chunkData, @Nullable ChunkReader cavesReader) {
         long startTime = System.currentTimeMillis();
@@ -101,15 +96,10 @@ class AbsoluteMerger implements Merger {
     /** return the 1st block mergeDepth_ blocks under surface or heigth_ */
     private int getLowerBlockToRemove(Reader reader, int x, int z, Block defaultBlock) {
         int lbtr = this.height_ + mergeDepth_;
-        while (!reader.blockAt(x, lbtr, z).orElse(defaultBlock).isSolid() && lbtr > -64) {
+        while (!reader.blockAt(x, lbtr, z).orElse(defaultBlock).isSolidAndSurfaceBlock() && lbtr > -64) {
             lbtr--;
         }
         return lbtr - mergeDepth_;
-    }
-
-    @Override
-    public void mergeBiomes(ChunkReader reader, ChunkData chunkData) {
-        // No need to set biome for chunk. It's done by the generator.
     }
 
 
@@ -126,11 +116,11 @@ class AbsoluteMerger implements Merger {
     }
     /** Return true if this biome need to be only custom world */
     private boolean isPreservedBiome(ChunkReader reader, Vector<Integer> v) {
-        return this.preserveBiomes_.contains(reader.biomeAt(v).orElse(null));
+        return this.preserveBiomes_.contains(reader.biomeAt(v).orElseThrow().getName());
     }
 
     private boolean isRavinBiome(ChunkReader reader, Vector<Integer> v) {
-        return this.ravinBiomes_.contains(reader.biomeAt(v).orElse(null));
+        return this.ravinBiomes_.contains(reader.biomeAt(v).orElseThrow().getName());
     }
 
     /** Return true if all the collumn is air. */

@@ -27,14 +27,15 @@ public class RelativeMerger implements Merger {
     // FIELDS
     private final WorldReader worldReader_;
     private final int upperLimit_, lowerLimit_, depth_, blendRange_;
-    private final List<? extends Biome> keptBiomes_, preserveBiomes_;
+    private final List<? extends Biome> keptBiomes_;
+    private final List<String> preserveBiomes_;
     private final boolean keepReferenceWorldBlocks_;
     private final List<String> keptReferenceWorldBlocks_;
 
 
     // CONSTRUCTORS
     RelativeMerger(WorldReader worldReader, int upperLimit, int lowerLimit, int depth, int transitionRange,
-            List<? extends Biome> keptBiomes, List<? extends Biome> preservedBiomes, List<String> keptReferenceWorldBlocks) {
+            List<? extends Biome> keptBiomes, List<String> preservedBiomes, List<String> keptReferenceWorldBlocks) {
         this.worldReader_ = worldReader;
         this.upperLimit_ = upperLimit;
         this.lowerLimit_ = lowerLimit;
@@ -48,11 +49,6 @@ public class RelativeMerger implements Merger {
 
 
     // OVERWRITES
-    // @Override
-    // public void merge(ChunkReader reader, ChunkData chunkData) {
-    // this.mergeLand(reader, chunkData);
-    // this.mergeBiomes(reader, chunkData);
-    // }
     @Override
     public void mergeLand(ChunkReader reader, ChunkData chunkData, @Nullable ChunkReader cavesReader) {
         Function<Vector<Integer>, Block> blockGetter = v -> chunkData.getBlock(RelativeMerger.relativeCoordinates(v.clone()));
@@ -142,7 +138,8 @@ public class RelativeMerger implements Merger {
     }
     /** Return true if this biome need to be only custom world */
     private boolean isPreservedBiome(ChunkReader reader, Vector v) {
-        return this.preserveBiomes_.contains(reader.biomeAt(relativeCoordinates(v)).orElse(null));
+        // return this.preserveBiomes_.contains(reader.biomeAt(relativeCoordinates(v)).orElseThrow().getName());
+        return false;
     }
     /**
      * Return true if this block is a block to preserve from the custom world and a solid block in vanilla world (This avoid to have ores
@@ -153,40 +150,6 @@ public class RelativeMerger implements Merger {
      */
     private boolean isCustomWorldOreOutOfVanillaCaves(Block b, Block vanillaBlock) {
         return keptReferenceWorldBlocks_.contains(b.getName().toUpperCase()) && (vanillaBlock == null || vanillaBlock.isSolid());
-    }
-
-    @Override
-    public void mergeBiomes(ChunkReader reader, ChunkData chunkData) {
-
-        // Extracting all non-solid blocks from base chunk, and trunking them into 4x4x4 biome cells.
-        List<Vector<Integer>> cells = reader.locationsOf(m -> !m.isSolid()).stream().map(LocatedBlock::vector).peek(v -> {
-            v.setX(v.x() >> 2);
-            v.setY(v.y() >> 2);
-            v.setZ(v.z() >> 2);
-        }).distinct().toList();
-
-        // Using a spreader to map cells in a 3D grid
-        Spreader spreader = new Spreader().setContainer(0, chunkData.getMinHeight() >> 2, 0, 3, (chunkData.getMaxHeight() >> 2) - 1, 3)
-                .setRootVectors(cells).setIterationsAmount(1);
-        spreader.spread();
-
-        // Looping through every cell
-        VectorIterable i = new VectorIterable(0, 4, chunkData.getMinHeight() >> 2, chunkData.getMaxHeight() >> 2, 0, 4);
-        for (Vector<Integer> v : i) {
-            Biome b;
-            if (!spreader.isPresent(v)) {
-                int x = v.x() << 2, y = v.y() << 2, z = v.z() << 2;
-                b = chunkData.getBiome(x, y, z);
-                if (this.keptBiomes_.contains(b)) {
-                    continue;
-                }
-            }
-            b = reader.biomeAtCell(v).orElse(null);
-            if (b == null) {
-                continue;
-            }
-            chunkData.setBiome(v, b);
-        }
     }
 
 

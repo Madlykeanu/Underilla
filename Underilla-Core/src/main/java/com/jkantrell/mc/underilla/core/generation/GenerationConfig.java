@@ -21,7 +21,9 @@ public class GenerationConfig {
 
     public List<? extends Biome> transferCavesWorldBiomes = Collections.emptyList();
 
-    public MergeStrategy mergeStrategy = MergeStrategy.RELATIVE;
+    public boolean customBiomeEnabled = false;
+
+    public MergeStrategy mergeStrategy = MergeStrategy.SURFACE;
 
     public int mergeUpperLimit = 320;
 
@@ -29,13 +31,11 @@ public class GenerationConfig {
 
     public int mergeDepth = 12;
 
-    public List<? extends Biome> keptUndergroundBiomes = Collections.emptyList();
-
     public List<String> keptReferenceWorldBlocks = Collections.emptyList();
 
-    public List<? extends Biome> preserveBiomes = Collections.emptyList();
+    public List<String> preserveBiomes = Collections.emptyList();
 
-    public List<? extends Biome> ravinBiomes = Collections.emptyList();
+    public List<String> ravinBiomes = Collections.emptyList();
 
     public int mergeLimit = 22;
 
@@ -45,6 +45,7 @@ public class GenerationConfig {
 
     public boolean needToMixBiomes() {
         // true if we transfer biomes and we have kept underground biomes and we are using relative merge strategy
-        return this.transferBiomes && !this.keptUndergroundBiomes.isEmpty() && MergeStrategy.RELATIVE.equals(this.mergeStrategy);
+        // return this.transferBiomes && !this.keptUndergroundBiomes.isEmpty() && MergeStrategy.RELATIVE.equals(this.mergeStrategy);
+        return false;
     }
 }

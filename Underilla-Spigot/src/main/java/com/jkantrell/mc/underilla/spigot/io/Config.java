@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.List;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
-import org.bukkit.block.Biome;
 import org.bukkit.generator.structure.Structure;
 import com.jkantrell.mc.underilla.core.generation.GenerationConfig;
 import com.jkantrell.mc.underilla.core.generation.MergeStrategy;
@@ -45,10 +44,13 @@ public class Config extends AbstractYamlConfig {
     public String cavesWorldName = "caves_world";
 
     @ConfigField(path = "transfered_caves_world_biomes")
-    public List<Biome> transferCavesWorldBiomes = List.of(Biome.DEEP_DARK, Biome.DRIPSTONE_CAVES, Biome.LUSH_CAVES);
+    public List<String> transferCavesWorldBiomes = List.of("minecraft:deep_dark", "minecraft:dripstone_caves", "minecraft:lush_caves");
+
+    @ConfigField(path = "custom_biome_enabled")
+    public boolean customBiomeEnabled = false;
 
     @ConfigField(path = "strategy")
-    public MergeStrategy mergeStrategy = MergeStrategy.RELATIVE;
+    public MergeStrategy mergeStrategy = MergeStrategy.SURFACE;
 
     @ConfigField(path = "relative.upper_limit")
     public int mergeUpperLimit = 320;
@@ -59,23 +61,23 @@ public class Config extends AbstractYamlConfig {
     @ConfigField(path = "relative_and_surface.depth")
     public int mergeDepth = 12;
 
-    @ConfigField(path = "relative.kept_underground_biomes")
-    public List<Biome> keptUndergroundBiomes = List.of();
-
     @ConfigField(path = "kept_reference_world_blocks")
     public List<String> keptReferenceWorldBlocks = List.of();
 
     @ConfigField(path = "surface_and_absolute.limit")
     public int mergeLimit = 22;
 
+    @ConfigField(path = "ignored_block_for_surface_calculation")
+    public List<String> ignoredBlockForSurfaceCalculation = List.of("LEAVES", "LOGS");
+
     @ConfigField(path = "blend_range")
     public int mergeBlendRange = 8;
 
     @ConfigField(path = "preserve_biomes")
-    public List<Biome> preserveBiomes = List.of();
+    public List<String> preserveBiomes = List.of();
 
     @ConfigField(path = "ravin_biomes")
-    public List<Biome> ravinBiomes = List.of();
+    public List<String> ravinBiomes = List.of();
 
     @ConfigField(path = "structures.enabled")
     public boolean generateStructures = true;
@@ -97,10 +99,9 @@ public class Config extends AbstractYamlConfig {
         r.mergeUpperLimit = this.mergeUpperLimit;
         r.mergeLowerLimit = this.mergeLowerLimit;
         r.mergeDepth = this.mergeDepth;
-        r.keptUndergroundBiomes = this.keptUndergroundBiomes.stream().map(BukkitBiome::new).toList();
         r.keptReferenceWorldBlocks = this.keptReferenceWorldBlocks;
-        r.preserveBiomes = this.preserveBiomes.stream().map(BukkitBiome::new).toList();
-        r.ravinBiomes = this.ravinBiomes.stream().map(BukkitBiome::new).toList();
+        r.preserveBiomes = this.preserveBiomes;
+        r.ravinBiomes = this.ravinBiomes;
         r.mergeLimit = this.mergeLimit;
         r.mergeBlendRange = this.mergeBlendRange;
         r.generateStructures = this.generateStructures;
