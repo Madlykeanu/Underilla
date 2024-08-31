@@ -2,7 +2,6 @@ package com.jkantrell.mc.underilla.core.generation;
 
 import java.util.Collections;
 import java.util.List;
-import com.jkantrell.mc.underilla.core.api.Biome;
 
 public class GenerationConfig {
 
@@ -15,11 +14,13 @@ public class GenerationConfig {
 
     public boolean transferBiomes = true;
 
-    public boolean transferWorldFromCavesWorld = false;
+    public boolean transferBlocksFromCavesWorld = false;
+
+    public boolean transferBiomesFromCavesWorld = false;
 
     public String cavesWorldName = "caves_world";
 
-    public List<? extends Biome> transferCavesWorldBiomes = Collections.emptyList();
+    public List<String> transferCavesWorldBiomes = Collections.emptyList();
 
     public boolean customBiomeEnabled = false;
 

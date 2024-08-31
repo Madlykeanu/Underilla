@@ -8,6 +8,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.jkantrell.mc.underilla.core.generation.Generator;
 import com.jkantrell.mc.underilla.spigot.generation.UnderillaChunkGenerator;
 import com.jkantrell.mc.underilla.spigot.impl.BukkitWorldReader;
+import com.jkantrell.mc.underilla.spigot.impl.NMSBiomeUtils;
 import com.jkantrell.mc.underilla.spigot.io.Config;
 import com.jkantrell.mc.underilla.spigot.listener.StructureEventListener;
 import jakarta.annotation.Nullable;
@@ -32,13 +33,16 @@ public final class Underilla extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        // Setting default config
-        this.saveResource("config.yml", false);
+        // save default config
+        this.saveDefaultConfig();
 
         // Loading config
         Underilla.CONFIG.setFilePath(this.getDataFolder() + File.separator + "config.yml");
         try {
             Underilla.CONFIG.load();
+            Underilla.CONFIG.transferCavesWorldBiomes = NMSBiomeUtils.normalizeBiomeNameList(Underilla.CONFIG.transferCavesWorldBiomes);
+            Underilla.CONFIG.preserveBiomes = NMSBiomeUtils.normalizeBiomeNameList(Underilla.CONFIG.preserveBiomes);
+            Underilla.CONFIG.ravinBiomes = NMSBiomeUtils.normalizeBiomeNameList(Underilla.CONFIG.ravinBiomes);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -52,7 +56,7 @@ public final class Underilla extends JavaPlugin {
             e.printStackTrace();
         }
         // Loading caves world if we should use it.
-        if (Underilla.CONFIG.transferWorldFromCavesWorld) {
+        if (Underilla.CONFIG.transferBlocksFromCavesWorld || Underilla.CONFIG.transferBiomesFromCavesWorld) {
             try {
                 this.getServer().getLogger().info("Loading caves world");
                 this.worldCavesReader = new BukkitWorldReader(Underilla.CONFIG.cavesWorldName);

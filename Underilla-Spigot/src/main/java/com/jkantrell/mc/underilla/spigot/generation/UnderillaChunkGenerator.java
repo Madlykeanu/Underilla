@@ -70,7 +70,7 @@ public class UnderillaChunkGenerator extends ChunkGenerator {
         BukkitChunkData data = new BukkitChunkData(chunkData);
         // Bukkit.getLogger().info("Generating chunk [" + chunkX + ", " + chunkZ + "] from " + this.worldReader_.getWorldName() + ".");
         ChunkReader cavesReader = null;
-        if (this.worldCavesReader_ != null) {
+        if (this.worldCavesReader_ != null && CONFIG.transferBlocksFromCavesWorld) {
             cavesReader = this.worldCavesReader_.readChunk(chunkX, chunkZ).orElse(null);
         }
         this.delegate_.generateSurface(reader.get(), data, cavesReader);
@@ -172,10 +172,15 @@ public class UnderillaChunkGenerator extends ChunkGenerator {
 
     private class BiomeProviderFromFile extends BiomeProvider {
 
+        // TODO clean code by moving most of the common code with CustomBiomeSource in a common function.
         @Override
         public @Nonnull Biome getBiome(@Nonnull WorldInfo worldInfo, int x, int y, int z) {
+            BukkitBiome surfaceWorldBiome = (BukkitBiome) worldReader_.biomeAt(x, y, z).orElse(null);
+
             // If the cave world is enabled and the biome is in the list of transfered biomes, return the biome from the cave world.
-            if (worldCavesReader_ != null) {
+            if (worldCavesReader_ != null && CONFIG.transferBiomesFromCavesWorld
+                    && (surfaceWorldBiome == null || !Underilla.CONFIG.preserveBiomes.contains(surfaceWorldBiome.getName()))
+                    && y < Underilla.CONFIG.mergeLimit) {
                 BukkitBiome cavesWorldBiome = (BukkitBiome) worldCavesReader_.biomeAt(x, y, z).orElse(null);
                 if (cavesWorldBiome != null && CONFIG.transferCavesWorldBiomes.contains(cavesWorldBiome.getName())) {
                     Biome biome = cavesWorldBiome.getBiome();
@@ -185,7 +190,6 @@ public class UnderillaChunkGenerator extends ChunkGenerator {
                 }
             }
             // If there is a surface world biome, return it, else return plains.
-            BukkitBiome surfaceWorldBiome = (BukkitBiome) worldReader_.biomeAt(x, y, z).orElse(null);
             if (surfaceWorldBiome != null) {
                 Biome biome = surfaceWorldBiome.getBiome();
                 String key = "surface:" + surfaceWorldBiome.getName();
