@@ -98,12 +98,12 @@ If you are strugeling with world generation, you can ask for help on the Discord
 18. Rename your exported custom world to `world_base/`
 19. Download [Underilla latest release](https://github.com/HydrolienF/Underilla/releases) & place it in your `plugins/` directory.
 20. Open the `bukkit.yml` file in your server's root and add the following lines on top:
-   ```
-   worlds:
-     world:
-       generator: Underilla
-   ```
-   This will tell Paper to use Underilla's chunk generator.
+    ```
+    worlds:
+        world:
+            generator: Underilla
+    ```
+    This will tell Paper to use Underilla's chunk generator.
 21. Copy the [Underilla config](Underilla-Spigot/src/main/resources/config.yml) into `plugins/Underilla/config.yml`.
 22. Edit Underilla config by setting `transfer_biomes_from_caves_world: true`.
 23. Underilla config: Remove some transfered_caves_world_biomes if you don't want all of them.
