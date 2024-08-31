@@ -9,13 +9,7 @@ public class BukkitBiome implements Biome {
 
 
     // // CONSTRUCTORS
-    public BukkitBiome(String name) {
-        name = name.toLowerCase();
-        if (!name.contains(":")) {
-            name = "minecraft:" + name;
-        }
-        this.name = name;
-    }
+    public BukkitBiome(String name) { this.name = NMSBiomeUtils.normalizeBiomeName(name); }
 
 
     // GETTERS

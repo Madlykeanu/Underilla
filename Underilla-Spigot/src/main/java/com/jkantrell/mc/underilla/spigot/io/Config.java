@@ -7,7 +7,7 @@ import org.bukkit.Registry;
 import org.bukkit.generator.structure.Structure;
 import com.jkantrell.mc.underilla.core.generation.GenerationConfig;
 import com.jkantrell.mc.underilla.core.generation.MergeStrategy;
-import com.jkantrell.mc.underilla.spigot.impl.BukkitBiome;
+import com.jkantrell.mc.underilla.spigot.impl.NMSBiomeUtils;
 import com.jkantrell.yamlizer.yaml.AbstractYamlConfig;
 import com.jkantrell.yamlizer.yaml.ConfigField;
 import com.jkantrell.yamlizer.yaml.YamlElementType;
@@ -37,8 +37,11 @@ public class Config extends AbstractYamlConfig {
     @ConfigField(path = "transfer_biomes")
     public boolean transferBiomes = true;
 
-    @ConfigField(path = "transfer_world_from_caves_world")
-    public boolean transferWorldFromCavesWorld = false;
+    @ConfigField(path = "transfer_blocks_from_caves_world")
+    public boolean transferBlocksFromCavesWorld = false;
+
+    @ConfigField(path = "transfer_biomes_from_caves_world")
+    public boolean transferBiomesFromCavesWorld = false;
 
     @ConfigField(path = "caves_world")
     public String cavesWorldName = "caves_world";
@@ -92,16 +95,17 @@ public class Config extends AbstractYamlConfig {
         r.generateCaves = this.generateCaves;
         r.vanillaPopulation = this.vanillaPopulation;
         r.transferBiomes = this.transferBiomes;
-        r.transferWorldFromCavesWorld = this.transferWorldFromCavesWorld;
+        r.transferBlocksFromCavesWorld = this.transferBlocksFromCavesWorld;
+        r.transferBiomesFromCavesWorld = this.transferBiomesFromCavesWorld;
         r.cavesWorldName = this.cavesWorldName;
-        r.transferCavesWorldBiomes = this.transferCavesWorldBiomes.stream().map(BukkitBiome::new).toList();
+        r.transferCavesWorldBiomes = NMSBiomeUtils.normalizeBiomeNameList(this.transferCavesWorldBiomes);
         r.mergeStrategy = this.mergeStrategy;
         r.mergeUpperLimit = this.mergeUpperLimit;
         r.mergeLowerLimit = this.mergeLowerLimit;
         r.mergeDepth = this.mergeDepth;
         r.keptReferenceWorldBlocks = this.keptReferenceWorldBlocks;
-        r.preserveBiomes = this.preserveBiomes;
-        r.ravinBiomes = this.ravinBiomes;
+        r.preserveBiomes = NMSBiomeUtils.normalizeBiomeNameList(this.preserveBiomes);
+        r.ravinBiomes = NMSBiomeUtils.normalizeBiomeNameList(this.ravinBiomes);
         r.mergeLimit = this.mergeLimit;
         r.mergeBlendRange = this.mergeBlendRange;
         r.generateStructures = this.generateStructures;

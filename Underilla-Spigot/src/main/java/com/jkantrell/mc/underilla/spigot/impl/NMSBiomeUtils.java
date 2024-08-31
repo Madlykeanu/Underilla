@@ -1,5 +1,6 @@
 package com.jkantrell.mc.underilla.spigot.impl;
 
+import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -54,9 +55,20 @@ public class NMSBiomeUtils {
     public static org.bukkit.block.Biome getBukkitBiome(String name) {
         try {
             return org.bukkit.block.Biome.valueOf(name.split(":")[1].toUpperCase());
-        }catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             Underilla.getInstance().getLogger().warning("Failed to get Bukkit biome from " + name);
             return org.bukkit.block.Biome.PLAINS;
         }
+    }
+
+    public static String normalizeBiomeName(String name) {
+        name = name.toLowerCase();
+        if (!name.contains(":")) {
+            name = "minecraft:" + name;
+        }
+        return name;
+    }
+    public static List<String> normalizeBiomeNameList(List<String> nameList) {
+        return nameList.stream().map(NMSBiomeUtils::normalizeBiomeName).toList();
     }
 }

@@ -32,15 +32,15 @@ public class CustomBiomeSource extends BiomeSource implements java.util.function
 
     // @Override
     // protected MapCodec<? extends BiomeSource> codec() {
-    //     try {
-    //         Method method = BiomeSource.class.getDeclaredMethod("codec");
-    //         method.setAccessible(true);
-    //         return (MapCodec<? extends BiomeSource>) method.invoke(vanillaBiomeSource);
-    //     } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-    //     Underilla.getInstance().getLogger().warning("Failed to get codec field from BiomeSource");
-    //     e.printStackTrace();
-    //     return null;
-    //     }
+    // try {
+    // Method method = BiomeSource.class.getDeclaredMethod("codec");
+    // method.setAccessible(true);
+    // return (MapCodec<? extends BiomeSource>) method.invoke(vanillaBiomeSource);
+    // } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+    // Underilla.getInstance().getLogger().warning("Failed to get codec field from BiomeSource");
+    // e.printStackTrace();
+    // return null;
+    // }
     // }
     @Override
     protected MapCodec<? extends BiomeSource> codec() { return null; }
@@ -71,7 +71,7 @@ public class CustomBiomeSource extends BiomeSource implements java.util.function
         }
 
         // Get biome from cave world if it's in the list of transferWorldFromCavesWorld.
-        if (Underilla.CONFIG.transferWorldFromCavesWorld && worldCavesReader != null) {
+        if (Underilla.CONFIG.transferBiomesFromCavesWorld && worldCavesReader != null) {
             BukkitBiome cavesBiome = (BukkitBiome) worldCavesReader.biomeAt(x, y, z).orElse(null);
             if (cavesBiome != null && Underilla.CONFIG.transferCavesWorldBiomes.contains(cavesBiome.getName())) {
                 info("Use cavesBiome because it's a transferedCavesWorldBiomes: " + cavesBiome.getName() + " at " + x + " " + y + " " + z);
