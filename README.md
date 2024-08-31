@@ -41,7 +41,7 @@ Underilla is currently only implemented as a Paper plugin, so it runs only on Pa
 2. Download Underilla's `.jar`.
 3. Place Underilla's `.jar` file into the `./plugins` directory of your server. Create the folder if it doesn't exist already.
 4. Into the `./plugins` folder, create a new folder called `Underilla` and place a `config.yml` file in it. You may get the file from [this repo](Underilla-Spigot/src/main/resources/config.yml).
-5. Open the `bukkit.yml`file in your server's root and add the following lines on top:
+5. Open the `bukkit.yml` file in your server's root and add the following lines on top:
    ```
    worlds:
      world:
@@ -71,6 +71,49 @@ All tests have been done on paper 1.20.4 on a 1000*1000 map generation of the sa
 - Relative strategy 11:07 (6.94 times longer than Vanilla generation)
 
 For a 50000 * 30000 world, it would take 40 hours to generate with Minecraft vanilla generator, 113 hours in surface strategie and 279 hours in relative.
+
+### How to get the best caves as possibles
+This steps are longer than the instalation steps, but will allow you to avoid all the current limitation of the plugins witch are :
+- Chests & Spawners data aren't transfered from cave world.
+- Caves biomes are generated after the other biome.
+- Default Minecraft population will generate unwanted features.
+If you are strugeling with world generation, you can ask for help on the Discord: https://discord.gg/RPNbtRSFqG
+
+1. Download the last paper version [here](https://papermc.io/downloads/paper).
+2. Create a new repository for your server and move the paper .jar file incide.
+3. Start paper with `java -jar paper-*replace by paper last version*.jar -nogui`
+4. Server stops because of eula, open eula.txt, set `eula=true` and restart the server.
+5. You know have a vanilla ready to work server. But we still want to do some config change to make it faster for world generation. Stop the server.
+6. Increase the number of thread that will be used for parallel chunk generation by setting `worker-threads: x` in `config/paper-global.yml`. x = physical CPU cores - 1. Paper default value use half your physical CPU cores, witch is great in most case, but for generation it's faster to use almost all your CPU cores.
+7. Set a seed for your world by editing `servers.properties` `level-seed=x`. x = a random number. If you know it, use the same seed than your woldpainter world. This steps will make the world caves generate always the same way. It will be usefull to merge caves biomes into a new world witch have exacly the same cave shapes.
+8. Download [Chunky](https://hangar.papermc.io/pop4959/Chunky) and place it in your `plugins/` directory.
+9. Start your server.
+10. Get your custom map min and max X & Z coordinate.
+11. Select the area with Chunky from the server console `chunky corners minX minZ maxX maxZ`. (Replace min & max by the actual values.)
+12. Start the world generation with `chunky start`.
+13. Wait until world generation is over. World generation might takes hours or even days if your world is huge. You can do the 2 nexts steps while waiting for the world generation to be over.
+15. If you haven't export your Underilla world yet, export it with no water or lava underground, no ores, no caves and no underground special stone (diorite, gravel). We will let Minecraft generation take care of the underground. This might take hours, you can do the next steps while waiting.
+16. Create an empty datapack. Then add the vanilla biome files into your datapack and edit them to remove the unwanted features. You probably want to remove all trees if you have some in your custom world. If you don't, you will have vanilla tree & custom world tree on the final world.
+17. All previous steps need to be done here. Rename your `world` directory to `world_caves`. We will use this vanilla world to have caves biome in our final world.
+18. Rename your exported custom world to `world_base/`
+19. Download [Underilla latest release](https://github.com/HydrolienF/Underilla/releases) & place it in your `plugins/` directory.
+20. Open the `bukkit.yml` file in your server's root and add the following lines on top:
+   ```
+   worlds:
+     world:
+       generator: Underilla
+   ```
+   This will tell Paper to use Underilla's chunk generator.
+21. Copy the [Underilla config](Underilla-Spigot/src/main/resources/config.yml) into `plugins/Underilla/config.yml`.
+22. Edit Underilla config by setting `transfer_biomes_from_caves_world: true`.
+23. Underilla config: Remove some transfered_caves_world_biomes if you don't want all of them.
+24. Underilla config: Add ignored_block_for_surface_calculation if needed.
+25. Underilla config: Add blacklisted structures if needed.
+26. It's know time to merge your custom world surface and a vanilla world underground. Start Chunky again with the 2 same commands. Underilla world generation might takes hours or even days if your world is huge. *The magic happends now, Underilla generate default caves then add your custom world surface. Then mixt your custom world biomes & the caves biomes from `world_caves` onto the final world. Then add structures witch will be placed according to the new surface shape & the new biome mixt. Then add the features (tree, flower, ores, grass, gravel etc) according to your datapack. Then spawn mobs according to the new biome mixt.*
+27. Once the underilla generation is done, you should do a save of `world`, then check if you like it.
+28. You can now safely remove Underilla from the plugin and remove `world_caves` & `world_base`
+29. You can also remove Underilla from the `bukkit.yml` generator. You should replace it with [VoidWorldGenerator](https://github.com/HydrolienF/VoidWorldGenerator) to avoid any vanilla biome generation out of the Underilla world.
+
 
 ## Known issues
 
