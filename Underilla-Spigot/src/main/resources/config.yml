@@ -21,6 +21,7 @@ caves_world: "world_caves"
 # Witch biome to transfer from caves_world to the merged world.
 # Biomes must be defined as spigot Biome enum constants or as biome resource key for example `minecraft:plains`. https://hub.spigotmc.org/javadocs/spigot/org/bukkit/block/Biome.html
 # Caves world biomes won't be transferred in preserve_biomes.
+# Caves world won't be transferred over surface_and_absolute.limit.
 transfered_caves_world_biomes:
   - "LUSH_CAVES"
   - "DRIPSTONE_CAVES"

@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "com.jkantrell.mc.underilla.spigot"
-version = "1.6.0"
+version = "1.6.1"
 description="Generate vanilla cave in custom world."
 
 repositories {

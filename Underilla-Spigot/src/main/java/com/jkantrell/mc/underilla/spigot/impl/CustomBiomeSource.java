@@ -70,8 +70,16 @@ public class CustomBiomeSource extends BiomeSource implements java.util.function
             return vanillaBiome;
         }
 
+        // Needed tp get surface biome & test if caves biome will override a preserved biome.
+        BukkitBiome surfaceBiome = (BukkitBiome) worldSurfaceReader.biomeAt(x, y, z).orElse(null);
+
         // Get biome from cave world if it's in the list of transferWorldFromCavesWorld.
-        if (Underilla.CONFIG.transferBiomesFromCavesWorld && worldCavesReader != null) {
+        // & surface biome does not have a preserved biome here.
+        // & it's below the surface.
+        // TODO use the same function than the block generator to know if it's below the surface.
+        if (Underilla.CONFIG.transferBiomesFromCavesWorld && worldCavesReader != null
+                && (surfaceBiome == null || !Underilla.CONFIG.preserveBiomes.contains(surfaceBiome.getName()))
+                && y < Underilla.CONFIG.mergeLimit) {
             BukkitBiome cavesBiome = (BukkitBiome) worldCavesReader.biomeAt(x, y, z).orElse(null);
             if (cavesBiome != null && Underilla.CONFIG.transferCavesWorldBiomes.contains(cavesBiome.getName())) {
                 info("Use cavesBiome because it's a transferedCavesWorldBiomes: " + cavesBiome.getName() + " at " + x + " " + y + " " + z);
@@ -82,7 +90,6 @@ public class CustomBiomeSource extends BiomeSource implements java.util.function
         }
 
         // Get biome from surface world.
-        BukkitBiome surfaceBiome = (BukkitBiome) worldSurfaceReader.biomeAt(x, y, z).orElse(null);
         if (surfaceBiome != null) {
             info("Use surfaceBiome: " + surfaceBiome.getName() + " at " + x + " " + y + " " + z);
             biomesPlaced.put("surface:" + surfaceBiome.getName(), biomesPlaced.getOrDefault("surface:" + surfaceBiome.getName(), 0L) + 1);
