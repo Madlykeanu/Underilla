@@ -67,10 +67,6 @@ ignored_block_for_surface_calculation:
   - .*FENCE
   - ICE
 
-# The range the transition between vanilla and reference worlds takes, the wider, the smoother.
-# <= 0 results in a sharp transition.
-blend_range: 8
-
 # The biomes where vanilla underground will not be generated.
 # Biomes must be defined as spigot Biome enum constants or as biome resource key for example `minecraft:plains`. https://hub.spigotmc.org/javadocs/spigot/org/bukkit/block/Biome.html
 preserve_biomes: []

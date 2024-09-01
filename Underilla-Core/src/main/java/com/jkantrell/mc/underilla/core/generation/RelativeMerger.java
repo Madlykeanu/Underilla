@@ -26,7 +26,7 @@ public class RelativeMerger implements Merger {
 
     // FIELDS
     private final WorldReader worldReader_;
-    private final int upperLimit_, lowerLimit_, depth_, blendRange_;
+    private final int upperLimit_, lowerLimit_, depth_;
     private final List<? extends Biome> keptBiomes_;
     private final List<String> preserveBiomes_;
     private final boolean keepReferenceWorldBlocks_;
@@ -34,13 +34,12 @@ public class RelativeMerger implements Merger {
 
 
     // CONSTRUCTORS
-    RelativeMerger(WorldReader worldReader, int upperLimit, int lowerLimit, int depth, int transitionRange,
-            List<? extends Biome> keptBiomes, List<String> preservedBiomes, List<String> keptReferenceWorldBlocks) {
+    RelativeMerger(WorldReader worldReader, int upperLimit, int lowerLimit, int depth, List<? extends Biome> keptBiomes,
+            List<String> preservedBiomes, List<String> keptReferenceWorldBlocks) {
         this.worldReader_ = worldReader;
         this.upperLimit_ = upperLimit;
         this.lowerLimit_ = lowerLimit;
         this.depth_ = depth;
-        this.blendRange_ = transitionRange;
         this.keptBiomes_ = keptBiomes;
         this.preserveBiomes_ = preservedBiomes;
         this.keepReferenceWorldBlocks_ = !keptReferenceWorldBlocks.isEmpty();

@@ -73,9 +73,6 @@ public class Config extends AbstractYamlConfig {
     @ConfigField(path = "ignored_block_for_surface_calculation")
     public List<String> ignoredBlockForSurfaceCalculation = List.of("LEAVES", "LOGS");
 
-    @ConfigField(path = "blend_range")
-    public int mergeBlendRange = 8;
-
     @ConfigField(path = "preserve_biomes")
     public List<String> preserveBiomes = List.of();
 
@@ -107,7 +104,6 @@ public class Config extends AbstractYamlConfig {
         r.preserveBiomes = NMSBiomeUtils.normalizeBiomeNameList(this.preserveBiomes);
         r.ravinBiomes = NMSBiomeUtils.normalizeBiomeNameList(this.ravinBiomes);
         r.mergeLimit = this.mergeLimit;
-        r.mergeBlendRange = this.mergeBlendRange;
         r.generateStructures = this.generateStructures;
 
         return r;
