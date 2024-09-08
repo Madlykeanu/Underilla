@@ -56,7 +56,7 @@ public class CustomBiomeSource extends BiomeSource implements java.util.function
     @Override
     public Holder<Biome> getNoiseBiome(int x, int y, int z, @Nonnull Sampler noise) {
         // Keep biome from vanilla noise biome generation if it's in the list of keptUndergroundBiomes.
-        // TODO find a fix for cave biomes that are never kept here. (probably because Minecraft generate them in a different way)
+        // Cave biomes are never kept here from vanilla world, you need a cave world to keep them.
         Holder<Biome> vanillaBiome = vanillaBiomeSource.getNoiseBiome(x, y, z, noise);
         // Edit value to mach actual world coordinates.
         x = x << 2;
