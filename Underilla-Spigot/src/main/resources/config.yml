@@ -6,7 +6,7 @@ reference_world: "world_base"
 
 # Allow vanilla Minecraft engine to generate caves over reference world terrain.
 # This results in only perlin worms type caves. 1.18+ caves are generated only in vanilla underground.
-generate_noodle_caves: true
+generate_noodle_caves: false
 
 # Weather or not to transfer the reference world's biomes over to the merged world. IF false, only terrain is merged.
 transfer_biomes: true
