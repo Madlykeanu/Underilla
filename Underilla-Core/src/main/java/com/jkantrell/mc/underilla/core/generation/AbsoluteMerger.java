@@ -21,8 +21,8 @@ class AbsoluteMerger implements Merger {
     private final int mergeDepth_;
 
     // CONSTRUCTORS
-    AbsoluteMerger(int height, List<String> preserveBiomes, List<String> ravinBiomes,
-            List<String> keptReferenceWorldBlocks, int mergeDepth) {
+    AbsoluteMerger(int height, List<String> preserveBiomes, List<String> ravinBiomes, List<String> keptReferenceWorldBlocks,
+            int mergeDepth) {
         this.height_ = height;
         this.preserveBiomes_ = preserveBiomes;
         this.ravinBiomes_ = ravinBiomes;
@@ -33,11 +33,11 @@ class AbsoluteMerger implements Merger {
 
     // IMPLEMENTATIONS
     @Override
-    public void mergeLand(ChunkReader reader, ChunkData chunkData, @Nullable ChunkReader cavesReader) {
+    public void mergeLand(ChunkReader surfaceReader, ChunkData chunkData, @Nullable ChunkReader cavesReader) {
         long startTime = System.currentTimeMillis();
-        Block airBlock = reader.blockFromTag(MCAUtil.airBlockTag()).get();
+        Block airBlock = surfaceReader.blockFromTag(MCAUtil.airBlockTag()).get();
         // int airColumn = Math.max(reader.airSectionsBottom(), -64);
-        int airColumn = reader.airSectionsBottom();
+        int airColumn = surfaceReader.airSectionsBottom();
         chunkData.setRegion(0, airColumn, 0, 16, chunkData.getMaxHeight(), 16, airBlock);
 
         VectorIterable iterable = new VectorIterable(0, 16, -64, airColumn, 0, 16);
@@ -47,7 +47,7 @@ class AbsoluteMerger implements Merger {
         Generator.addTime("Create VectorIterable to merge land", startTime);
         for (Vector<Integer> v : iterable) {
             startTime = System.currentTimeMillis();
-            Block customBlock = reader.blockAt(v).orElse(airBlock);
+            Block customBlock = surfaceReader.blockAt(v).orElse(airBlock);
             Generator.addTime("Read block data from custom world", startTime);
             startTime = System.currentTimeMillis();
             Block vanillaBlock = cavesReader == null ? chunkData.getBlock(v) : cavesReader.blockAt(v).orElse(airBlock);
@@ -58,7 +58,7 @@ class AbsoluteMerger implements Merger {
             if (v.x() != lastX || v.z() != lastZ) {
                 lastX = v.x();
                 lastZ = v.z();
-                columnHeigth = (isPreservedBiome(reader, v) ? -64 : getLowerBlockToRemove(reader, v.x(), v.z(), airBlock));
+                columnHeigth = (isPreservedBiome(surfaceReader, v) ? -64 : getLowerBlockToRemove(surfaceReader, v.x(), v.z(), airBlock));
             }
             Generator.addTime("Calculate lower block to remove", startTime);
 
@@ -86,7 +86,7 @@ class AbsoluteMerger implements Merger {
             }
 
             // create ravines in biome that should have ravines
-            if (v.y() == columnHeigth && vanillaBlock.isAir() && isRavinBiome(reader, v) && isAirCollumn(chunkData, v, 30)) {
+            if (v.y() == columnHeigth && vanillaBlock.isAir() && isRavinBiome(surfaceReader, v) && isAirCollumn(chunkData, v, 30)) {
                 chunkData.setRegion(v.x(), columnHeigth, v.z(), v.x() + 1, airColumn, v.z() + 1, airBlock);
             }
             Generator.addTime("Merge block or not", startTime);
@@ -94,9 +94,9 @@ class AbsoluteMerger implements Merger {
     }
 
     /** return the 1st block mergeDepth_ blocks under surface or heigth_ */
-    private int getLowerBlockToRemove(Reader reader, int x, int z, Block defaultBlock) {
+    private int getLowerBlockToRemove(Reader surfaceReader, int x, int z, Block defaultBlock) {
         int lbtr = this.height_ + mergeDepth_;
-        while (!reader.blockAt(x, lbtr, z).orElse(defaultBlock).isSolidAndSurfaceBlock() && lbtr > -64) {
+        while (!surfaceReader.blockAt(x, lbtr, z).orElse(defaultBlock).isSolidAndSurfaceBlock() && lbtr > -64) {
             lbtr--;
         }
         return lbtr - mergeDepth_;

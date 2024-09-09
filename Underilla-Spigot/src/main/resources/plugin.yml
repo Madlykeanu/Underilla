@@ -1,5 +1,5 @@
 name: Underilla
-author: Jeshuakrc, Hydrolien
+authors: [ Jeshuakrc, Hydrolien ]
 version: '$version'
 main: ${group}.Underilla
 description: $description
