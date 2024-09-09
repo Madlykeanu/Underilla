@@ -1,11 +1,9 @@
 package com.jkantrell.mc.underilla.spigot.generation;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
-import org.bukkit.Bukkit;
 import org.bukkit.HeightMap;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
@@ -19,11 +17,11 @@ import com.jkantrell.mc.underilla.core.generation.Generator;
 import com.jkantrell.mc.underilla.core.reader.ChunkReader;
 import com.jkantrell.mc.underilla.core.reader.WorldReader;
 import com.jkantrell.mc.underilla.spigot.Underilla;
-import com.jkantrell.mc.underilla.spigot.impl.BukkitBiome;
 import com.jkantrell.mc.underilla.spigot.impl.BukkitChunkData;
 import com.jkantrell.mc.underilla.spigot.impl.BukkitRegionChunkData;
 import com.jkantrell.mc.underilla.spigot.impl.BukkitWorldInfo;
 import com.jkantrell.mc.underilla.spigot.impl.BukkitWorldReader;
+import com.jkantrell.mc.underilla.spigot.impl.CustomBiomeSource;
 import com.jkantrell.mc.underilla.spigot.io.Config;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
@@ -41,16 +39,16 @@ public class UnderillaChunkGenerator extends ChunkGenerator {
 
     // FIELDS
     private final Generator delegate_;
-    private final @Nonnull com.jkantrell.mc.underilla.core.reader.WorldReader worldReader_;
-    private final @Nullable com.jkantrell.mc.underilla.core.reader.WorldReader worldCavesReader_;
-    private static Map<String, Long> biomesPlaced = new HashMap<>();
+    private final @Nonnull com.jkantrell.mc.underilla.core.reader.WorldReader worldSurfaceReader;
+    private final @Nullable com.jkantrell.mc.underilla.core.reader.WorldReader worldCavesReader;
+    private static CustomBiomeSource customBiomeSource;
 
 
     // CONSTRUCTORS
-    public UnderillaChunkGenerator(@Nonnull BukkitWorldReader worldReader, @Nullable BukkitWorldReader worldCavesReader) {
-        this.worldReader_ = worldReader;
-        this.worldCavesReader_ = worldCavesReader;
-        this.delegate_ = new Generator(worldReader, CONFIG.toGenerationConfig());
+    public UnderillaChunkGenerator(@Nonnull BukkitWorldReader worldSurfaceReader, @Nullable BukkitWorldReader worldCavesReader) {
+        this.worldSurfaceReader = worldSurfaceReader;
+        this.worldCavesReader = worldCavesReader;
+        this.delegate_ = new Generator(worldSurfaceReader, CONFIG.toGenerationConfig());
     }
 
 
@@ -63,15 +61,15 @@ public class UnderillaChunkGenerator extends ChunkGenerator {
 
     @Override
     public void generateSurface(WorldInfo worldInfo, Random random, int chunkX, int chunkZ, ChunkData chunkData) {
-        Optional<ChunkReader> reader = this.worldReader_.readChunk(chunkX, chunkZ);
+        Optional<ChunkReader> reader = this.worldSurfaceReader.readChunk(chunkX, chunkZ);
         if (reader.isEmpty()) {
             return;
         }
         BukkitChunkData data = new BukkitChunkData(chunkData);
         // Bukkit.getLogger().info("Generating chunk [" + chunkX + ", " + chunkZ + "] from " + this.worldReader_.getWorldName() + ".");
         ChunkReader cavesReader = null;
-        if (this.worldCavesReader_ != null && CONFIG.transferBlocksFromCavesWorld) {
-            cavesReader = this.worldCavesReader_.readChunk(chunkX, chunkZ).orElse(null);
+        if (this.worldCavesReader != null && CONFIG.transferBlocksFromCavesWorld) {
+            cavesReader = this.worldCavesReader.readChunk(chunkX, chunkZ).orElse(null);
         }
         this.delegate_.generateSurface(reader.get(), data, cavesReader);
 
@@ -81,7 +79,7 @@ public class UnderillaChunkGenerator extends ChunkGenerator {
     @Override
     public List<BlockPopulator> getDefaultPopulators(World world) {
         // Caves are vanilla generated, but they are carved underwater, this re-places the water blocks in case they were carved into.
-        return List.of(new Populator(this.worldReader_, this.delegate_));
+        return List.of(new Populator(this.worldSurfaceReader, this.delegate_));
     }
 
     @Override
@@ -123,20 +121,21 @@ public class UnderillaChunkGenerator extends ChunkGenerator {
         // TODO Mvndi patch, if biome name contains "beach" return beach biome, if biome names contains "ocean" but not "deep" return ocean.
         // This way we will have shipwrecks well placed.
         if (Underilla.CONFIG.customBiomeEnabled) {
-            return null; // biomes will be set later in CustomBiomeSource. This won't place structures in the right biome. But features will
-                         // be in the right biome.
+            Underilla.getInstance().getLogger().info(
+                    "Custom biomes are enable. Structures won't be generate in the right biome. But features will be in the right biome.");
+            return null;
         } else if (!Underilla.CONFIG.transferBiomes) {
-            Bukkit.getLogger().info(
+            Underilla.getInstance().getLogger().info(
                     "Biome aren't transfered from the reference world. This will generate the world with the default biome provider.");
             return null;
         } else {
-            Bukkit.getLogger()
+            Underilla.getInstance().getLogger()
                     .info("Underilla Use the custom biome provider from file data. Structures will be generate in the right biome.");
             return new BiomeProviderFromFile();
         }
     }
 
-    public static Map<String, Long> getBiomesPlaced() { return biomesPlaced; }
+    public static Map<String, Long> getBiomesPlaced() { return customBiomeSource.getBiomesPlaced(); }
 
 
     // CLASSES
@@ -172,34 +171,14 @@ public class UnderillaChunkGenerator extends ChunkGenerator {
 
     private class BiomeProviderFromFile extends BiomeProvider {
 
-        // TODO clean code by moving most of the common code with CustomBiomeSource in a common function.
+        private BiomeProviderFromFile() {
+            customBiomeSource = new CustomBiomeSource(null, ((BukkitWorldReader) worldSurfaceReader),
+                    ((BukkitWorldReader) worldCavesReader));
+        }
+
         @Override
         public @Nonnull Biome getBiome(@Nonnull WorldInfo worldInfo, int x, int y, int z) {
-            BukkitBiome surfaceWorldBiome = (BukkitBiome) worldReader_.biomeAt(x, y, z).orElse(null);
-
-            // If the cave world is enabled and the biome is in the list of transfered biomes, return the biome from the cave world.
-            if (worldCavesReader_ != null && CONFIG.transferBiomesFromCavesWorld
-                    && (surfaceWorldBiome == null || !Underilla.CONFIG.preserveBiomes.contains(surfaceWorldBiome.getName()))
-                    && y < Underilla.CONFIG.mergeLimit) {
-                BukkitBiome cavesWorldBiome = (BukkitBiome) worldCavesReader_.biomeAt(x, y, z).orElse(null);
-                if (cavesWorldBiome != null && CONFIG.transferCavesWorldBiomes.contains(cavesWorldBiome.getName())) {
-                    Biome biome = cavesWorldBiome.getBiome();
-                    String key = "caves:" + cavesWorldBiome.getName();
-                    biomesPlaced.put(key, biomesPlaced.getOrDefault(key, 0L) + 1);
-                    return biome;
-                }
-            }
-            // If there is a surface world biome, return it, else return plains.
-            if (surfaceWorldBiome != null) {
-                Biome biome = surfaceWorldBiome.getBiome();
-                String key = "surface:" + surfaceWorldBiome.getName();
-                biomesPlaced.put(key, biomesPlaced.getOrDefault(key, 0L) + 1);
-                return biome;
-            } else {
-                String key = "notfound:minecraft:plains";
-                biomesPlaced.put(key, biomesPlaced.getOrDefault(key, 0L) + 1);
-                return Biome.PLAINS;
-            }
+            return customBiomeSource.getBiome(x, y, z, null).getBiome();
         }
 
         @Override

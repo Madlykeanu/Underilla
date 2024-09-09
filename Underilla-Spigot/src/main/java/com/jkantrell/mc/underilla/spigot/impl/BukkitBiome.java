@@ -1,8 +1,11 @@
 package com.jkantrell.mc.underilla.spigot.impl;
 
 import com.jkantrell.mc.underilla.core.api.Biome;
+import net.minecraft.core.Holder;
 
 public class BukkitBiome implements Biome {
+
+    public static final BukkitBiome DEFAULT = new BukkitBiome("minecraft:plains");
 
     // FIELDS
     private String name;
@@ -14,6 +17,10 @@ public class BukkitBiome implements Biome {
 
     // GETTERS
     public org.bukkit.block.Biome getBiome() { return NMSBiomeUtils.getBukkitBiome(this.name); }
+    public net.minecraft.world.level.biome.Biome getBiomeNMS() { return NMSBiomeUtils.getBiome(this.name); }
+    public Holder<net.minecraft.world.level.biome.Biome> getBiomeHolder() {
+        return NMSBiomeUtils.getBiomeRegistry().wrapAsHolder(getBiomeNMS());
+    }
 
 
     // IMPLEMENTATIONS
