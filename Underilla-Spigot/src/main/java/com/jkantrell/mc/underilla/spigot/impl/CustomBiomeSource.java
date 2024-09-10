@@ -43,12 +43,15 @@ public class CustomBiomeSource extends BiomeSource implements java.util.function
         return biomeRegistry.stream().map(biomeRegistry::wrapAsHolder);
     }
 
+    /**
+     * Get biome at x, y, z.
+     * 
+     * @param x Biome coordinate. (*4 to get world coordinate)
+     * @param y Biome coordinate. (*4 to get world coordinate)
+     * @param z Biome coordinate. (*4 to get world coordinate)
+     */
     @Override
-    public Holder<Biome> getNoiseBiome(int x, int y, int z, @Nonnull Sampler noise) { return getBiome(x, y, z, noise).getBiomeHolder(); }
-
-    public BukkitBiome getBiome(int x, int y, int z, @Nullable Sampler noise) {
-        // Keep biome from vanilla noise biome generation if it's in the list of keptUndergroundBiomes.
-        // Cave biomes are never kept here from vanilla world, you need a cave world to keep them.
+    public Holder<Biome> getNoiseBiome(int x, int y, int z, @Nonnull Sampler noise) {
         BukkitBiome vanillaBiome = null;
         if (vanillaBiomeSource != null && noise != null) {
             vanillaBiome = new BukkitBiome(vanillaBiomeSource.getNoiseBiome(x, y, z, noise).getRegisteredName());
@@ -57,6 +60,22 @@ public class CustomBiomeSource extends BiomeSource implements java.util.function
         x = x << 2;
         y = y << 2;
         z = z << 2;
+        return getBiome(x, y, z, vanillaBiome).getBiomeHolder();
+    }
+
+    /**
+     * Get biome at x, y, z.
+     * 
+     * @param x     Actual world coordinate.
+     * @param y     Actual world coordinate.
+     * @param z     Actual world coordinate.
+     * @param noise Noise used to get biome.
+     * @return
+     */
+    public BukkitBiome getBiome(int x, int y, int z, @Nullable BukkitBiome vanillaBiome) {
+
+        // Keep biome from vanilla noise biome generation if it's in the list of keptUndergroundBiomes.
+        // Cave biomes are never kept here from vanilla world, you need a cave world to keep them.
         if (!Underilla.CONFIG.transferBiomes) {
             if (vanillaBiome == null) {
                 warning("We can't use vanillaBiome because it's null at " + x + " " + y + " " + z);
