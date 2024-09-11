@@ -93,7 +93,7 @@ If you are strugeling with world generation, you can ask for help on the Discord
 12. Start the world generation with `chunky start`.
 13. Wait until world generation is over. World generation might takes hours or even days if your world is huge. You can do the 2 nexts steps while waiting for the world generation to be over.
 15. If you haven't export your Underilla world yet, export it with no water or lava underground, no ores, no caves and no underground special stone (diorite, gravel). We will let Minecraft generation take care of the underground. This might take hours, you can do the next steps while waiting.
-16. Create an empty datapack. Then add the vanilla biome files into your datapack and edit them to remove the unwanted features. You probably want to remove all trees if you have some in your custom world. If you don't, you will have vanilla tree & custom world tree on the final world.
+16. Create an empty datapack. Then add the vanilla biome files into your datapack and edit them to remove the unwanted features. You probably want to remove all trees if you have some in your custom world. If you don't, you will have vanilla tree & custom world tree on the final world. It is recommand to set the depth to 320 everywher to be sur that there will be caves where you have custom world moutains. See [UnderillaBaseDataPack].
 17. All previous steps need to be done here. Rename your `world` directory to `world_caves`. We will use this vanilla world to have caves biome in our final world.
 18. Rename your exported custom world to `world_base/`
 19. Download [Underilla latest release](https://github.com/HydrolienF/Underilla/releases) & place it in your `plugins/` directory.
