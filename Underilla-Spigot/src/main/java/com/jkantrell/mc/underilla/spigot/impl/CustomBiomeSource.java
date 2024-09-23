@@ -99,9 +99,9 @@ public class CustomBiomeSource extends BiomeSource implements java.util.function
         // & it's below the surface.
         if (Underilla.CONFIG.transferBiomesFromCavesWorld && worldCavesReader != null
                 && (surfaceWorldBiome == null || !Underilla.CONFIG.preserveBiomes.contains(surfaceWorldBiome.getName()))
-                // && y < Underilla.CONFIG.mergeLimit - Underilla.CONFIG.mergeDepth) {
-                    && y < 50) {
+                && y < Underilla.CONFIG.mergeLimit - Underilla.CONFIG.mergeDepth && y < 50) {
             // TODO use real surface height instead of the max one (mergeLimit - mergeDepth).
+            // For now there is as 50 hard max limits.
             BukkitBiome cavesWorldBiome = (BukkitBiome) worldCavesReader.biomeAt(x, y, z).orElse(null);
             if (cavesWorldBiome != null && Underilla.CONFIG.transferCavesWorldBiomes.contains(cavesWorldBiome.getName())) {
                 info("Use cavesWorldBiome because it's a transferedCavesWorldBiomes: " + cavesWorldBiome.getName() + " at " + x + " " + y
