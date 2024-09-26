@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "com.Jkantrell.mc"
-version = "1.6.5"
+version = "1.6.6"
 java.sourceCompatibility = JavaVersion.VERSION_21
 
 repositories {
