@@ -31,6 +31,8 @@ public class BukkitChunkReader extends ChunkReader {
         if (properties == null) {
             block = new BukkitBlock(m.createBlockData());
             return Optional.of(block);
+        } else {
+            block = null;
         }
 
         // IllegalArgumentException might be thrown if block data is not compatible with current version of Minecraft
@@ -40,6 +42,9 @@ public class BukkitChunkReader extends ChunkReader {
             // if (dataString != null && dataString.length() > 90) {
             // Underilla.getInstance().getLogger().info(dataString);
             // }
+            if (m.equals(Material.VINE)) {
+                dataString = removeVineDownProperty(dataString);
+            }
             block = new BukkitBlock(m.createBlockData(dataString));
         } catch (IllegalArgumentException e) {
             Underilla.getInstance().getLogger().warning("Failed to create block data " + m + ": " + e.getMessage());
@@ -48,6 +53,10 @@ public class BukkitChunkReader extends ChunkReader {
         }
         return Optional.of(block);
     }
+
+    // From minecraft:vine[west=false,east=false,up=false,south=false,down=false,north=true]
+    // To minecraft:vine[west=false,east=false,up=false,south=false,north=true]
+    private String removeVineDownProperty(String dataString) { return dataString.replace(",down=false", ""); }
 
     // [21:29:47 INFO]: [Underilla] [STDOUT] Loaded Block Entities:
     // {"type":"ListTag","value":{"type":"CompoundTag","list":[{"MaxNearbyEntities":{"type":"ShortTag","value":6},
