@@ -45,10 +45,11 @@ public class Generator {
             return 0;
         }
 
+        // From 320, while it's not check, go down.
         Predicate<Block> check = switch (heightMap) {
             case WORLD_SURFACE, WORLD_SURFACE_WG -> Block::isAir;
-            case OCEAN_FLOOR, OCEAN_FLOOR_WG, MOTION_BLOCKING -> Block::isSolid;
-            case MOTION_BLOCKING_NO_LEAVES -> b -> b.isSolid() || b.getName().toLowerCase().contains("leaves");
+            case OCEAN_FLOOR, OCEAN_FLOOR_WG, MOTION_BLOCKING -> block -> !block.isSolid();
+            case MOTION_BLOCKING_NO_LEAVES -> b -> (!b.isSolid() || b.getName().toLowerCase().contains("leaves"));
         };
         int y = chunkReader.airSectionsBottom();
         Block b, airBlock = chunkReader.blockFromTag(MCAUtil.airBlockTag()).get();
