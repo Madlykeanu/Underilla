@@ -74,7 +74,7 @@ For a 50000 * 30000 world, it would take 40 hours to generate with Minecraft van
 
 ### How to get the best caves as possibles
 This steps are longer than the instalation steps, but will allow you to avoid all the current limitation of the plugins witch are :
-- Chests & Spawners data aren't transfered from cave world.
+- Chests data aren't transfered from cave world.
 - Caves biomes are generated after the other biome.
 - Default Minecraft population will generate unwanted features.
 If you are strugeling with world generation, you can ask for help on the Discord: https://discord.gg/RPNbtRSFqG
