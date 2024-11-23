@@ -14,6 +14,10 @@ It's original purpose is adding vanilla caves to custom [WorldPainter](https://w
 
 ![Underilla](https://github.com/HydrolienF/Underilla/assets/71718798/5d4c0812-443e-42db-90cf-a138f11ec6c9)
 
+## Links
+Discord: https://discord.gg/RPNbtRSFqG
+Hangar: https://hangar.papermc.io/Hydrolien/Underilla
+Original plugin repo: https://github.com/Jeshuakrc/Underilla
 
 ## Main features
 - 4 merging strategies:
