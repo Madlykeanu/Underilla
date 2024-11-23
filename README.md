@@ -124,6 +124,7 @@ If you are strugeling with world generation, you can ask for help on the Discord
 - Underilla's generation disables Minecraft's chunk blender, which means there will be sharp old-school chunk borders at the edge of the reference world's chunks. This may be tackled by trimming your custom world chunks around the edges to generate blended chunks ahead of time.
 - Due to Spigot's generation API, outside the reference world's area, heightmaps are broken, which has an impact on structures. You may work around this by pre-generating the whole reference world area, and then disabling Underilla.
 - **Relative strategy only:** Little underground lava and water pockets will translate to odd floating blobs in the final world if they overlap with large caves. Avoid such generation patterns.
+- Olds map before 1.19 won't be load by Underilla. To use an old map, generate the full map without Underilla in the right version, then use the generated map. This will let minecraft update the map files and Underilla will be able to read them as expected.
 
 ## WorldPainter considerations
 If you're going to plug your custom WorldPainter world into Underilla, consider before exporting:
