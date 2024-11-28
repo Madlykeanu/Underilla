@@ -3,7 +3,7 @@ plugins {
     id("io.github.goooler.shadow") version "8.1.7"
     id("io.papermc.paperweight.userdev") version "1.7.1" // paperweight // Check for new versions at https://plugins.gradle.org/plugin/io.papermc.paperweight.userdev
     `maven-publish` // Add ./gradlew publishToMavenLocal
-    id("xyz.jpenilla.run-paper") version "2.3.0"
+    id("xyz.jpenilla.run-paper") version "2.3.1"
 }
 
 group = "com.jkantrell.mc.underilla.spigot"
