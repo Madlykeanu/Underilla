@@ -7,13 +7,14 @@
 [ ![download][] ][downloadLink]
 [ ![discord-shield][] ][discord-invite]
 
+[**Discord**](https://discord.gg/RPNbtRSFqG) | [**Hangar**](https://hangar.papermc.io/Hydrolien/Underilla) | [**GitHub**](https://github.com/HydrolienF/Underilla) | [**Original author Github** (Outdated)](https://github.com/Jeshuakrc/Underilla)
+
 # Underilla
 Underilla is a Paper based plugin for Minecraft Servers to 'merge' existing custom Minecraft word surfaces and vanilla undergrounds. It works by allowing the vanilla generation engine create chunks as normal, then intercepting the generator and forcing the surface of the original world, which works as a reference. In oder worlds, Underilla generates a brand-new world with vanilla undergrounds, but cloning the surface of an already existing world.
 
 It's original purpose is adding vanilla caves to custom [WorldPainter](https://www.worldpainter.net/) worlds, but it would perfectly work for any pre-generated world.
 
 ![Underilla](https://github.com/HydrolienF/Underilla/assets/71718798/5d4c0812-443e-42db-90cf-a138f11ec6c9)
-
 
 ## Main features
 - 4 merging strategies:
@@ -120,6 +121,7 @@ If you are strugeling with world generation, you can ask for help on the Discord
 - Underilla's generation disables Minecraft's chunk blender, which means there will be sharp old-school chunk borders at the edge of the reference world's chunks. This may be tackled by trimming your custom world chunks around the edges to generate blended chunks ahead of time.
 - Due to Spigot's generation API, outside the reference world's area, heightmaps are broken, which has an impact on structures. You may work around this by pre-generating the whole reference world area, and then disabling Underilla.
 - **Relative strategy only:** Little underground lava and water pockets will translate to odd floating blobs in the final world if they overlap with large caves. Avoid such generation patterns.
+- Olds map before 1.19 won't be load by Underilla. To use an old map, generate the full map without Underilla in the right version, then use the generated map. This will let minecraft update the map files and Underilla will be able to read them as expected.
 
 ## WorldPainter considerations
 If you're going to plug your custom WorldPainter world into Underilla, consider before exporting:
