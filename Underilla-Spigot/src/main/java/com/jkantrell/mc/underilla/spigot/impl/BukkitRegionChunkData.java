@@ -74,6 +74,6 @@ public class BukkitRegionChunkData implements ChunkData {
             return;
         }
         // this.region_.setBiome(this.absX_ + x, y, this.absZ_ + z, bukkitBiome.getBiome());
-        BiomeHelper.setCustomBiome(bukkitBiome.getName(), this.absX_ + x, y, this.absZ_ + z);
+        NMSBiomeUtils.setCustomBiome(bukkitBiome.getName(), this.absX_ + x, y, this.absZ_ + z);
     }
 }

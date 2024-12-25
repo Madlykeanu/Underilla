@@ -1,13 +1,13 @@
 plugins {
     `java-library`
     id("io.github.goooler.shadow") version "8.1.7"
-    id("io.papermc.paperweight.userdev") version "1.7.1" // paperweight // Check for new versions at https://plugins.gradle.org/plugin/io.papermc.paperweight.userdev
+    id("io.papermc.paperweight.userdev") version "2.0.0-beta.8" // paperweight // Check for new versions at https://plugins.gradle.org/plugin/io.papermc.paperweight.userdev
     `maven-publish` // Add ./gradlew publishToMavenLocal
     id("xyz.jpenilla.run-paper") version "2.3.1"
 }
 
 group = "com.jkantrell.mc.underilla.spigot"
-version = "1.6.6"
+version = "1.6.7"
 description="Generate vanilla cave in custom world."
 
 repositories {
@@ -22,7 +22,7 @@ repositories {
 
 dependencies {
     // compileOnly("io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT") // without paperweight
-    paperweight.paperDevBundle("1.21.1-R0.1-SNAPSHOT") // paperweight
+    paperweight.paperDevBundle("1.21.4-R0.1-SNAPSHOT") // paperweight
     implementation("com.jkantrell:Yamlizer:main-SNAPSHOT")
     implementation(project(":Underilla-Core"))
 }
@@ -71,7 +71,7 @@ tasks {
         // Configure the Minecraft version for our task.
         // This is the only required configuration besides applying the plugin.
         // Your plugin's jar (or shadowJar if present) will be used automatically.
-        minecraftVersion("1.21.1")
+        minecraftVersion("1.21.4")
     }
 }
 
