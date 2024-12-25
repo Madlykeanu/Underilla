@@ -28,10 +28,10 @@ public abstract class WorldReader implements Reader {
 
 
     // CONSTRUCTORS
-    public WorldReader(String worldPath) throws NoSuchFieldException { this(new File(worldPath)); }
-    public WorldReader(String worldPath, int cacheSize) throws NoSuchFieldException { this(new File(worldPath), cacheSize); }
-    public WorldReader(File worldDir) throws NoSuchFieldException { this(worldDir, 16); }
-    public WorldReader(File worldDir, int cacheSize) throws NoSuchFieldException {
+    protected WorldReader(String worldPath) throws NoSuchFieldException { this(new File(worldPath)); }
+    protected WorldReader(String worldPath, int cacheSize) throws NoSuchFieldException { this(new File(worldPath), cacheSize); }
+    protected WorldReader(File worldDir) throws NoSuchFieldException { this(worldDir, 16); }
+    protected WorldReader(File worldDir, int cacheSize) throws NoSuchFieldException {
         if (!(worldDir.exists() && worldDir.isDirectory())) {
             throw new NoSuchFieldException("World directory '" + worldDir.getPath() + "' does not exist.");
         }
