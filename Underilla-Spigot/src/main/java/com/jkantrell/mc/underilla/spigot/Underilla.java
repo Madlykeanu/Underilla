@@ -79,10 +79,12 @@ public final class Underilla extends JavaPlugin {
     @Override
     public void onDisable() {
         try {
-            long totalTime = Generator.times.entrySet().stream().mapToLong(Map.Entry::getValue).sum();
-            for (Map.Entry<String, Long> entry : Generator.times.entrySet()) {
-                this.getServer().getLogger()
-                        .info(entry.getKey() + " took " + entry.getValue() + "ms (" + (entry.getValue() * 100 / totalTime) + "%)");
+            if(Generator.times != null) {
+                long totalTime = Generator.times.entrySet().stream().mapToLong(Map.Entry::getValue).sum();
+                for (Map.Entry<String, Long> entry : Generator.times.entrySet()) {
+                    this.getServer().getLogger()
+                            .info(entry.getKey() + " took " + entry.getValue() + "ms (" + (entry.getValue() * 100 / totalTime) + "%)");
+                }
             }
             Map<String, Long> biomesPlaced = worldInitListener != null ? worldInitListener.getCustomBiomeSource().getBiomesPlaced()
                     : UnderillaChunkGenerator.getBiomesPlaced();
