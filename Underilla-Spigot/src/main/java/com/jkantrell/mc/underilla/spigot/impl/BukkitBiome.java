@@ -1,5 +1,6 @@
 package com.jkantrell.mc.underilla.spigot.impl;
 
+import fr.formiko.mc.biomeutils.NMSBiomeUtils;
 import com.jkantrell.mc.underilla.core.api.Biome;
 import net.minecraft.core.Holder;
 

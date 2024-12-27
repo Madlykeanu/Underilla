@@ -1,5 +1,6 @@
 package com.jkantrell.mc.underilla.spigot.io;
 
+import fr.formiko.mc.biomeutils.NMSBiomeUtils;
 import java.util.Collections;
 import java.util.List;
 import org.bukkit.NamespacedKey;
@@ -7,7 +8,6 @@ import org.bukkit.Registry;
 import org.bukkit.generator.structure.Structure;
 import com.jkantrell.mc.underilla.core.generation.GenerationConfig;
 import com.jkantrell.mc.underilla.core.generation.MergeStrategy;
-import com.jkantrell.mc.underilla.spigot.impl.NMSBiomeUtils;
 import com.jkantrell.yamlizer.yaml.AbstractYamlConfig;
 import com.jkantrell.yamlizer.yaml.ConfigField;
 import com.jkantrell.yamlizer.yaml.YamlElementType;

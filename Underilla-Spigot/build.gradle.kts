@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "com.jkantrell.mc.underilla.spigot"
-version = "1.6.7"
+version = "1.6.8"
 description="Generate vanilla cave in custom world."
 
 repositories {
@@ -25,6 +25,7 @@ dependencies {
     paperweight.paperDevBundle("1.21.4-R0.1-SNAPSHOT") // paperweight
     implementation("com.jkantrell:Yamlizer:main-SNAPSHOT")
     implementation(project(":Underilla-Core"))
+    implementation("fr.formiko.mc.biomeutils:biomeutils:1.1.8")
 }
 
 // tasks.build.dependsOn tasks.reobfJar // paperweight
@@ -44,6 +45,7 @@ tasks {
             "co.aikar",
             "org.bstats",
             "jakarta.annotation",
+            "fr.formiko.mc.biomeutils",
         ).forEach { pkg ->
             relocate(pkg, "$prefix.$pkg")
         }
