@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "com.jkantrell.mc.underilla.spigot"
-version = "1.6.11"
+version = "1.6.12"
 description="Generate vanilla cave in custom world."
 val mainMinecraftVersion = "1.21.3"
 val supportedMinecraftVersions = "[1.21.3 - 1.21.4]"
