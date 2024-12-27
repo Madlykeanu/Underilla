@@ -35,6 +35,13 @@ jobs:
           echo "Version: ${{ steps.version.outputs.version }}"
           echo "Release Name: ${{ steps.version.outputs.releaseName }}"
 
+
+      - name: Create an empty CHANGELOG.md if missing
+        run: |
+          if [ ! -f CHANGELOG.md ]; then
+            touch CHANGELOG.md
+          fi
+
       - name: Create Release
         id: createRelease
         uses: softprops/action-gh-release@v2
