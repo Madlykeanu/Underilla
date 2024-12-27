@@ -27,8 +27,8 @@ jobs:
       - name: Get version & release name
         id: version
         run: |
-          echo "version=$(./gradlew echoVersion)" >> $GITHUB_OUTPUT
-          echo "releaseName=$(./gradlew echoReleaseName)" >> $GITHUB_OUTPUT
+          echo "version=$(./gradlew -q echoVersion)" >> $GITHUB_OUTPUT
+          echo "releaseName=$(./gradlew -q echoReleaseName)" >> $GITHUB_OUTPUT
       
       - name: Print version & release name
         run: |
