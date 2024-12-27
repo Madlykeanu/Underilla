@@ -1,3 +1,5 @@
+import io.papermc.hangarpublishplugin.model.Platforms
+
 plugins {
     `java-library`
     id("io.github.goooler.shadow") version "8.1.7"
@@ -5,13 +7,14 @@ plugins {
     id("io.papermc.paperweight.userdev") version "1.7.7" // paperweight // Check for new versions at https://plugins.gradle.org/plugin/io.papermc.paperweight.userdev
     `maven-publish` // Add ./gradlew publishToMavenLocal
     id("xyz.jpenilla.run-paper") version "2.3.1"
+    id("io.papermc.hangar-publish-plugin") version "0.1.2"
 }
 
 group = "com.jkantrell.mc.underilla.spigot"
-version = "1.6.14"
+version = "1.6.14-SNAPSHOT"
 description="Generate vanilla cave in custom world."
 val mainMinecraftVersion = "1.21.3"
-val supportedMinecraftVersions = "[1.21.3 - 1.21.4]"
+val supportedMinecraftVersions = "1.21.3 - 1.21.4"
 
 repositories {
     mavenLocal()
@@ -102,6 +105,28 @@ tasks.register("echoVersion") {
 
 tasks.register("echoReleaseName") {
     doLast {
-        println("${project.version} ${supportedMinecraftVersions}")
+        println("${project.version} [${supportedMinecraftVersions}]")
+    }
+}
+
+val versionString: String = version as String
+val isRelease: Boolean = !versionString.contains("SNAPSHOT")
+
+hangarPublish { // ./gradlew publishPluginPublicationToHangar
+    publications.register("plugin") {
+        version.set(project.version as String)
+        channel.set(if (isRelease) "Release" else "Snapshot")
+        // id.set(project.name as String)
+        id.set("Underilla")
+        apiKey.set(System.getenv("HANGAR_API_TOKEN"))
+        platforms {
+            register(Platforms.PAPER) {
+                jar.set(tasks.shadowJar.flatMap { it.archiveFile })
+
+                // Set platform versions from gradle.properties file
+                val versions: List<String> = supportedMinecraftVersions.replace(" ", "").split(",")
+                platformVersions.set(versions)
+            }
+        }
     }
 }

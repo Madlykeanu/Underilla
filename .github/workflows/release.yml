@@ -2,7 +2,7 @@ name: Build and Publish Release
 on:
   push:
     # Tag triggers releases, push triggers pre-releases
-    branches: [ master, main ]
+    # branches: [ master, main ]
     tags:
       - '*'
     
@@ -56,5 +56,11 @@ jobs:
           tag: ${{ steps.version.outputs.version }}
           name: ${{ steps.version.outputs.releaseName }}
           bodyFile: CHANGELOG.md
-          prerelease: ${{ !startsWith(github.ref, 'refs/tags/') }}
+          # prerelease: ${{ !startsWith(github.ref, 'refs/tags/') }} #Always release for now
           skipIfReleaseExists: true
+      
+      - name: Publish to hangar
+        env:
+          # Make sure you have added a repository secret in the repository's settings
+          HANGAR_API_TOKEN: ${{ secrets.HANGAR_API_TOKEN }}
+        run: ./gradlew build publishPluginPublicationToHangar --stacktrace
