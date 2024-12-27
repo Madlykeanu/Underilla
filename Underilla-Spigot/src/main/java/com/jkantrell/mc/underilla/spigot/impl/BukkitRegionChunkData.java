@@ -1,5 +1,6 @@
 package com.jkantrell.mc.underilla.spigot.impl;
 
+import fr.formiko.mc.biomeutils.NMSBiomeUtils;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.generator.LimitedRegion;
 import com.jkantrell.mc.underilla.core.api.Biome;
@@ -7,6 +8,7 @@ import com.jkantrell.mc.underilla.core.api.Block;
 import com.jkantrell.mc.underilla.core.api.ChunkData;
 import com.jkantrell.mc.underilla.core.vector.VectorIterable;
 import com.jkantrell.mc.underilla.spigot.Underilla;
+
 
 public class BukkitRegionChunkData implements ChunkData {
 
@@ -74,6 +76,6 @@ public class BukkitRegionChunkData implements ChunkData {
             return;
         }
         // this.region_.setBiome(this.absX_ + x, y, this.absZ_ + z, bukkitBiome.getBiome());
-        BiomeHelper.setCustomBiome(bukkitBiome.getName(), this.absX_ + x, y, this.absZ_ + z);
+        NMSBiomeUtils.setCustomBiome(bukkitBiome.getName(), this.absX_ + x, y, this.absZ_ + z, this.region_.getWorld());
     }
 }

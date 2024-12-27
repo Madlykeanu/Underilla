@@ -140,7 +140,7 @@ If you want to remove some of the game features, for example the `monster_room` 
 It can also be used to add feature to some biome. For example a quartz_ore feature if your nether is disabled you you still want your builder to have quartz.
 
 ## Build
-Create a working jar with `./gradlew buildDependents`
+Create a working jar with `./gradlew assemble`
 
 ## TODO
 - Build-in pre-generation system.

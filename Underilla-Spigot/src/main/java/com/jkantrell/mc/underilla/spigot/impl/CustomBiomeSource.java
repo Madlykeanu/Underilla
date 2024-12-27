@@ -1,5 +1,6 @@
 package com.jkantrell.mc.underilla.spigot.impl;
 
+import fr.formiko.mc.biomeutils.NMSBiomeUtils;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;

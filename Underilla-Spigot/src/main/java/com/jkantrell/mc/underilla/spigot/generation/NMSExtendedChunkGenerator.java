@@ -14,7 +14,6 @@ import net.minecraft.world.level.biome.BiomeManager;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGenerator;
-import net.minecraft.world.level.levelgen.GenerationStep.Carving;
 import net.minecraft.world.level.levelgen.Heightmap.Types;
 import net.minecraft.world.level.levelgen.RandomState;
 import net.minecraft.world.level.levelgen.blending.Blender;
@@ -42,8 +41,8 @@ public class NMSExtendedChunkGenerator extends ChunkGenerator {
 
     @Override
     public void applyCarvers(WorldGenRegion chunkRegion, long seed, RandomState noiseConfig, BiomeManager biomeAccess,
-            StructureManager structureAccessor, ChunkAccess chunk, Carving carverStep) {
-        vanillaChunkGenerator.applyCarvers(chunkRegion, seed, noiseConfig, biomeAccess, structureAccessor, chunk, carverStep);
+            StructureManager structureAccessor, ChunkAccess chunk) {
+        vanillaChunkGenerator.applyCarvers(chunkRegion, seed, noiseConfig, biomeAccess, structureAccessor, chunk);
     }
 
     @Override

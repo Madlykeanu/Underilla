@@ -1,14 +1,17 @@
 plugins {
     `java-library`
     id("io.github.goooler.shadow") version "8.1.7"
-    id("io.papermc.paperweight.userdev") version "1.7.1" // paperweight // Check for new versions at https://plugins.gradle.org/plugin/io.papermc.paperweight.userdev
+    // paperweight.userdev 2.0.0-beta.8 isn't working to have a Underilla-Spigot-1.6.9.jar which is the reobf jar.
+    id("io.papermc.paperweight.userdev") version "1.7.7" // paperweight // Check for new versions at https://plugins.gradle.org/plugin/io.papermc.paperweight.userdev
     `maven-publish` // Add ./gradlew publishToMavenLocal
     id("xyz.jpenilla.run-paper") version "2.3.1"
 }
 
 group = "com.jkantrell.mc.underilla.spigot"
-version = "1.6.6"
+version = "1.6.10"
 description="Generate vanilla cave in custom world."
+val mainMinecraftVersion = "1.21.3"
+val supportedMinecraftVersions = "[1.21.3 - 1.21.4]"
 
 repositories {
     mavenLocal()
@@ -22,9 +25,10 @@ repositories {
 
 dependencies {
     // compileOnly("io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT") // without paperweight
-    paperweight.paperDevBundle("1.21.1-R0.1-SNAPSHOT") // paperweight
+    paperweight.paperDevBundle("$mainMinecraftVersion-R0.1-SNAPSHOT")
     implementation("com.jkantrell:Yamlizer:main-SNAPSHOT")
     implementation(project(":Underilla-Core"))
+    implementation("fr.formiko.mc.biomeutils:biomeutils:1.1.8")
 }
 
 // tasks.build.dependsOn tasks.reobfJar // paperweight
@@ -44,6 +48,7 @@ tasks {
             "co.aikar",
             "org.bstats",
             "jakarta.annotation",
+            "fr.formiko.mc.biomeutils",
         ).forEach { pkg ->
             relocate(pkg, "$prefix.$pkg")
         }
@@ -71,7 +76,11 @@ tasks {
         // Configure the Minecraft version for our task.
         // This is the only required configuration besides applying the plugin.
         // Your plugin's jar (or shadowJar if present) will be used automatically.
-        minecraftVersion("1.21.1")
+        minecraftVersion(mainMinecraftVersion)
+        // https://hangar.papermc.io/pop4959/Chunky
+        downloadPlugins {
+            hangar("Chunky", "1.4.28")
+        }
     }
 }
 
@@ -83,3 +92,16 @@ publishing {
 
 // Break Yamlizer.
 // paperweight.reobfArtifactConfiguration = io.papermc.paperweight.userdev.ReobfArtifactConfiguration.MOJANG_PRODUCTION
+
+
+tasks.register("echoVersion") {
+    doLast {
+        println("${project.version}")
+    }
+}
+
+tasks.register("echoReleaseName") {
+    doLast {
+        println("${project.version} ${supportedMinecraftVersions}")
+    }
+}
