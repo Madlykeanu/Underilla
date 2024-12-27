@@ -1,0 +1,43 @@
+name: Build and Publish Release
+on:
+  push:
+    branches: [ master, main ]
+    
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: gradle
+      # Configure Gradle for optimal use in GitHub Actions, including caching of downloaded dependencies.
+      # See: https://github.com/gradle/actions/blob/main/setup-gradle/README.md
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
+      # build
+      - name: Build with Gradle Wrapper
+        run: ./gradlew assemble
+
+      - name: Get version
+        id: version
+        run: echo "version=$(./gradlew echoVersion)" >> $env:GITHUB_OUTPUT
+      - name: Get releaseName
+        id: releaseName
+        run: echo "releaseName=$(./gradlew echoReleaseName)" >> $env:GITHUB_OUTPUT
+
+      - name: Create Release
+        id: createRelease
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build/libs/Underilla-Spigot-${{ steps.version.outputs.version }}.jar
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag_name: ${{ steps.version.outputs.version }}
+          name: ${{ steps.releaseName.outputs.releaseName }}
+          body_path: CHANGELOG.md
+          prerelease: true
