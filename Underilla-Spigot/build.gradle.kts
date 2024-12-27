@@ -9,6 +9,8 @@ plugins {
 group = "com.jkantrell.mc.underilla.spigot"
 version = "1.6.8"
 description="Generate vanilla cave in custom world."
+val mainMinecraftVersion = "1.21.4"
+val supportedMinecraftVersions = "[1.21.3 - 1.21.4]"
 
 repositories {
     mavenLocal()
@@ -74,6 +76,10 @@ tasks {
         // This is the only required configuration besides applying the plugin.
         // Your plugin's jar (or shadowJar if present) will be used automatically.
         minecraftVersion("1.21.4")
+        // https://hangar.papermc.io/pop4959/Chunky
+        downloadPlugins {
+            hangar("Chunky", "1.4.28")
+        }
     }
 }
 
@@ -85,3 +91,9 @@ publishing {
 
 // Break Yamlizer.
 // paperweight.reobfArtifactConfiguration = io.papermc.paperweight.userdev.ReobfArtifactConfiguration.MOJANG_PRODUCTION
+
+tasks.register("echoReleaseName") {
+    doLast {
+        println("${project.version} ${supportedMinecraftVersions}")
+    }
+}
