@@ -24,12 +24,16 @@ jobs:
       - name: Build with Gradle Wrapper
         run: ./gradlew assemble
 
-      - name: Get version
+      - name: Get version & release name
         id: version
-        run: echo "version=$(./gradlew echoVersion)" >> $env:GITHUB_OUTPUT
-      - name: Get releaseName
-        id: releaseName
-        run: echo "releaseName=$(./gradlew echoReleaseName)" >> $env:GITHUB_OUTPUT
+        run: |
+          echo "version=$(./gradlew echoVersion)" >> $GITHUB_ENV
+          echo "releaseName=$(./gradlew echoReleaseName)" >> $GITHUB_ENV
+      
+      - name: Print version & release name
+        run: |
+          echo "Version: ${{ steps.version.outputs.version }}"
+          echo "Release Name: ${{ steps.version.outputs.releaseName }}"
 
       - name: Create Release
         id: createRelease
@@ -38,6 +42,6 @@ jobs:
           files: build/libs/Underilla-Spigot-${{ steps.version.outputs.version }}.jar
           token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: ${{ steps.version.outputs.version }}
-          name: ${{ steps.releaseName.outputs.releaseName }}
+          name: ${{ steps.version.outputs.releaseName }}
           body_path: CHANGELOG.md
           prerelease: true
