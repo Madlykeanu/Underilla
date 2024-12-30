@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "com.jkantrell.mc.underilla.spigot"
-version = "1.6.14-SNAPSHOT"
+version = "1.6.15"
 description="Generate vanilla cave in custom world."
 val mainMinecraftVersion = "1.21.3"
 val supportedMinecraftVersions = "1.21.3 - 1.21.4"
@@ -122,6 +122,7 @@ hangarPublish { // ./gradlew publishPluginPublicationToHangar
         platforms {
             register(Platforms.PAPER) {
                 jar.set(tasks.shadowJar.flatMap { it.archiveFile })
+                // externalDownloadUrl.set("https://github.com/HydrolienF/Underilla/releases/download/1.6.14/Underilla-Spigot-1.6.14.jar")
 
                 // Set platform versions from gradle.properties file
                 val versions: List<String> = supportedMinecraftVersions.replace(" ", "").split(",")

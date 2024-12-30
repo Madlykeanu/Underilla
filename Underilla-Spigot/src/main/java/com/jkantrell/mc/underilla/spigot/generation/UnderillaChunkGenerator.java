@@ -75,6 +75,13 @@ public class UnderillaChunkGenerator extends ChunkGenerator {
 
     }
 
+    @Override
+    public void generateCaves(@Nonnull WorldInfo worldInfo, @Nonnull Random random, int chunkX, int chunkZ, @Nonnull ChunkData chunkData){
+        // TODO add an option to merge the surface & cave world here instead of in generateSurface.
+        // This option will avoid having the surface damaged by the caves with floating trees & grass & carving inside water bodies.
+        // TODO check if reinserLiquids is needed after that.
+    }
+
 
     @Override
     public List<BlockPopulator> getDefaultPopulators(World world) {
