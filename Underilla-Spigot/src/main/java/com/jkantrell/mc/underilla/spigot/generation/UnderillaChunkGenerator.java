@@ -66,19 +66,15 @@ public class UnderillaChunkGenerator extends ChunkGenerator {
     public void generateSurface(@NotNull WorldInfo worldInfo, @NotNull Random random, int chunkX, int chunkZ,
             @NotNull ChunkData chunkData) {
         String biomeKey = getBiomeKeyStringFromChunkCoordinates(worldInfo, chunkX, chunkZ);
-        // if is a biome that should be carved and surface should not be preserved from carvers (== merge the world before).
-        if (Underilla.getUnderillaConfig().isBiomeInSet(SetBiomeStringKeys.APPLY_CARVERS_ONLY_ON_BIOMES, biomeKey) && !Underilla
+        // if is a biome that should not be carved OR surface should not be preserved from carvers (== merge the world before).
+        if (!Underilla.getUnderillaConfig().isBiomeInSet(SetBiomeStringKeys.APPLY_CARVERS_ONLY_ON_BIOMES, biomeKey) || !Underilla
                 .getUnderillaConfig().isBiomeInSet(SetBiomeStringKeys.PRESERVE_SURFACE_WORLD_FROM_CAVERS_ONLY_ON_BIOMES, biomeKey)) {
             mergeSurfaceWorldAndCavesWorld(worldInfo, random, chunkX, chunkZ, chunkData);
         }
-
     }
 
     @Override
     public void generateCaves(@NotNull WorldInfo worldInfo, @NotNull Random random, int chunkX, int chunkZ, @NotNull ChunkData chunkData) {
-        // TODO add an option to merge the surface & cave world here instead of in generateSurface.
-        // This option will avoid having the surface damaged by the caves with floating trees & grass & carving inside water bodies.
-        // TODO check if reinserLiquids is needed after that.
         String biomeKey = getBiomeKeyStringFromChunkCoordinates(worldInfo, chunkX, chunkZ);
         // if is a biome that should be carved and surface should be preserved from carvers (== merge the world after).
         if (Underilla.getUnderillaConfig().isBiomeInSet(SetBiomeStringKeys.APPLY_CARVERS_ONLY_ON_BIOMES, biomeKey) && Underilla
@@ -125,9 +121,13 @@ public class UnderillaChunkGenerator extends ChunkGenerator {
     }
 
 
+    /**
+     * Should generate caves with carvers.
+     */
     @Override
     public boolean shouldGenerateCaves(WorldInfo worldInfo, Random random, int chunkX, int chunkZ) {
-        return this.delegate_.shouldGenerateCaves(chunkX, chunkZ);
+        String biomeKey = getBiomeKeyStringFromChunkCoordinates(worldInfo, chunkX, chunkZ);
+        return Underilla.getUnderillaConfig().isBiomeInSet(SetBiomeStringKeys.APPLY_CARVERS_ONLY_ON_BIOMES, biomeKey);
     }
 
     @Override

@@ -39,6 +39,7 @@ public class Generator {
         times = new HashMap<>();
     }
 
+    // TODO fix issue with short grass making village houses 1 block higher
     public int getBaseHeight(WorldInfo worldInfo, int x, int z, HeightMapType heightMap) {
         int chunkX = MCAUtil.blockToChunk(x), chunkZ = MCAUtil.blockToChunk(z);
         ChunkReader chunkReader = this.worldReader_.readChunk(chunkX, chunkZ).orElse(null);
