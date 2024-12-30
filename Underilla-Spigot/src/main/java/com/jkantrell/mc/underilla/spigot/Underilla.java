@@ -23,6 +23,7 @@ public final class Underilla extends JavaPlugin {
     private BukkitWorldReader worldSurfaceReader;
     private @Nullable BukkitWorldReader worldCavesReader;
     private com.jkantrell.mc.underilla.spigot.generation.WorldInitListener worldInitListener;
+    public static final int CHUNK_SIZE = 16;
 
 
     @Override
@@ -47,7 +48,6 @@ public final class Underilla extends JavaPlugin {
             Underilla.CONFIG.load();
             Underilla.CONFIG.transferCavesWorldBiomes = NMSBiomeUtils.normalizeBiomeNameList(Underilla.CONFIG.transferCavesWorldBiomes);
             Underilla.CONFIG.preserveBiomes = NMSBiomeUtils.normalizeBiomeNameList(Underilla.CONFIG.preserveBiomes);
-            Underilla.CONFIG.ravinBiomes = NMSBiomeUtils.normalizeBiomeNameList(Underilla.CONFIG.ravinBiomes);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -113,6 +113,7 @@ public final class Underilla extends JavaPlugin {
     }
 
     public static Underilla getInstance() { return getPlugin(Underilla.class); }
+    public static UnderillaConfig getUnderillaConfig() { return getInstance().underillaConfig; }
 
 
     public static void log(Level level, String message) { getInstance().getLogger().log(level, message); }

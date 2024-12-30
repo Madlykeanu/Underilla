@@ -28,10 +28,6 @@ public class Config extends AbstractYamlConfig {
     @ConfigField(path = "reference_world")
     public String referenceWorldName = "backup";
 
-    @ConfigField(path = "generate_noodle_caves")
-    @Deprecated
-    public boolean generateCaves = true;
-
     @ConfigField(path = "vanilla_population")
     public boolean vanillaPopulation = true;
 
@@ -77,10 +73,6 @@ public class Config extends AbstractYamlConfig {
     @ConfigField(path = "preserve_biomes")
     public List<String> preserveBiomes = List.of();
 
-    @ConfigField(path = "ravin_biomes")
-    @Deprecated
-    public List<String> ravinBiomes = List.of();
-
     @ConfigField(path = "structures.enabled")
     public boolean generateStructures = true;
 
@@ -91,7 +83,6 @@ public class Config extends AbstractYamlConfig {
         GenerationConfig r = new GenerationConfig();
 
         r.referenceWorldName = this.referenceWorldName;
-        r.generateCaves = this.generateCaves;
         r.vanillaPopulation = this.vanillaPopulation;
         r.transferBiomes = this.transferBiomes;
         r.transferBlocksFromCavesWorld = this.transferBlocksFromCavesWorld;
@@ -104,7 +95,6 @@ public class Config extends AbstractYamlConfig {
         r.mergeDepth = this.mergeDepth;
         r.keptReferenceWorldBlocks = this.keptReferenceWorldBlocks;
         r.preserveBiomes = NMSBiomeUtils.normalizeBiomeNameList(this.preserveBiomes);
-        r.ravinBiomes = NMSBiomeUtils.normalizeBiomeNameList(this.ravinBiomes);
         r.mergeLimit = this.mergeLimit;
         r.generateStructures = this.generateStructures;
 

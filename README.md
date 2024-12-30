@@ -17,12 +17,10 @@ It's original purpose is adding vanilla caves to custom [WorldPainter](https://w
 ![Underilla](https://github.com/HydrolienF/Underilla/assets/71718798/5d4c0812-443e-42db-90cf-a138f11ec6c9)
 
 ## Main features
-- 4 merging strategies:
+- 3 merging strategies:
     - **None:** No actual vanilla underground noise is generated. `generate_noodle_caves` setting can still be on, to generate noodle caves.
     - **Absolute:** A Y coordinate value divides the original world surface and vanilla underground.
     - **Surface:** Mix the original world surface and vanilla underground at a variable y that depends of original & vanilla world surface. It have the best racio generated world quality & performance.
-    - **Relative:** **This strategie still need improvement, for now you should use Surface**. The reference world's surface will be dynamically carved into vanilla underground; which means there's no actual height-based division.
-- Custom caves also supported. If using Relative merge strategy, every non-solid block and surroundings will be preserved, thus, if the reference world has itself an underground system, it'll be transferred over to the merged world.
 - Heightmap fixed. Underilla re-calculates heightmaps when merging chunks, getting rid of floating and buried structures. Vanilla villagers and other structures are placed at the right height.
 - Biome overwrite. Biomes from the reference world will be transferred and overwrite biomes from de vanilla seed being used. Cave biomes underground will be preserved.
 
@@ -69,7 +67,7 @@ All tests have been done on paper 1.20.4 on a 1000*1000 map generation of the sa
 - None strategy 3:25 (2.13 times longer than Vanilla generation)
 - Absolute stategy 4:34 (2.85 times longer than Vanilla generation)
 - Surface srategy 4:32 (2.83 times longer than Vanilla generation)
-- Relative strategy 11:07 (6.94 times longer than Vanilla generation)
+- Relative strategy (have been removed since) 11:07 (6.94 times longer than Vanilla generation)
 
 For a 50000 * 30000 world, it would take 40 hours to generate with Minecraft vanilla generator, 113 hours in surface strategie and 279 hours in relative.
 
@@ -120,7 +118,6 @@ If you are strugeling with world generation, you can ask for help on the Discord
 
 - Underilla's generation disables Minecraft's chunk blender, which means there will be sharp old-school chunk borders at the edge of the reference world's chunks. This may be tackled by trimming your custom world chunks around the edges to generate blended chunks ahead of time.
 - Due to Spigot's generation API, outside the reference world's area, heightmaps are broken, which has an impact on structures. You may work around this by pre-generating the whole reference world area, and then disabling Underilla.
-- **Relative strategy only:** Little underground lava and water pockets will translate to odd floating blobs in the final world if they overlap with large caves. Avoid such generation patterns.
 - Olds map before 1.19 won't be load by Underilla. To use an old map, generate the full map without Underilla in the right version, then use the generated map. This will let minecraft update the map files and Underilla will be able to read them as expected.
 
 ## WorldPainter considerations
@@ -129,7 +126,6 @@ If you're going to plug your custom WorldPainter world into Underilla, consider 
 - Always disable the `Allow Minecraft to populate the entire terrain` option. Rather use the `vanilla_population` option in Underilla's `config.yml` file.
 - Don't user the resource layer. Underilla will have the vanilla generator take care of that for you.
 - The Populate layer has no effect. Weather all or none of the terrain will be populated based on the above point.
-- If you have custom cave/tunnels layers and want to preserve them during the merge, you'd want to use the Relative merge strategy
 
 ## Custom biome
 Cave generation on custom biomes is now working. Features (ores, flowers etc) will be placed according to the custom surface world biome but structures won't.

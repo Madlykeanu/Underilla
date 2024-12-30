@@ -1,11 +1,13 @@
 package com.jkantrell.mc.underilla.spigot.generation;
 
+import fr.formiko.mc.biomeutils.NMSBiomeUtils;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.bukkit.Bukkit;
 import org.bukkit.HeightMap;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
@@ -14,17 +16,18 @@ import org.bukkit.generator.BlockPopulator;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.generator.LimitedRegion;
 import org.bukkit.generator.WorldInfo;
+import org.jetbrains.annotations.NotNull;
 import com.jkantrell.mc.underilla.core.api.HeightMapType;
 import com.jkantrell.mc.underilla.core.generation.Generator;
 import com.jkantrell.mc.underilla.core.reader.ChunkReader;
 import com.jkantrell.mc.underilla.core.reader.WorldReader;
 import com.jkantrell.mc.underilla.spigot.Underilla;
 import com.jkantrell.mc.underilla.spigot.impl.BukkitChunkData;
-import com.jkantrell.mc.underilla.spigot.impl.BukkitRegionChunkData;
 import com.jkantrell.mc.underilla.spigot.impl.BukkitWorldInfo;
 import com.jkantrell.mc.underilla.spigot.impl.BukkitWorldReader;
 import com.jkantrell.mc.underilla.spigot.impl.CustomBiomeSource;
 import com.jkantrell.mc.underilla.spigot.io.Config;
+import com.jkantrell.mc.underilla.spigot.io.UnderillaConfig.SetBiomeStringKeys;
 
 public class UnderillaChunkGenerator extends ChunkGenerator {
     // TODO : For performance reason, we should generate and empty world if transfer_world_from_caves_world==true
@@ -60,26 +63,46 @@ public class UnderillaChunkGenerator extends ChunkGenerator {
     }
 
     @Override
-    public void generateSurface(WorldInfo worldInfo, Random random, int chunkX, int chunkZ, ChunkData chunkData) {
+    public void generateSurface(@NotNull WorldInfo worldInfo, @NotNull Random random, int chunkX, int chunkZ,
+            @NotNull ChunkData chunkData) {
+        String biomeKey = getBiomeKeyStringFromChunkCoordinates(worldInfo, chunkX, chunkZ);
+        // if is a biome that should be carved and surface should not be preserved from carvers (== merge the world before).
+        if (Underilla.getUnderillaConfig().isBiomeInSet(SetBiomeStringKeys.APPLY_CARVERS_ONLY_ON_BIOMES, biomeKey) && !Underilla
+                .getUnderillaConfig().isBiomeInSet(SetBiomeStringKeys.PRESERVE_SURFACE_WORLD_FROM_CAVERS_ONLY_ON_BIOMES, biomeKey)) {
+            mergeSurfaceWorldAndCavesWorld(worldInfo, random, chunkX, chunkZ, chunkData);
+        }
+
+    }
+
+    @Override
+    public void generateCaves(@NotNull WorldInfo worldInfo, @NotNull Random random, int chunkX, int chunkZ, @NotNull ChunkData chunkData) {
+        // TODO add an option to merge the surface & cave world here instead of in generateSurface.
+        // This option will avoid having the surface damaged by the caves with floating trees & grass & carving inside water bodies.
+        // TODO check if reinserLiquids is needed after that.
+        String biomeKey = getBiomeKeyStringFromChunkCoordinates(worldInfo, chunkX, chunkZ);
+        // if is a biome that should be carved and surface should be preserved from carvers (== merge the world after).
+        if (Underilla.getUnderillaConfig().isBiomeInSet(SetBiomeStringKeys.APPLY_CARVERS_ONLY_ON_BIOMES, biomeKey) && Underilla
+                .getUnderillaConfig().isBiomeInSet(SetBiomeStringKeys.PRESERVE_SURFACE_WORLD_FROM_CAVERS_ONLY_ON_BIOMES, biomeKey)) {
+            mergeSurfaceWorldAndCavesWorld(worldInfo, random, chunkX, chunkZ, chunkData);
+        }
+    }
+
+    private void mergeSurfaceWorldAndCavesWorld(@NotNull WorldInfo worldInfo, @NotNull Random random, int chunkX, int chunkZ,
+            @NotNull ChunkData chunkData) {
         Optional<ChunkReader> reader = this.worldSurfaceReader.readChunk(chunkX, chunkZ);
         if (reader.isEmpty()) {
             return;
         }
         BukkitChunkData data = new BukkitChunkData(chunkData);
-        // Bukkit.getLogger().info("Generating chunk [" + chunkX + ", " + chunkZ + "] from " + this.worldReader_.getWorldName() + ".");
         ChunkReader cavesReader = null;
         if (this.worldCavesReader != null && CONFIG.transferBlocksFromCavesWorld) {
             cavesReader = this.worldCavesReader.readChunk(chunkX, chunkZ).orElse(null);
         }
         this.delegate_.generateSurface(reader.get(), data, cavesReader);
-
     }
-
-    @Override
-    public void generateCaves(@Nonnull WorldInfo worldInfo, @Nonnull Random random, int chunkX, int chunkZ, @Nonnull ChunkData chunkData){
-        // TODO add an option to merge the surface & cave world here instead of in generateSurface.
-        // This option will avoid having the surface damaged by the caves with floating trees & grass & carving inside water bodies.
-        // TODO check if reinserLiquids is needed after that.
+    private String getBiomeKeyStringFromChunkCoordinates(@NotNull WorldInfo worldInfo, int chunkX, int chunkZ) {
+        return NMSBiomeUtils.getBiomeKeyString(chunkX * Underilla.CHUNK_SIZE, 0, chunkZ * Underilla.CHUNK_SIZE,
+                Bukkit.getWorld(worldInfo.getUID()));
     }
 
 
@@ -124,7 +147,7 @@ public class UnderillaChunkGenerator extends ChunkGenerator {
 
     // To support custom biomes, we can't use bukkit biome provider. So biome merging is done in CustomBiomeSource.
     @Override
-    public BiomeProvider getDefaultBiomeProvider(@Nonnull WorldInfo worldInfo) {
+    public BiomeProvider getDefaultBiomeProvider(@NotNull WorldInfo worldInfo) {
         // TODO Mvndi patch, if biome name contains "beach" return beach biome, if biome names contains "ocean" but not "deep" return ocean.
         // This way we will have shipwrecks well placed.
         if (Underilla.CONFIG.customBiomeEnabled) {
@@ -163,16 +186,16 @@ public class UnderillaChunkGenerator extends ChunkGenerator {
         // OVERRITES
         @Override
         public void populate(WorldInfo worldInfo, Random random, int chunkX, int chunkZ, LimitedRegion limitedRegion) {
-            if (!CONFIG.generateCaves) {
-                return;
-            }
-            ChunkReader reader = this.worldReader_.readChunk(chunkX, chunkZ).orElse(null);
-            if (reader == null) {
-                return;
-            }
-            BukkitRegionChunkData chunkData = new BukkitRegionChunkData(limitedRegion, chunkX, chunkZ, worldInfo.getMinHeight(),
-                    worldInfo.getMaxHeight());
-            this.generator_.reInsertLiquids(reader, chunkData);
+            // if (!CONFIG.generateCaves) {
+            // return;
+            // }
+            // ChunkReader reader = this.worldReader_.readChunk(chunkX, chunkZ).orElse(null);
+            // if (reader == null) {
+            // return;
+            // }
+            // BukkitRegionChunkData chunkData = new BukkitRegionChunkData(limitedRegion, chunkX, chunkZ, worldInfo.getMinHeight(),
+            // worldInfo.getMaxHeight());
+            // this.generator_.reInsertLiquids(reader, chunkData);
         }
     }
 

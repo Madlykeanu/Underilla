@@ -90,6 +90,7 @@ carvers:
   # Apply carvers with special rules on the biomes listed here.
   # If both onlyOn and exceptOn are empty, the carvers will be applied on all biomes. 
   # Do not use both onlyOn and exceptOn at the same time.
+  # The carvers will be applied once per chunk. So it might carve or not a chunk that have different biomes.
   applyCarversOnBiomes:
     # Apply carvers only on the biomes listed here.
     onlyOn: []

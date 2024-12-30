@@ -1,5 +1,6 @@
 package com.jkantrell.mc.underilla.core.generation;
 
+import fr.formiko.mc.biomeutils.NMSBiomeUtils;
 import java.util.List;
 import javax.annotation.Nullable;
 import com.jkantrell.mc.underilla.core.api.Block;
@@ -9,23 +10,20 @@ import com.jkantrell.mc.underilla.core.reader.Reader;
 import com.jkantrell.mc.underilla.core.vector.IntVector;
 import com.jkantrell.mc.underilla.core.vector.Vector;
 import com.jkantrell.mc.underilla.core.vector.VectorIterable;
+import com.jkantrell.mc.underilla.spigot.Underilla;
+import com.jkantrell.mc.underilla.spigot.io.UnderillaConfig.SetBiomeStringKeys;
 import com.jkantrell.mca.MCAUtil;
 
 class AbsoluteMerger implements Merger {
 
     // FIELDS
     private final int height_;
-    private final List<String> preserveBiomes_;
-    private final List<String> ravinBiomes_;
     private final List<String> keptReferenceWorldBlocks_;
     private final int mergeDepth_;
 
     // CONSTRUCTORS
-    AbsoluteMerger(int height, List<String> preserveBiomes, List<String> ravinBiomes, List<String> keptReferenceWorldBlocks,
-            int mergeDepth) {
+    AbsoluteMerger(int height, List<String> keptReferenceWorldBlocks, int mergeDepth) {
         this.height_ = height;
-        this.preserveBiomes_ = preserveBiomes;
-        this.ravinBiomes_ = ravinBiomes;
         this.keptReferenceWorldBlocks_ = keptReferenceWorldBlocks;
         this.mergeDepth_ = mergeDepth;
     }
@@ -85,10 +83,6 @@ class AbsoluteMerger implements Merger {
                 // Use vanilla block from current world
             }
 
-            // // create ravines in biome that should have ravines
-            // if (v.y() == columnHeigth && vanillaBlock.isAir() && isRavinBiome(surfaceReader, v) && isAirCollumn(chunkData, v, 30)) {
-            //     chunkData.setRegion(v.x(), columnHeigth, v.z(), v.x() + 1, airColumn, v.z() + 1, airBlock);
-            // }
             Generator.addTime("Merge block or not", startTime);
         }
     }
@@ -116,11 +110,8 @@ class AbsoluteMerger implements Merger {
     }
     /** Return true if this biome need to be only custom world */
     private boolean isPreservedBiome(ChunkReader reader, Vector<Integer> v) {
-        return this.preserveBiomes_.contains(reader.biomeAt(v).orElseThrow().getName());
-    }
-
-    private boolean isRavinBiome(ChunkReader reader, Vector<Integer> v) {
-        return this.ravinBiomes_.contains(reader.biomeAt(v).orElseThrow().getName());
+        String biomeKey = NMSBiomeUtils.normalizeBiomeName(reader.biomeAt(v).orElseThrow().getName());
+        return Underilla.getUnderillaConfig().isBiomeInSet(SetBiomeStringKeys.SURFACE_WORLD_ONLY_ON_THIS_BIOMES, biomeKey);
     }
 
     /** Return true if all the collumn is air. */

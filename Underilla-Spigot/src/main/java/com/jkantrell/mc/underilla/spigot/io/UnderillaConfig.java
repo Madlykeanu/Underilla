@@ -108,6 +108,9 @@ public class UnderillaConfig {
         if (getBoolean(BooleanKeys.CARVERS_ENABLED)) {
             mergeOnlyOnAndExceptOn(SetBiomeStringKeys.APPLY_CARVERS_ONLY_ON_BIOMES, SetBiomeStringKeys.APPLY_CARVERS_EXCEPT_ON_BIOMES,
                     allBiomes);
+            // Do not apply carvers on the biomes that should have surface world only.
+            listBiomeStringMap.get(SetBiomeStringKeys.APPLY_CARVERS_ONLY_ON_BIOMES)
+                    .removeAll(listBiomeStringMap.get(SetBiomeStringKeys.SURFACE_WORLD_ONLY_ON_THIS_BIOMES));
         } else {
             listBiomeStringMap.put(SetBiomeStringKeys.APPLY_CARVERS_ONLY_ON_BIOMES, Set.of());
             listBiomeStringMap.remove(SetBiomeStringKeys.APPLY_CARVERS_EXCEPT_ON_BIOMES);
@@ -142,8 +145,6 @@ public class UnderillaConfig {
         Set<String> exceptOn = listBiomeStringMap.get(exceptOnKey);
         boolean onlyOnEmpty = onlyOn.isEmpty();
         boolean exceptOnEmpty = exceptOn.isEmpty();
-        System.out.println("onlyOn = " + onlyOn);
-        System.out.println("exceptOn = " + exceptOn);
 
         if (!onlyOnEmpty && !exceptOnEmpty) {
             Underilla.warning("Both " + onlyOnKey + " and " + exceptOnKey + " are set. Ignoring " + exceptOnKey + ".");
@@ -152,9 +153,6 @@ public class UnderillaConfig {
         } else if (onlyOnEmpty) {
             listBiomeStringMap.put(onlyOnKey, allBiomes.stream().filter(biome -> !exceptOn.contains(biome)).collect(Collectors.toSet()));
         }
-
-        System.out.println("Final onlyOn = " + listBiomeStringMap.get(onlyOnKey));
-
 
         listBiomeStringMap.remove(exceptOnKey);
     }

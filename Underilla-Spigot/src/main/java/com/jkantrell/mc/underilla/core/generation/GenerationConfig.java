@@ -8,8 +8,6 @@ public class GenerationConfig {
     // FIELDS
     public String referenceWorldName = "backup";
 
-    public boolean generateCaves = true;
-
     public boolean vanillaPopulation = true;
 
     public boolean transferBiomes = true;
@@ -35,8 +33,6 @@ public class GenerationConfig {
     public List<String> keptReferenceWorldBlocks = Collections.emptyList();
 
     public List<String> preserveBiomes = Collections.emptyList();
-
-    public List<String> ravinBiomes = Collections.emptyList();
 
     public int mergeLimit = 22;
 

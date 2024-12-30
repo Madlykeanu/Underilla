@@ -13,6 +13,8 @@ import com.jkantrell.mc.underilla.core.api.WorldInfo;
 import com.jkantrell.mc.underilla.core.reader.ChunkReader;
 import com.jkantrell.mc.underilla.core.reader.WorldReader;
 import com.jkantrell.mc.underilla.core.vector.LocatedBlock;
+import com.jkantrell.mc.underilla.spigot.Underilla;
+import com.jkantrell.mc.underilla.spigot.io.UnderillaConfig.BooleanKeys;
 import com.jkantrell.mca.MCAUtil;
 
 public class Generator {
@@ -30,10 +32,9 @@ public class Generator {
         this.config_ = config;
         this.merger_ = switch (config_.mergeStrategy) {
             case RELATIVE -> new RelativeMerger(this.worldReader_, config_.mergeUpperLimit, config_.mergeLowerLimit, config_.mergeDepth,
-                    List.of(), config_.preserveBiomes, config_.keptReferenceWorldBlocks);
+                    List.of(), config_.keptReferenceWorldBlocks);
             case SURFACE, ABSOLUTE, NONE -> new AbsoluteMerger(config_.mergeStrategy.equals(MergeStrategy.NONE) ? -64 : config_.mergeLimit,
-                    config_.preserveBiomes, config.ravinBiomes, config_.keptReferenceWorldBlocks,
-                    config_.mergeStrategy.equals(MergeStrategy.SURFACE) ? config_.mergeDepth : 0);
+                    config_.keptReferenceWorldBlocks, config_.mergeStrategy.equals(MergeStrategy.SURFACE) ? config_.mergeDepth : 0);
         };
         times = new HashMap<>();
     }
@@ -93,7 +94,9 @@ public class Generator {
         return true;
     }
 
-    public boolean shouldGenerateCaves(int chunkX, int chunkZ) { return this.config_.generateCaves; }
+    public boolean shouldGenerateCaves(int chunkX, int chunkZ) {
+        return Underilla.getUnderillaConfig().getBoolean(BooleanKeys.CARVERS_ENABLED);
+    }
 
     public boolean shouldGenerateDecorations(int chunkX, int chunkZ) { return this.config_.vanillaPopulation; }
 

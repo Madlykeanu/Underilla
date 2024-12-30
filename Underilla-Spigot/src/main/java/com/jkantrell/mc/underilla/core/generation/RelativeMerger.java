@@ -28,20 +28,18 @@ public class RelativeMerger implements Merger {
     private final WorldReader worldReader_;
     private final int upperLimit_, lowerLimit_, depth_;
     private final List<? extends Biome> keptBiomes_;
-    private final List<String> preserveBiomes_;
     private final boolean keepReferenceWorldBlocks_;
     private final List<String> keptReferenceWorldBlocks_;
 
 
     // CONSTRUCTORS
     RelativeMerger(WorldReader worldReader, int upperLimit, int lowerLimit, int depth, List<? extends Biome> keptBiomes,
-            List<String> preservedBiomes, List<String> keptReferenceWorldBlocks) {
+            List<String> keptReferenceWorldBlocks) {
         this.worldReader_ = worldReader;
         this.upperLimit_ = upperLimit;
         this.lowerLimit_ = lowerLimit;
         this.depth_ = depth;
         this.keptBiomes_ = keptBiomes;
-        this.preserveBiomes_ = preservedBiomes;
         this.keepReferenceWorldBlocks_ = !keptReferenceWorldBlocks.isEmpty();
         this.keptReferenceWorldBlocks_ = keptReferenceWorldBlocks;
     }
