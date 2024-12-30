@@ -4,6 +4,8 @@ import fr.formiko.mc.biomeutils.NMSBiomeUtils;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Map;
+import java.util.function.Supplier;
+import java.util.logging.Level;
 import javax.annotation.Nullable;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -11,11 +13,13 @@ import com.jkantrell.mc.underilla.core.generation.Generator;
 import com.jkantrell.mc.underilla.spigot.generation.UnderillaChunkGenerator;
 import com.jkantrell.mc.underilla.spigot.impl.BukkitWorldReader;
 import com.jkantrell.mc.underilla.spigot.io.Config;
+import com.jkantrell.mc.underilla.spigot.io.UnderillaConfig;
 import com.jkantrell.mc.underilla.spigot.listener.StructureEventListener;
 
 public final class Underilla extends JavaPlugin {
 
     public static final Config CONFIG = new Config("");
+    private UnderillaConfig underillaConfig;
     private BukkitWorldReader worldSurfaceReader;
     private @Nullable BukkitWorldReader worldCavesReader;
     private com.jkantrell.mc.underilla.spigot.generation.WorldInitListener worldInitListener;
@@ -35,6 +39,7 @@ public final class Underilla extends JavaPlugin {
     public void onEnable() {
         // save default config
         this.saveDefaultConfig();
+        reloadConfig();
 
         // Loading config
         Underilla.CONFIG.setFilePath(this.getDataFolder() + File.separator + "config.yml");
@@ -97,5 +102,35 @@ public final class Underilla extends JavaPlugin {
         }
     }
 
+    @Override
+    public void reloadConfig() {
+        super.reloadConfig();
+        if (underillaConfig == null) {
+            underillaConfig = new UnderillaConfig(getConfig());
+        } else {
+            underillaConfig.reload(getConfig());
+        }
+    }
+
     public static Underilla getInstance() { return getPlugin(Underilla.class); }
+
+
+    public static void log(Level level, String message) { getInstance().getLogger().log(level, message); }
+    public static void log(Level level, String message, Throwable e) { getInstance().getLogger().log(level, message, e); }
+    public static void debug(String message) {
+        if (getInstance().getConfig().getBoolean("debug", false)) {
+            log(Level.INFO, message);
+        }
+    }
+    public static void debug(Supplier<String> messageProvider) {
+        if (getInstance().getConfig().getBoolean("debug", false)) {
+            log(Level.INFO, messageProvider.get());
+        }
+    }
+    public static void info(String message) { log(Level.INFO, message); }
+    public static void info(String message, Throwable e) { log(Level.INFO, message, e); }
+    public static void warning(String message) { log(Level.WARNING, message); }
+    public static void warning(String message, Throwable e) { log(Level.WARNING, message, e); }
+    public static void error(String message) { log(Level.SEVERE, message); }
+    public static void error(String message, Throwable e) { log(Level.SEVERE, message, e); }
 }

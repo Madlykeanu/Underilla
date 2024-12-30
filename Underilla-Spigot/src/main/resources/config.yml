@@ -1,12 +1,10 @@
+debug: true
+
 # # The world to merge the terrain into
 # world: "world"
 
 # The world to copy the surface from
-reference_world: "world_base"
-
-# Allow vanilla Minecraft engine to generate caves over reference world terrain.
-# This results in only perlin worms type caves. 1.18+ caves are generated only in vanilla underground.
-generate_noodle_caves: false
+reference_world: "world_surface"
 
 # Weather or not to transfer the reference world's biomes over to the merged world. IF false, only terrain is merged.
 transfer_biomes: true
@@ -70,10 +68,6 @@ ignored_block_for_surface_calculation:
 # Biomes must be defined as spigot Biome enum constants or as biome resource key for example `minecraft:plains`. https://hub.spigotmc.org/javadocs/spigot/org/bukkit/block/Biome.html
 preserve_biomes: []
 
-# The biomes where caves will reach surfaces.
-# Biomes must be defined as spigot Biome enum constants or as biome resource key for example `minecraft:plains`. https://hub.spigotmc.org/javadocs/spigot/org/bukkit/block/Biome.html
-ravin_biomes: []
-
 # Weather or not to allow vanilla Minecraft populate/decorate over the reference world.
 vanilla_population: true
 
@@ -88,3 +82,38 @@ structures:
   # Must be defined as Structure enum from Spigot API: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/generator/structure/Structure.html
   # Example: ["MONUMENT","FORTRESS"]
   blacklist: []
+
+# Carvers -------------------------------------------------------------------------------------
+carvers:
+  # Weather or not to allow vanilla Minecraft generate carvers in the world. It will use datapack carvers if specific carvers are defined in the biome .json files of a datapack.
+  enabled: true
+  # Apply carvers with special rules on the biomes listed here.
+  # If both onlyOn and exceptOn are empty, the carvers will be applied on all biomes. 
+  # Do not use both onlyOn and exceptOn at the same time.
+  applyCarversOnBiomes:
+    # Apply carvers only on the biomes listed here.
+    onlyOn: []
+    # Apply carvers on all biomes except the ones listed here.
+    exceptOn: []
+  
+  # If true the carvers will be applied before copying the reference world to the final world.
+  # So the surface will not be carved by the carvers.
+  preserveSurfaceWorldFromCavers: true
+  # Preserve the surface world from cavers with special rules on the biomes listed here.
+  # If both onlyOn and exceptOn are empty, the carvers will be applied on all biomes.
+  # Do not use both onlyOn and exceptOn at the same time.
+  preserveSurfaceWorldFromCaversOnBiomes:
+    # Preserve the surface world from cavers only on the biomes listed here.
+    onlyOn: []
+    # Preserve the surface world from cavers on all biomes except the ones listed here.
+    exceptOn: []
+  
+  
+
+# # Allow vanilla Minecraft engine to generate caves over reference world terrain.
+# # This results in perlin worms type caves. 1.18+ caves are generated only in vanilla underground.
+# generate_noodle_caves: true
+
+# # The biomes where caves will reach surfaces.
+# # Biomes must be defined as spigot Biome enum constants or as biome resource key for example `minecraft:plains`. https://hub.spigotmc.org/javadocs/spigot/org/bukkit/block/Biome.html
+# ravin_biomes: []

@@ -49,8 +49,8 @@ Underilla is currently only implemented as a Paper plugin, so it runs only on Pa
        generator: Underilla
    ```
    This will tell Spigot to use Underilla's chunk generator.
-6. In your server's root, create a new folder called `world_base`.
-7. From the folder of your reference world, copy the `region` folder, and paste it into the `world_base` folder you just created.
+6. In your server's root, create a new folder called `world_surface`.
+7. From the folder of your reference world, copy the `region` folder, and paste it into the `world_surface` folder you just created.
 8. If existing, delete the `world` folder fom your server's root.
 9. (Optional) Open the `server.properties` file in your server's root, and tweak the `level-seed` property. This has a direct impact on the generated underground.
 10. Run the server.
@@ -96,7 +96,7 @@ If you are strugeling with world generation, you can ask for help on the Discord
 15. If you haven't export your Underilla world yet, export it with no water or lava underground, no ores, no caves and no underground special stone (diorite, gravel). We will let Minecraft generation take care of the underground. This might take hours, you can do the next steps while waiting.
 16. Create an empty datapack. Then add the vanilla biome files into your datapack and edit them to remove the unwanted features. You probably want to remove all trees if you have some in your custom world. If you don't, you will have vanilla tree & custom world tree on the final world. It is recommand to set the depth to 320 everywher to be sur that there will be caves where you have custom world moutains. See [UnderillaBaseDataPack].
 17. All previous steps need to be done here. Rename your `world` directory to `world_caves`. We will use this vanilla world to have caves biome in our final world.
-18. Rename your exported custom world to `world_base/`
+18. Rename your exported custom world to `world_surface/`
 19. Download [Underilla latest release](https://github.com/HydrolienF/Underilla/releases) & place it in your `plugins/` directory.
 20. Open the `bukkit.yml` file in your server's root and add the following lines on top:
     ```
@@ -112,7 +112,7 @@ If you are strugeling with world generation, you can ask for help on the Discord
 25. Underilla config: Add blacklisted structures if needed.
 26. It's know time to merge your custom world surface and a vanilla world underground. Start Chunky again with the 2 same commands. Underilla world generation might takes hours or even days if your world is huge. *The magic happends now, Underilla generate default caves then add your custom world surface. Then mixt your custom world biomes & the caves biomes from `world_caves` onto the final world. Then add structures witch will be placed according to the new surface shape & the new biome mixt. Then add the features (tree, flower, ores, grass, gravel etc) according to your datapack. Then spawn mobs according to the new biome mixt.*
 27. Once the underilla generation is done, you should do a save of `world`, then check if you like it.
-28. You can now safely remove Underilla from the plugin and remove `world_caves` & `world_base`
+28. You can now safely remove Underilla from the plugin and remove `world_caves` & `world_surface`
 29. You can also remove Underilla from the `bukkit.yml` generator. You should replace it with [VoidWorldGenerator](https://github.com/HydrolienF/VoidWorldGenerator) to avoid any vanilla biome generation out of the Underilla world.
 
 
