@@ -4,6 +4,7 @@ import fr.formiko.mc.biomeutils.NMSBiomeUtils;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Map;
+import javax.annotation.Nullable;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
 import com.jkantrell.mc.underilla.core.generation.Generator;
@@ -11,7 +12,6 @@ import com.jkantrell.mc.underilla.spigot.generation.UnderillaChunkGenerator;
 import com.jkantrell.mc.underilla.spigot.impl.BukkitWorldReader;
 import com.jkantrell.mc.underilla.spigot.io.Config;
 import com.jkantrell.mc.underilla.spigot.listener.StructureEventListener;
-import jakarta.annotation.Nullable;
 
 public final class Underilla extends JavaPlugin {
 

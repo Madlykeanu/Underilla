@@ -1,6 +1,7 @@
 package com.jkantrell.mc.underilla.core.generation;
 
 import java.util.List;
+import javax.annotation.Nullable;
 import com.jkantrell.mc.underilla.core.api.Block;
 import com.jkantrell.mc.underilla.core.api.ChunkData;
 import com.jkantrell.mc.underilla.core.reader.ChunkReader;
@@ -9,7 +10,6 @@ import com.jkantrell.mc.underilla.core.vector.IntVector;
 import com.jkantrell.mc.underilla.core.vector.Vector;
 import com.jkantrell.mc.underilla.core.vector.VectorIterable;
 import com.jkantrell.mca.MCAUtil;
-import jakarta.annotation.Nullable;
 
 class AbsoluteMerger implements Merger {
 
@@ -85,10 +85,10 @@ class AbsoluteMerger implements Merger {
                 // Use vanilla block from current world
             }
 
-            // create ravines in biome that should have ravines
-            if (v.y() == columnHeigth && vanillaBlock.isAir() && isRavinBiome(surfaceReader, v) && isAirCollumn(chunkData, v, 30)) {
-                chunkData.setRegion(v.x(), columnHeigth, v.z(), v.x() + 1, airColumn, v.z() + 1, airBlock);
-            }
+            // // create ravines in biome that should have ravines
+            // if (v.y() == columnHeigth && vanillaBlock.isAir() && isRavinBiome(surfaceReader, v) && isAirCollumn(chunkData, v, 30)) {
+            //     chunkData.setRegion(v.x(), columnHeigth, v.z(), v.x() + 1, airColumn, v.z() + 1, airBlock);
+            // }
             Generator.addTime("Merge block or not", startTime);
         }
     }

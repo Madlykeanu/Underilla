@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.bukkit.HeightMap;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
@@ -23,8 +25,6 @@ import com.jkantrell.mc.underilla.spigot.impl.BukkitWorldInfo;
 import com.jkantrell.mc.underilla.spigot.impl.BukkitWorldReader;
 import com.jkantrell.mc.underilla.spigot.impl.CustomBiomeSource;
 import com.jkantrell.mc.underilla.spigot.io.Config;
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 
 public class UnderillaChunkGenerator extends ChunkGenerator {
     // TODO : For performance reason, we should generate and empty world if transfer_world_from_caves_world==true

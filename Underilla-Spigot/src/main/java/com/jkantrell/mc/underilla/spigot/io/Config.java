@@ -29,6 +29,7 @@ public class Config extends AbstractYamlConfig {
     public String referenceWorldName = "backup";
 
     @ConfigField(path = "generate_noodle_caves")
+    @Deprecated
     public boolean generateCaves = true;
 
     @ConfigField(path = "vanilla_population")
@@ -77,6 +78,7 @@ public class Config extends AbstractYamlConfig {
     public List<String> preserveBiomes = List.of();
 
     @ConfigField(path = "ravin_biomes")
+    @Deprecated
     public List<String> ravinBiomes = List.of();
 
     @ConfigField(path = "structures.enabled")

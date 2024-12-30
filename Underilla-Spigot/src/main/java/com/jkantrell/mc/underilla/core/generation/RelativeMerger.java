@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
+import javax.annotation.Nullable;
 import com.jkantrell.mc.underilla.core.api.Biome;
 import com.jkantrell.mc.underilla.core.api.Block;
 import com.jkantrell.mc.underilla.core.api.ChunkData;
@@ -15,7 +16,6 @@ import com.jkantrell.mc.underilla.core.vector.LocatedBlock;
 import com.jkantrell.mc.underilla.core.vector.Vector;
 import com.jkantrell.mc.underilla.core.vector.VectorIterable;
 import com.jkantrell.mca.MCAUtil;
-import jakarta.annotation.Nullable;
 
 public class RelativeMerger implements Merger {
 

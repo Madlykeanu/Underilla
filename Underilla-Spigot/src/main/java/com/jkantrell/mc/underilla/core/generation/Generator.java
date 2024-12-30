@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import com.jkantrell.mc.underilla.core.api.Block;
 import com.jkantrell.mc.underilla.core.api.ChunkData;
 import com.jkantrell.mc.underilla.core.api.HeightMapType;
@@ -12,8 +14,6 @@ import com.jkantrell.mc.underilla.core.reader.ChunkReader;
 import com.jkantrell.mc.underilla.core.reader.WorldReader;
 import com.jkantrell.mc.underilla.core.vector.LocatedBlock;
 import com.jkantrell.mca.MCAUtil;
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 
 public class Generator {
 

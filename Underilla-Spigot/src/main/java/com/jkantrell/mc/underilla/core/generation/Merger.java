@@ -1,9 +1,9 @@
 package com.jkantrell.mc.underilla.core.generation;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import com.jkantrell.mc.underilla.core.api.ChunkData;
 import com.jkantrell.mc.underilla.core.reader.ChunkReader;
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 
 interface Merger {
 

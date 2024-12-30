@@ -10,8 +10,8 @@ plugins {
     id("io.papermc.hangar-publish-plugin") version "0.1.2"
 }
 
-group = "com.jkantrell.mc.underilla.spigot"
-version = "1.6.15"
+group = "com.jkantrell.mc.underilla"
+version = "1.7.0"
 description="Generate vanilla cave in custom world."
 val mainMinecraftVersion = "1.21.3"
 val supportedMinecraftVersions = "1.21.3 - 1.21.4"
@@ -30,8 +30,8 @@ dependencies {
     // compileOnly("io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT") // without paperweight
     paperweight.paperDevBundle("$mainMinecraftVersion-R0.1-SNAPSHOT")
     implementation("com.jkantrell:Yamlizer:main-SNAPSHOT")
-    implementation(project(":Underilla-Core"))
     implementation("fr.formiko.mc.biomeutils:biomeutils:1.1.8")
+    api("com.github.HydrolienF:KntNBT:2.2.2")
 }
 
 // tasks.build.dependsOn tasks.reobfJar // paperweight

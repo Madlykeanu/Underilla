@@ -1,7 +1,7 @@
 name: Underilla
 authors: [ Jeshuakrc, Hydrolien ]
 version: '$version'
-main: ${group}.Underilla
+main: ${group}.spigot.Underilla
 description: $description
 api-version: "$apiVersion"
 load: STARTUP
