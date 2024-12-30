@@ -1,6 +1,7 @@
 package com.jkantrell.mc.underilla.spigot;
 
 import fr.formiko.mc.biomeutils.NMSBiomeUtils;
+import fr.formiko.mc.voidworldgenerator.VoidWorldGeneratorPlugin;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Map;
@@ -14,6 +15,7 @@ import com.jkantrell.mc.underilla.spigot.generation.UnderillaChunkGenerator;
 import com.jkantrell.mc.underilla.spigot.impl.BukkitWorldReader;
 import com.jkantrell.mc.underilla.spigot.io.Config;
 import com.jkantrell.mc.underilla.spigot.io.UnderillaConfig;
+import com.jkantrell.mc.underilla.spigot.io.UnderillaConfig.StringKeys;
 import com.jkantrell.mc.underilla.spigot.listener.StructureEventListener;
 
 public final class Underilla extends JavaPlugin {
@@ -29,11 +31,21 @@ public final class Underilla extends JavaPlugin {
     @Override
     public ChunkGenerator getDefaultWorldGenerator(String worldName, String id) {
         if (this.worldSurfaceReader == null) {
-            this.getServer().getLogger().warning("No world with name '" + Underilla.CONFIG.referenceWorldName + "' found");
+            getLogger().warning("No world with name '" + Underilla.CONFIG.referenceWorldName + "' found");
             return super.getDefaultWorldGenerator(worldName, id);
         }
-        this.getServer().getLogger().info("Using Underilla as world generator!");
-        return new UnderillaChunkGenerator(this.worldSurfaceReader, this.worldCavesReader);
+        String outOfTheSurfaceWorldGeneratorName = Underilla.getUnderillaConfig().getString(StringKeys.OUT_OF_THE_SURFACE_WORLD_GENERATOR);
+        ChunkGenerator outOfTheSurfaceWorldGenerator;
+        if (outOfTheSurfaceWorldGeneratorName == null || "VANILLA".equals(outOfTheSurfaceWorldGeneratorName)) {
+            outOfTheSurfaceWorldGenerator = null;
+        } else if ("VoidWorldGenerator".equals(outOfTheSurfaceWorldGeneratorName)) {
+            outOfTheSurfaceWorldGenerator = getProvidingPlugin(VoidWorldGeneratorPlugin.class).getDefaultWorldGenerator(worldName, id);
+        } else {
+            outOfTheSurfaceWorldGenerator = null;
+        }
+        getLogger().info(
+                "Using Underilla as main world generator (with " + outOfTheSurfaceWorldGenerator + " as outOfTheSurfaceWorldGenerator)!");
+        return new UnderillaChunkGenerator(this.worldSurfaceReader, this.worldCavesReader, outOfTheSurfaceWorldGenerator);
     }
 
     @Override
@@ -55,18 +67,18 @@ public final class Underilla extends JavaPlugin {
         // Loading reference world
         try {
             this.worldSurfaceReader = new BukkitWorldReader(Underilla.CONFIG.referenceWorldName);
-            this.getServer().getLogger().info("World + '" + Underilla.CONFIG.referenceWorldName + "' found.");
+            getLogger().info("World + '" + Underilla.CONFIG.referenceWorldName + "' found.");
         } catch (NoSuchFieldException e) {
-            this.getServer().getLogger().warning("No world with name '" + Underilla.CONFIG.referenceWorldName + "' found");
+            getLogger().warning("No world with name '" + Underilla.CONFIG.referenceWorldName + "' found");
             e.printStackTrace();
         }
         // Loading caves world if we should use it.
         if (Underilla.CONFIG.transferBlocksFromCavesWorld || Underilla.CONFIG.transferBiomesFromCavesWorld) {
             try {
-                this.getServer().getLogger().info("Loading caves world");
+                getLogger().info("Loading caves world");
                 this.worldCavesReader = new BukkitWorldReader(Underilla.CONFIG.cavesWorldName);
             } catch (NoSuchFieldException e) {
-                this.getServer().getLogger().warning("No world with name '" + Underilla.CONFIG.cavesWorldName + "' found");
+                getLogger().warning("No world with name '" + Underilla.CONFIG.cavesWorldName + "' found");
                 e.printStackTrace();
             }
         }
@@ -87,17 +99,15 @@ public final class Underilla extends JavaPlugin {
             if (Generator.times != null) {
                 long totalTime = Generator.times.entrySet().stream().mapToLong(Map.Entry::getValue).sum();
                 for (Map.Entry<String, Long> entry : Generator.times.entrySet()) {
-                    this.getServer().getLogger()
-                            .info(entry.getKey() + " took " + entry.getValue() + "ms (" + (entry.getValue() * 100 / totalTime) + "%)");
+                    getLogger().info(entry.getKey() + " took " + entry.getValue() + "ms (" + (entry.getValue() * 100 / totalTime) + "%)");
                 }
             }
             Map<String, Long> biomesPlaced = worldInitListener != null ? worldInitListener.getCustomBiomeSource().getBiomesPlaced()
                     : UnderillaChunkGenerator.getBiomesPlaced();
-            this.getServer().getLogger()
-                    .info("Map of chunks: " + biomesPlaced.entrySet().stream().sorted((a, b) -> Long.compare(b.getValue(), a.getValue()))
-                            .map(entry -> entry.getKey() + ": " + entry.getValue()).reduce((a, b) -> a + ", " + b).orElse(""));
+            getLogger().info("Map of chunks: " + biomesPlaced.entrySet().stream().sorted((a, b) -> Long.compare(b.getValue(), a.getValue()))
+                    .map(entry -> entry.getKey() + ": " + entry.getValue()).reduce((a, b) -> a + ", " + b).orElse(""));
         } catch (Exception e) {
-            this.getServer().getLogger().info("Fail to print times or biomes placed.");
+            getLogger().info("Fail to print times or biomes placed.");
             e.printStackTrace();
         }
     }

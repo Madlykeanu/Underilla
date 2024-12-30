@@ -141,3 +141,7 @@ Create a working jar with `./gradlew assemble`
 ## TODO
 - Build-in pre-generation system.
 - Allow to generate the 2nd world on the fly.
+
+```sh
+rm -fr Underilla-Spigot/run/world/;mkdir -pv Underilla-Spigot/run/world/datapacks; cp UnderillaBaseDataPack/ Underilla-Spigot/run/world/datapacks; ./gradlew runServer
+```

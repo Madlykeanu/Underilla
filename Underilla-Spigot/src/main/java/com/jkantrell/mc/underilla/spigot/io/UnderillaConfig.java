@@ -181,7 +181,11 @@ public class UnderillaConfig {
     }
     public enum IntegerKeys {
         // @formatter:off
-        SURFACE_LAYER_THICKNESS("relative_and_surface.depth", 6, 0, Integer.MAX_VALUE);
+        SURFACE_LAYER_THICKNESS("relative_and_surface.depth", 6, 0, Integer.MAX_VALUE),
+        GENERATION_AREA_MIN_X("generationArea.minX", 0),
+        GENERATION_AREA_MIN_Z("generationArea.minZ", 0),
+        GENERATION_AREA_MAX_X("generationArea.maxX", 512),
+        GENERATION_AREA_MAX_Z("generationArea.maxZ", 512);
         // @formatter:on
 
         private final String path;
@@ -194,10 +198,13 @@ public class UnderillaConfig {
             this.min = min;
             this.max = max;
         }
+        IntegerKeys(String path, int defaultValue) { this(path, defaultValue, Integer.MIN_VALUE, Integer.MAX_VALUE); }
+        IntegerKeys(String path) { this(path, 0); }
     }
     public enum StringKeys {
         // @formatter:off
-        SURFACE_WORLD("reference_world", "world_surface");
+        SURFACE_WORLD("reference_world", "world_surface"),
+        OUT_OF_THE_SURFACE_WORLD_GENERATOR("outOfTheSurfaceWorldGenerator", "VoidWorldGenerator");
         // @formatter:on
 
         private final String path;
@@ -224,7 +231,6 @@ public class UnderillaConfig {
     public enum SetBiomeStringKeys {
         // @formatter:off
         TRANSFERED_CAVES_WORLD_BIOMES("transfered_caves_world_biomes", Set.of("minecraft:deep_dark", "minecraft:dripstone_caves", "minecraft:lush_caves")),
-        // preserve_biomes
         SURFACE_WORLD_ONLY_ON_THIS_BIOMES("preserve_biomes"),
         APPLY_CARVERS_ONLY_ON_BIOMES("carvers.applyCarversOnBiomes.onlyOn"),
         APPLY_CARVERS_EXCEPT_ON_BIOMES("carvers.applyCarversOnBiomes.exceptOn"),

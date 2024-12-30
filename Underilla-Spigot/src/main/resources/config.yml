@@ -6,6 +6,21 @@ debug: true
 # The world to copy the surface from
 reference_world: "world_surface"
 
+# Set this area to match the surface world coordinates if you want to merge the entire surface world.
+# You can do test with a smaller area to speed up the process.
+# Each value should be a multiple of 16. The min values are inclusive, the max values are exclusive.
+generationArea:
+  minX: 0
+  minZ: 0
+  maxX: 512
+  maxZ: 512
+
+# Which world generator to use for the chunks that are out of the surface world.
+# Possible values: "VoidWorldGenerator", "VANILLA" or any other world generator plugin name that is installed on your server.
+# VANILLA will generate the chunks with the default world generator.
+# VoidWorldGenerator will generate void chunks. It's not possible to never generate chunks, so the best way to avoid having blocks outside of the surface world is to use this generator.
+outOfTheSurfaceWorldGenerator: "VoidWorldGenerator"
+
 # Weather or not to transfer the reference world's biomes over to the merged world. IF false, only terrain is merged.
 transfer_biomes: true
 
@@ -83,7 +98,7 @@ structures:
   # Example: ["MONUMENT","FORTRESS"]
   blacklist: []
 
-# Carvers -------------------------------------------------------------------------------------
+# Carvers -------------------------------------------------------------------------------------------------------------
 carvers:
   # Weather or not to allow vanilla Minecraft generate carvers in the world. It will use datapack carvers if specific carvers are defined in the biome .json files of a datapack.
   enabled: true
@@ -108,13 +123,3 @@ carvers:
     onlyOn: []
     # Preserve the surface world from cavers on all biomes except the ones listed here.
     exceptOn: []
-  
-  
-
-# # Allow vanilla Minecraft engine to generate caves over reference world terrain.
-# # This results in perlin worms type caves. 1.18+ caves are generated only in vanilla underground.
-# generate_noodle_caves: true
-
-# # The biomes where caves will reach surfaces.
-# # Biomes must be defined as spigot Biome enum constants or as biome resource key for example `minecraft:plains`. https://hub.spigotmc.org/javadocs/spigot/org/bukkit/block/Biome.html
-# ravin_biomes: []

@@ -23,6 +23,7 @@ repositories {
     maven ("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
     maven ("https://oss.sonatype.org/content/groups/public/")
     maven ("https://jitpack.io")
+    maven("https://repo.codemc.io/repository/maven-public/") // For Chunky
 }
 
 
@@ -32,6 +33,8 @@ dependencies {
     implementation("com.jkantrell:Yamlizer:main-SNAPSHOT")
     implementation("fr.formiko.mc.biomeutils:biomeutils:1.1.8")
     api("com.github.HydrolienF:KntNBT:2.2.2")
+    compileOnly("fr.formiko.mc.voidworldgenerator:voidworldgenerator:1.3.2")
+    compileOnly("org.popcraft:chunky-bukkit:1.4.28")
 }
 
 // tasks.build.dependsOn tasks.reobfJar // paperweight
@@ -52,6 +55,7 @@ tasks {
             "org.bstats",
             "jakarta.annotation",
             "fr.formiko.mc.biomeutils",
+            // "fr.formiko.mc.voidworldgenerator",
         ).forEach { pkg ->
             relocate(pkg, "$prefix.$pkg")
         }
@@ -83,6 +87,7 @@ tasks {
         // https://hangar.papermc.io/pop4959/Chunky
         downloadPlugins {
             hangar("Chunky", "1.4.28")
+            github("HydrolienF", "VoidWorldGenerator", "1.3.2", "VoidWorldGenerator-1.3.2.jar")
         }
     }
 }
