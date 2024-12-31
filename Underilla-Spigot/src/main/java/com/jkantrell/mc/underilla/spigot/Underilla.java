@@ -17,6 +17,7 @@ import com.jkantrell.mc.underilla.spigot.io.Config;
 import com.jkantrell.mc.underilla.spigot.io.UnderillaConfig;
 import com.jkantrell.mc.underilla.spigot.io.UnderillaConfig.StringKeys;
 import com.jkantrell.mc.underilla.spigot.listener.StructureEventListener;
+import com.jkantrell.mc.underilla.spigot.preparing.ServerSetup;
 
 public final class Underilla extends JavaPlugin {
 
@@ -90,6 +91,8 @@ public final class Underilla extends JavaPlugin {
         if (CONFIG.generateStructures) {
             this.getServer().getPluginManager().registerEvents(new StructureEventListener(CONFIG.structureBlackList), this);
         }
+
+        runSteps();
     }
 
     @Override
@@ -144,4 +147,11 @@ public final class Underilla extends JavaPlugin {
     public static void warning(String message, Throwable e) { log(Level.WARNING, message, e); }
     public static void error(String message) { log(Level.SEVERE, message); }
     public static void error(String message, Throwable e) { log(Level.SEVERE, message, e); }
+
+
+    private void runSteps() {
+        // TODO If there is config steps todo:
+        ServerSetup.setupPaper();
+        // ChunkyBukkit chunky = new ChunkyBukkit();
+    }
 }

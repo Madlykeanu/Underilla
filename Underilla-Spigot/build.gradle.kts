@@ -34,7 +34,10 @@ dependencies {
     implementation("fr.formiko.mc.biomeutils:biomeutils:1.1.8")
     api("com.github.HydrolienF:KntNBT:2.2.2")
     compileOnly("fr.formiko.mc.voidworldgenerator:voidworldgenerator:1.3.2")
-    compileOnly("org.popcraft:chunky-bukkit:1.4.28")
+    // compileOnly("org.popcraft:chunky-bukkit:1.4.28")
+    compileOnly("org.popcraft:chunky-common:1.4.28")
+    // compileOnly("org.popcraft:chunky-paper:1.4.28")
+    // compileOnly("org.popcraft:chunky-folia:1.4.28")
 }
 
 // tasks.build.dependsOn tasks.reobfJar // paperweight
