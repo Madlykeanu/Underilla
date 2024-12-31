@@ -55,8 +55,6 @@ transfered_caves_world_biomes:
   - "DRIPSTONE_CAVES"
   - "DEEP_DARK"
 
-custom_biome_enabled: false
-
 
 # How to merge vanilla and reference worlds.
 #   - SURFACE: Generation will be based on the custom word surface. It have a top limits with surface_and_absolute.limit and always generate world at least x blocks below the custom world surface (see relative_and_surface.depth). This is the best choice for most cases.

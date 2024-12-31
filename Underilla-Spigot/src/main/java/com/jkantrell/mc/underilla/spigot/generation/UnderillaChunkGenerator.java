@@ -194,15 +194,10 @@ public class UnderillaChunkGenerator extends ChunkGenerator {
     }
 
     // To support custom biomes, we can't use bukkit biome provider. So biome merging is done in CustomBiomeSource.
+    // Since 1.21.3 custom biomes are supported by paper.
     @Override
     public BiomeProvider getDefaultBiomeProvider(@NotNull WorldInfo worldInfo) {
-        // TODO Mvndi patch, if biome name contains "beach" return beach biome, if biome names contains "ocean" but not "deep" return ocean.
-        // This way we will have shipwrecks well placed.
-        if (Underilla.CONFIG.customBiomeEnabled) {
-            Underilla.getInstance().getLogger().info(
-                    "Custom biomes are enable. Structures won't be generate in the right biome. But features will be in the right biome.");
-            return null;
-        } else if (!Underilla.CONFIG.transferBiomes) {
+        if (!Underilla.CONFIG.transferBiomes) {
             Underilla.getInstance().getLogger().info(
                     "Biome aren't transfered from the reference world. This will generate the world with the default biome provider.");
             return null;

@@ -188,7 +188,6 @@ public class UnderillaConfig {
         TRANSFER_BIOMES("transfer_biomes", false),
         TRANSFER_BLOCKS_FROM_CAVES_WORLD("transfer_blocks_from_caves_world", false),
         TRANSFER_BIOMES_FROM_CAVES_WORLD("transfer_biomes_from_caves_world", false),
-        CUSTOM_BIOME_ENABLED("custom_biome_enabled", false),
         VANILLA_POPULATION("vanilla_population", true),
         STRUCTURES_ENABLED("structures.enabled", true),
         CARVERS_ENABLED("carvers.enabled", true),

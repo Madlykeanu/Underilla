@@ -20,8 +20,6 @@ public class GenerationConfig {
 
     public List<String> transferCavesWorldBiomes = Collections.emptyList();
 
-    public boolean customBiomeEnabled = false;
-
     public MergeStrategy mergeStrategy = MergeStrategy.SURFACE;
 
     public int mergeDepth = 12;

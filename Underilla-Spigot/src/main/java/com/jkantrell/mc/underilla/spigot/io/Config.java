@@ -46,9 +46,6 @@ public class Config extends AbstractYamlConfig {
     @ConfigField(path = "transfered_caves_world_biomes")
     public List<String> transferCavesWorldBiomes = List.of("minecraft:deep_dark", "minecraft:dripstone_caves", "minecraft:lush_caves");
 
-    @ConfigField(path = "custom_biome_enabled")
-    public boolean customBiomeEnabled = false;
-
     @ConfigField(path = "strategy")
     public MergeStrategy mergeStrategy = MergeStrategy.SURFACE;
 

@@ -24,7 +24,7 @@ public final class Underilla extends JavaPlugin {
     private UnderillaConfig underillaConfig;
     private BukkitWorldReader worldSurfaceReader;
     private @Nullable BukkitWorldReader worldCavesReader;
-    private com.jkantrell.mc.underilla.spigot.generation.WorldInitListener worldInitListener;
+    // private com.jkantrell.mc.underilla.spigot.generation.WorldInitListener worldInitListener;
     public static final int CHUNK_SIZE = 16;
 
 
@@ -90,10 +90,10 @@ public final class Underilla extends JavaPlugin {
         if (CONFIG.generateStructures) {
             this.getServer().getPluginManager().registerEvents(new StructureEventListener(CONFIG.structureBlackList), this);
         }
-        if (CONFIG.transferBiomes && CONFIG.customBiomeEnabled) {
-            worldInitListener = new com.jkantrell.mc.underilla.spigot.generation.WorldInitListener(worldSurfaceReader, worldCavesReader);
-            this.getServer().getPluginManager().registerEvents(worldInitListener, this);
-        }
+        // if (CONFIG.transferBiomes && CONFIG.customBiomeEnabled) {
+        // worldInitListener = new com.jkantrell.mc.underilla.spigot.generation.WorldInitListener(worldSurfaceReader, worldCavesReader);
+        // this.getServer().getPluginManager().registerEvents(worldInitListener, this);
+        // }
     }
 
     @Override
@@ -105,8 +105,9 @@ public final class Underilla extends JavaPlugin {
                     getLogger().info(entry.getKey() + " took " + entry.getValue() + "ms (" + (entry.getValue() * 100 / totalTime) + "%)");
                 }
             }
-            Map<String, Long> biomesPlaced = worldInitListener != null ? worldInitListener.getCustomBiomeSource().getBiomesPlaced()
-                    : UnderillaChunkGenerator.getBiomesPlaced();
+            // Map<String, Long> biomesPlaced = worldInitListener != null ? worldInitListener.getCustomBiomeSource().getBiomesPlaced()
+            // : UnderillaChunkGenerator.getBiomesPlaced();
+            Map<String, Long> biomesPlaced = UnderillaChunkGenerator.getBiomesPlaced();
             getLogger().info("Map of chunks: " + biomesPlaced.entrySet().stream().sorted((a, b) -> Long.compare(b.getValue(), a.getValue()))
                     .map(entry -> entry.getKey() + ": " + entry.getValue()).reduce((a, b) -> a + ", " + b).orElse(""));
         } catch (Exception e) {

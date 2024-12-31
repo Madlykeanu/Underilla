@@ -1,21 +1,13 @@
 package com.jkantrell.mc.underilla.spigot.impl;
 
-import fr.formiko.mc.biomeutils.NMSBiomeUtils;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import com.jkantrell.mc.underilla.spigot.Underilla;
-import com.mojang.serialization.MapCodec;
-import net.minecraft.core.Holder;
-import net.minecraft.core.Registry;
-import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSource;
-import net.minecraft.world.level.biome.Climate.Sampler;
 
-public class CustomBiomeSource extends BiomeSource implements java.util.function.Supplier<Set<Holder<Biome>>> {
+public class CustomBiomeSource {
     private final BiomeSource vanillaBiomeSource;
     private final BukkitWorldReader worldSurfaceReader;
     private final BukkitWorldReader worldCavesReader;
@@ -32,37 +24,6 @@ public class CustomBiomeSource extends BiomeSource implements java.util.function
     }
 
     public Map<String, Long> getBiomesPlaced() { return biomesPlaced; }
-
-    @Override
-    protected MapCodec<? extends BiomeSource> codec() { return null; }
-
-    @Override
-    protected Stream<Holder<Biome>> collectPossibleBiomes() {
-        Registry<Biome> biomeRegistry = NMSBiomeUtils.getBiomeRegistry();
-        Underilla.getInstance().getLogger().info(
-                "Collecting possible biomes: " + biomeRegistry.stream().map(biome -> biomeRegistry.getKey(biome).toString()).toList());
-        return biomeRegistry.stream().map(biomeRegistry::wrapAsHolder);
-    }
-
-    /**
-     * Get biome at x, y, z.
-     * 
-     * @param x Biome coordinate. (*4 to get world coordinate)
-     * @param y Biome coordinate. (*4 to get world coordinate)
-     * @param z Biome coordinate. (*4 to get world coordinate)
-     */
-    @Override
-    public Holder<Biome> getNoiseBiome(int x, int y, int z, @Nonnull Sampler noise) {
-        BukkitBiome vanillaBiome = null;
-        if (vanillaBiomeSource != null && noise != null) {
-            vanillaBiome = new BukkitBiome(vanillaBiomeSource.getNoiseBiome(x, y, z, noise).getRegisteredName());
-        }
-        // Edit value to mach actual world coordinates.
-        x = x << 2;
-        y = y << 2;
-        z = z << 2;
-        return getBiome(x, y, z, vanillaBiome).getBiomeHolder();
-    }
 
     /**
      * Get biome at x, y, z.
@@ -148,11 +109,4 @@ public class CustomBiomeSource extends BiomeSource implements java.util.function
             lastWarnningPrinted = currentTime;
         }
     }
-
-    /**
-     * I don't understand why BiomeSource need to extend Supplier, but it's needed to work with paper.
-     */
-    @Override
-    public Set<Holder<Biome>> get() { return collectPossibleBiomes().distinct().collect(java.util.stream.Collectors.toSet()); }
-
 }
