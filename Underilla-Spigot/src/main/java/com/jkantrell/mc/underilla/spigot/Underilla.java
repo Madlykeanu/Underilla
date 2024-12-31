@@ -31,7 +31,8 @@ public final class Underilla extends JavaPlugin {
     @Override
     public ChunkGenerator getDefaultWorldGenerator(String worldName, String id) {
         if (this.worldSurfaceReader == null) {
-            getLogger().warning("No world with name '" + Underilla.CONFIG.referenceWorldName + "' found");
+            getLogger()
+                    .warning("No world with name '" + Underilla.getUnderillaConfig().getString(StringKeys.SURFACE_WORLD_NAME) + "' found");
             return super.getDefaultWorldGenerator(worldName, id);
         }
         String outOfTheSurfaceWorldGeneratorName = Underilla.getUnderillaConfig().getString(StringKeys.OUT_OF_THE_SURFACE_WORLD_GENERATOR);
@@ -66,19 +67,21 @@ public final class Underilla extends JavaPlugin {
 
         // Loading reference world
         try {
-            this.worldSurfaceReader = new BukkitWorldReader(Underilla.CONFIG.referenceWorldName);
-            getLogger().info("World + '" + Underilla.CONFIG.referenceWorldName + "' found.");
+            this.worldSurfaceReader = new BukkitWorldReader(Underilla.getUnderillaConfig().getString(StringKeys.SURFACE_WORLD_NAME));
+            getLogger().info("World + '" + Underilla.getUnderillaConfig().getString(StringKeys.SURFACE_WORLD_NAME) + "' found.");
         } catch (NoSuchFieldException e) {
-            getLogger().warning("No world with name '" + Underilla.CONFIG.referenceWorldName + "' found");
+            getLogger()
+                    .warning("No world with name '" + Underilla.getUnderillaConfig().getString(StringKeys.SURFACE_WORLD_NAME) + "' found");
             e.printStackTrace();
         }
         // Loading caves world if we should use it.
         if (Underilla.CONFIG.transferBlocksFromCavesWorld || Underilla.CONFIG.transferBiomesFromCavesWorld) {
             try {
                 getLogger().info("Loading caves world");
-                this.worldCavesReader = new BukkitWorldReader(Underilla.CONFIG.cavesWorldName);
+                this.worldCavesReader = new BukkitWorldReader(Underilla.getUnderillaConfig().getString(StringKeys.CAVES_WORLD_NAME));
             } catch (NoSuchFieldException e) {
-                getLogger().warning("No world with name '" + Underilla.CONFIG.cavesWorldName + "' found");
+                getLogger().warning(
+                        "No world with name '" + Underilla.getUnderillaConfig().getString(StringKeys.CAVES_WORLD_NAME) + "' found");
                 e.printStackTrace();
             }
         }

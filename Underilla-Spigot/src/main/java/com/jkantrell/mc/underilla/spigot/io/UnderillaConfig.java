@@ -2,6 +2,7 @@ package com.jkantrell.mc.underilla.spigot.io;
 
 import fr.formiko.mc.biomeutils.NMSBiomeUtils;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumMap;
 import java.util.HashSet;
@@ -9,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import com.jkantrell.mc.underilla.spigot.Underilla;
 
@@ -18,6 +20,7 @@ public class UnderillaConfig {
     private final EnumMap<StringKeys, String> stringMap;
     private final EnumMap<SetStringKeys, Set<String>> listStringMap;
     private final EnumMap<SetBiomeStringKeys, Set<String>> listBiomeStringMap;
+    private final EnumMap<SetMaterialKeys, Set<Material>> listMaterialMap;
 
 
     public UnderillaConfig(FileConfiguration fileConfiguration) {
@@ -26,6 +29,7 @@ public class UnderillaConfig {
         stringMap = new EnumMap<>(StringKeys.class);
         listStringMap = new EnumMap<>(SetStringKeys.class);
         listBiomeStringMap = new EnumMap<>(SetBiomeStringKeys.class);
+        listMaterialMap = new EnumMap<>(SetMaterialKeys.class);
         reload(fileConfiguration);
     }
 
@@ -82,6 +86,26 @@ public class UnderillaConfig {
             }
         }
 
+        listMaterialMap.clear();
+        for (SetMaterialKeys key : SetMaterialKeys.values()) {
+            List<String> regexList = new ArrayList<>();
+            if (fileConfiguration.contains(key.path)) {
+                regexList.addAll(fileConfiguration.getStringList(key.path));
+            } else {
+                Underilla.warning("Key " + key + " not found in config");
+                regexList.addAll(key.defaultValue);
+            }
+            Set<Material> materialSet = Arrays.stream(Material.values())
+                    .filter(material -> regexList.stream().anyMatch(s -> material.toString().matches(s))).collect(Collectors.toSet());
+            listMaterialMap.put(key, materialSet);
+        }
+
+        initListBiomeStringMap(fileConfiguration);
+
+        Underilla.info("Config reloaded with values: " + this);
+    }
+
+    private void initListBiomeStringMap(FileConfiguration fileConfiguration) {
         Set<String> allBiomes = NMSBiomeUtils.getAllBiomes().keySet();
         listBiomeStringMap.clear();
         for (SetBiomeStringKeys key : SetBiomeStringKeys.values()) {
@@ -123,15 +147,14 @@ public class UnderillaConfig {
             listBiomeStringMap.put(SetBiomeStringKeys.PRESERVE_SURFACE_WORLD_FROM_CAVERS_ONLY_ON_BIOMES, Set.of());
             listBiomeStringMap.remove(SetBiomeStringKeys.PRESERVE_SURFACE_WORLD_FROM_CAVERS_EXCEPT_ON_BIOMES);
         }
-
-        Underilla.info("Config reloaded with values: " + this);
     }
 
 
     @Override
     public String toString() {
         return "UnderillaConfig{" + "booleanMap=" + booleanMap + "\nintegerMap=" + integerMap + "\nstringMap=" + stringMap
-                + "\nlistStringMap=" + toString(listStringMap) + "\nlistBiomeStringMap=" + toString(listBiomeStringMap) + '}';
+                + "\nlistStringMap=" + toString(listStringMap) + "\nlistBiomeStringMap=" + toString(listBiomeStringMap)
+                + "\nlistMaterialMap=" + toString(listMaterialMap) + '}';
     }
     private String toString(Map<?, ? extends Collection<?>> map) {
         return map.entrySet().stream().map(e -> e.getKey() + " (" + e.getValue().size() + ") = " + e.getValue().stream().sorted().toList())
@@ -203,8 +226,9 @@ public class UnderillaConfig {
     }
     public enum StringKeys {
         // @formatter:off
-        FINAL_WORLD("final_world", "world"),
-        SURFACE_WORLD("reference_world", "world_surface"),
+        FINAL_WORLD_NAME("final_world", "world"),
+        SURFACE_WORLD_NAME("reference_world", "world_surface"),
+        CAVES_WORLD_NAME("caves_world", "world_caves"),
         OUT_OF_THE_SURFACE_WORLD_GENERATOR("outOfTheSurfaceWorldGenerator", "VoidWorldGenerator"),
         STRATEGY("strategy", "SURFACE");
         // @formatter:on
@@ -247,5 +271,17 @@ public class UnderillaConfig {
             this.defaultValue = defaultValue;
         }
         SetBiomeStringKeys(String path) { this(path, Set.of()); }
+    }
+    public enum SetMaterialKeys {
+        // @formatter:off
+        IGNORED_BLOCK_FOR_SURFACE_CALCULATION("ignored_block_for_surface_calculation");
+        // @formatter:on
+        private final String path;
+        private final Set<String> defaultValue;
+        SetMaterialKeys(String path, Set<String> defaultValue) {
+            this.path = path;
+            this.defaultValue = defaultValue;
+        }
+        SetMaterialKeys(String path) { this(path, Set.of()); }
     }
 }

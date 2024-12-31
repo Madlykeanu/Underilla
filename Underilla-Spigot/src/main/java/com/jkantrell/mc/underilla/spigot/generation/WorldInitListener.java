@@ -8,6 +8,7 @@ import org.bukkit.event.world.WorldInitEvent;
 import com.jkantrell.mc.underilla.spigot.Underilla;
 import com.jkantrell.mc.underilla.spigot.impl.BukkitWorldReader;
 import com.jkantrell.mc.underilla.spigot.impl.CustomBiomeSource;
+import com.jkantrell.mc.underilla.spigot.io.UnderillaConfig.BooleanKeys;
 import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.biome.BiomeSource;
@@ -28,12 +29,14 @@ public class WorldInitListener implements Listener {
 
     @EventHandler
     public void onWorldInit(WorldInitEvent event) {
-        if (!Underilla.CONFIG.customBiomeEnabled){
-            Underilla.getInstance().getLogger().info("Custom biome is disabled, no need to take over the world: " + event.getWorld().getName());
+        if (!Underilla.getUnderillaConfig().getBoolean(BooleanKeys.CUSTOM_BIOME_ENABLED)) {
+            Underilla.getInstance().getLogger()
+                    .info("Custom biome is disabled, no need to take over the world: " + event.getWorld().getName());
             return;
         }
 
-        Underilla.getInstance().getLogger().info("Preparing to take over the world: " + event.getWorld().getName()+" to use custom biome source");
+        Underilla.getInstance().getLogger()
+                .info("Preparing to take over the world: " + event.getWorld().getName() + " to use custom biome source");
         CraftWorld craftWorld = (CraftWorld) event.getWorld();
         ServerLevel serverLevel = craftWorld.getHandle();
 
@@ -76,7 +79,7 @@ public class WorldInitListener implements Listener {
             // // Edit value even if it's final.
             // unsafe = getUnsafe();
             // unsafe.putObject(biomeSourceStructureCheck.get(structureCheck), unsafe.objectFieldOffset(biomeSourceStructureCheck),
-            //         customBiomeSource);
+            // customBiomeSource);
             // biomeSourceStructureCheck.set(structureCheck, customBiomeSource);
 
             // Field structureManagerField = getField(serverLevel.getClass(), net.minecraft.world.level.StructureManager.class);
@@ -85,7 +88,7 @@ public class WorldInitListener implements Listener {
             // structureCheckInStructureManager.setAccessible(true);
             // unsafe = getUnsafe();
             // unsafe.putObject(structureCheckInStructureManager.get(structureManagerField.get(serverLevel)),
-            //         unsafe.objectFieldOffset(structureCheckInStructureManager), structureCheck);
+            // unsafe.objectFieldOffset(structureCheckInStructureManager), structureCheck);
             // structureCheckInStructureManager.set(structureManagerField.get(serverLevel), structureCheck);
 
 
