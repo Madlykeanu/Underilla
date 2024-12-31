@@ -267,7 +267,7 @@ public class UnderillaChunkGenerator extends ChunkGenerator {
         }
 
         @Override
-        public @Nonnull Biome getBiome(@Nonnull WorldInfo worldInfo, int x, int y, int z) {
+        public @Nonnull Biome getBiome(@NotNull WorldInfo worldInfo, int x, int y, int z) {
             if (outOfTheSurfaceWorldBiomeProdiver != null && isOutsideOfTheSurfaceWorld(x, z)) {
                 return outOfTheSurfaceWorldBiomeProdiver.getBiome(worldInfo, x, y, z);
             }
@@ -275,8 +275,9 @@ public class UnderillaChunkGenerator extends ChunkGenerator {
         }
 
         @Override
-        public @Nonnull List<Biome> getBiomes(@Nonnull WorldInfo worldInfo) {
-            return List.of(Biome.values()).stream().filter(b -> !b.equals(Biome.CUSTOM)).toList();
+        public @Nonnull List<Biome> getBiomes(@NotNull WorldInfo worldInfo) {
+            return io.papermc.paper.registry.RegistryAccess.registryAccess().getRegistry(io.papermc.paper.registry.RegistryKey.BIOME)
+                    .stream().toList();
         }
 
     }
