@@ -181,7 +181,7 @@ public class UnderillaConfig {
     }
     public enum IntegerKeys {
         // @formatter:off
-        SURFACE_LAYER_THICKNESS("relative_and_surface.depth", 6, 0, Integer.MAX_VALUE),
+        SURFACE_LAYER_THICKNESS("surface.depth", 6, 0, Integer.MAX_VALUE),
         GENERATION_AREA_MIN_X("generationArea.minX", 0),
         GENERATION_AREA_MIN_Z("generationArea.minZ", 0),
         GENERATION_AREA_MAX_X("generationArea.maxX", 512),
@@ -203,8 +203,10 @@ public class UnderillaConfig {
     }
     public enum StringKeys {
         // @formatter:off
+        FINAL_WORLD("final_world", "world"),
         SURFACE_WORLD("reference_world", "world_surface"),
-        OUT_OF_THE_SURFACE_WORLD_GENERATOR("outOfTheSurfaceWorldGenerator", "VoidWorldGenerator");
+        OUT_OF_THE_SURFACE_WORLD_GENERATOR("outOfTheSurfaceWorldGenerator", "VoidWorldGenerator"),
+        STRATEGY("strategy", "SURFACE");
         // @formatter:on
 
         private final String path;

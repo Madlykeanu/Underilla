@@ -52,13 +52,7 @@ public class Config extends AbstractYamlConfig {
     @ConfigField(path = "strategy")
     public MergeStrategy mergeStrategy = MergeStrategy.SURFACE;
 
-    @ConfigField(path = "relative.upper_limit")
-    public int mergeUpperLimit = 320;
-
-    @ConfigField(path = "relative.lower_limit")
-    public int mergeLowerLimit = -64;
-
-    @ConfigField(path = "relative_and_surface.depth")
+    @ConfigField(path = "surface.depth")
     public int mergeDepth = 12;
 
     @ConfigField(path = "kept_reference_world_blocks")
@@ -90,8 +84,6 @@ public class Config extends AbstractYamlConfig {
         r.cavesWorldName = this.cavesWorldName;
         r.transferCavesWorldBiomes = NMSBiomeUtils.normalizeBiomeNameList(this.transferCavesWorldBiomes);
         r.mergeStrategy = this.mergeStrategy;
-        r.mergeUpperLimit = this.mergeUpperLimit;
-        r.mergeLowerLimit = this.mergeLowerLimit;
         r.mergeDepth = this.mergeDepth;
         r.keptReferenceWorldBlocks = this.keptReferenceWorldBlocks;
         r.preserveBiomes = NMSBiomeUtils.normalizeBiomeNameList(this.preserveBiomes);

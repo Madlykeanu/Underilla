@@ -1,7 +1,22 @@
 debug: true
 
-# # The world to merge the terrain into
-# world: "world"
+# Steps to merge the worlds -------------------------------------------------------------------------------------------
+# steps can be "todo", "doing", "done", "failed" or "skip"
+# If you don't want a step to be done, set it to "skip"
+steps:
+  # setupPaperForQuickGeneration: "todo"
+  # downloadDependencyPlugins: "todo"
+  # generateSurfaceWorld: "todo"
+  # setUnderillaAsWorldGenerator: "todo"
+  # Remove world folder if it already exists
+  # Need a restart before running this step
+  underillaGeneration: "todo"
+  cleaningBlocks: "todo"
+  cleaingEntities: "todo"
+
+
+# The world to merge the terrain into
+final_world: "world"
 
 # The world to copy the surface from
 reference_world: "world_surface"
@@ -45,8 +60,6 @@ custom_biome_enabled: false
 
 # How to merge vanilla and reference worlds.
 #   - SURFACE: Generation will be based on the custom word surface. It have a top limits with surface_and_absolute.limit and always generate world at least x blocks below the custom world surface (see relative_and_surface.depth). This is the best choice for most cases.
-#   - RELATIVE: At a given depth based on terrain height and air pockets at every X and Z coordinates. This strategy sometimes results in stone clusters at random places. Use only if you absolutely need to keep your custom world underground caves.
-#   - ABSOLUTE: At a fixed Y height.
 #   - NONE: Just... don't merge. Reference world will be re-generated without vanilla underground.
 strategy: "SURFACE"
 
@@ -67,7 +80,7 @@ surface_and_absolute:
   limit: 60
 
 # How deep reference world terrain should dig into vanilla word.
-relative_and_surface:
+surface:
   depth: 6
 
 

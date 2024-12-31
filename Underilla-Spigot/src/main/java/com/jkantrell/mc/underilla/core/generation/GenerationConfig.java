@@ -24,10 +24,6 @@ public class GenerationConfig {
 
     public MergeStrategy mergeStrategy = MergeStrategy.SURFACE;
 
-    public int mergeUpperLimit = 320;
-
-    public int mergeLowerLimit = -64;
-
     public int mergeDepth = 12;
 
     public List<String> keptReferenceWorldBlocks = Collections.emptyList();
