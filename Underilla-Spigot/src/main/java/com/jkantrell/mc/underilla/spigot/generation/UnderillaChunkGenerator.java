@@ -197,17 +197,11 @@ public class UnderillaChunkGenerator extends ChunkGenerator {
     // Since 1.21.3 custom biomes are supported by paper.
     @Override
     public BiomeProvider getDefaultBiomeProvider(@NotNull WorldInfo worldInfo) {
-        if (!Underilla.CONFIG.transferBiomes) {
-            Underilla.getInstance().getLogger().info(
-                    "Biome aren't transfered from the reference world. This will generate the world with the default biome provider.");
-            return null;
-        } else {
-            Underilla.getInstance().getLogger()
-                    .info("Underilla Use the custom biome provider from file data. Structures will be generate in the right biome.");
-            BiomeProvider outOfTheSurfaceWorldBiomeProdiver = outOfTheSurfaceWorldGenerator == null ? null
-                    : outOfTheSurfaceWorldGenerator.getDefaultBiomeProvider(worldInfo);
-            return new BiomeProviderFromFile(outOfTheSurfaceWorldBiomeProdiver);
-        }
+        Underilla.getInstance().getLogger()
+                .info("Underilla Use the custom biome provider from file data. Structures will be generate in the right biome.");
+        BiomeProvider outOfTheSurfaceWorldBiomeProdiver = outOfTheSurfaceWorldGenerator == null ? null
+                : outOfTheSurfaceWorldGenerator.getDefaultBiomeProvider(worldInfo);
+        return new BiomeProviderFromFile(outOfTheSurfaceWorldBiomeProdiver);
     }
 
     public static Map<String, Long> getBiomesPlaced() { return customBiomeSource.getBiomesPlaced(); }
@@ -257,8 +251,7 @@ public class UnderillaChunkGenerator extends ChunkGenerator {
 
         private BiomeProviderFromFile(BiomeProvider outOfTheSurfaceWorldBiomeProdiver) {
             this.outOfTheSurfaceWorldBiomeProdiver = outOfTheSurfaceWorldBiomeProdiver;
-            customBiomeSource = new CustomBiomeSource(null, ((BukkitWorldReader) worldSurfaceReader),
-                    ((BukkitWorldReader) worldCavesReader));
+            customBiomeSource = new CustomBiomeSource(((BukkitWorldReader) worldSurfaceReader), ((BukkitWorldReader) worldCavesReader));
         }
 
         @Override
@@ -266,7 +259,7 @@ public class UnderillaChunkGenerator extends ChunkGenerator {
             if (outOfTheSurfaceWorldBiomeProdiver != null && isOutsideOfTheSurfaceWorld(x, z)) {
                 return outOfTheSurfaceWorldBiomeProdiver.getBiome(worldInfo, x, y, z);
             }
-            return customBiomeSource.getBiome(x, y, z, null).getBiome();
+            return customBiomeSource.getBiome(worldInfo, x, y, z);
         }
 
         @Override

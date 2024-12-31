@@ -90,10 +90,6 @@ public final class Underilla extends JavaPlugin {
         if (CONFIG.generateStructures) {
             this.getServer().getPluginManager().registerEvents(new StructureEventListener(CONFIG.structureBlackList), this);
         }
-        // if (CONFIG.transferBiomes && CONFIG.customBiomeEnabled) {
-        // worldInitListener = new com.jkantrell.mc.underilla.spigot.generation.WorldInitListener(worldSurfaceReader, worldCavesReader);
-        // this.getServer().getPluginManager().registerEvents(worldInitListener, this);
-        // }
     }
 
     @Override

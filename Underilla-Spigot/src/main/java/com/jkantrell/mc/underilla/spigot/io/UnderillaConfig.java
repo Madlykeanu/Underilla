@@ -147,6 +147,14 @@ public class UnderillaConfig {
             listBiomeStringMap.put(SetBiomeStringKeys.PRESERVE_SURFACE_WORLD_FROM_CAVERS_ONLY_ON_BIOMES, Set.of());
             listBiomeStringMap.remove(SetBiomeStringKeys.PRESERVE_SURFACE_WORLD_FROM_CAVERS_EXCEPT_ON_BIOMES);
         }
+
+        if (getBoolean(BooleanKeys.BIOME_MERGING_FROM_CAVES_GENERATION_ENABLED)) {
+            mergeOnlyOnAndExceptOn(SetBiomeStringKeys.BIOME_MERGING_FROM_CAVES_GENERATION_ONLY_ON_BIOMES,
+                    SetBiomeStringKeys.BIOME_MERGING_FROM_CAVES_GENERATION_EXCEPT_ON_BIOMES, allBiomes);
+        } else {
+            listBiomeStringMap.put(SetBiomeStringKeys.BIOME_MERGING_FROM_CAVES_GENERATION_ONLY_ON_BIOMES, Set.of());
+            listBiomeStringMap.remove(SetBiomeStringKeys.BIOME_MERGING_FROM_CAVES_GENERATION_EXCEPT_ON_BIOMES);
+        }
     }
 
 
@@ -191,7 +199,8 @@ public class UnderillaConfig {
         VANILLA_POPULATION("vanilla_population", true),
         STRUCTURES_ENABLED("structures.enabled", true),
         CARVERS_ENABLED("carvers.enabled", true),
-        PRESERVE_SURFACE_WORLD_FROM_CAVERS("carvers.preserveSurfaceWorldFromCavers", true);
+        PRESERVE_SURFACE_WORLD_FROM_CAVERS("carvers.preserveSurfaceWorldFromCavers", true),
+        BIOME_MERGING_FROM_CAVES_GENERATION_ENABLED("structures.enabled", true);
         // @formatter:on
 
         private final String path;
@@ -260,7 +269,9 @@ public class UnderillaConfig {
         APPLY_CARVERS_ONLY_ON_BIOMES("carvers.applyCarversOnBiomes.onlyOn"),
         APPLY_CARVERS_EXCEPT_ON_BIOMES("carvers.applyCarversOnBiomes.exceptOn"),
         PRESERVE_SURFACE_WORLD_FROM_CAVERS_ONLY_ON_BIOMES("carvers.preserveSurfaceWorldFromCaversOnBiomes.onlyOn"),
-        PRESERVE_SURFACE_WORLD_FROM_CAVERS_EXCEPT_ON_BIOMES("carvers.preserveSurfaceWorldFromCaversOnBiomes.exceptOn");
+        PRESERVE_SURFACE_WORLD_FROM_CAVERS_EXCEPT_ON_BIOMES("carvers.preserveSurfaceWorldFromCaversOnBiomes.exceptOn"),
+        BIOME_MERGING_FROM_CAVES_GENERATION_ONLY_ON_BIOMES("biomesMerging.fromCavesGeneration.onlyOn", Set.of("minecraft:deep_dark", "minecraft:dripstone_caves", "minecraft:lush_caves")),
+        BIOME_MERGING_FROM_CAVES_GENERATION_EXCEPT_ON_BIOMES("biomesMerging.fromCavesGeneration.exceptOn");
         // @formatter:on
 
         private final String path;

@@ -36,9 +36,6 @@ generationArea:
 # VoidWorldGenerator will generate void chunks. It's not possible to never generate chunks, so the best way to avoid having blocks outside of the surface world is to use this generator.
 outOfTheSurfaceWorldGenerator: "VoidWorldGenerator"
 
-# Weather or not to transfer the reference world's biomes over to the merged world. IF false, only terrain is merged.
-transfer_biomes: true
-
 # If true caves block will be transferred from caves_world to the merged world. Else it will be generated from a new vanilla world.
 # This is useful if you want to have a custom underground from an existing world. This is mandatory if you wich to transfer underground biomes as "LUSH_CAVES".
 transfer_blocks_from_caves_world: false
@@ -139,4 +136,18 @@ carvers:
     # Preserve the surface world from cavers only on the biomes listed here.
     onlyOn: []
     # Preserve the surface world from cavers on all biomes except the ones listed here.
+    exceptOn: []
+
+# Biomes transfer -----------------------------------------------------------------------------------------------------
+biomesMerging:
+  # From where to take the biomes the underground part of the world.
+  # Over the surface, only the surface biomes will be taken.
+  # Default value use the caves biomes from the caves generation is there is any, else it will use the surface biomes.
+  # Having this biome is mandatory to have the features that come with it as the dripstones.
+  fromCavesGeneration:
+    enabled: true
+    onlyOn:
+      - "minecraft:lush_caves"
+      - "minecraft:dripstone_caves"
+      - "minecraft:deep_dark"
     exceptOn: []
