@@ -10,9 +10,12 @@ import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.generator.BiomeProvider;
 import org.bukkit.generator.WorldInfo;
 import org.jetbrains.annotations.NotNull;
+import com.jkantrell.mc.underilla.core.generation.AbsoluteMerger;
+import com.jkantrell.mc.underilla.core.reader.ChunkReader;
 import com.jkantrell.mc.underilla.spigot.Underilla;
 import com.jkantrell.mc.underilla.spigot.io.UnderillaConfig.SetBiomeStringKeys;
 import com.jkantrell.mc.underilla.spigot.io.UnderillaConfig.StringKeys;
+import com.jkantrell.mca.MCAUtil;
 
 public class CustomBiomeSource {
     private BiomeProvider vanillaBiomeSource;
@@ -40,6 +43,8 @@ public class CustomBiomeSource {
      * @return
      */
     public Biome getBiome(@NotNull WorldInfo worldInfo, int x, int y, int z) {
+        // Needed to get surface biome & test if caves biome will override a preserved biome.
+        BukkitBiome surfaceWorldBiome = (BukkitBiome) worldSurfaceReader.biomeAt(x, y, z).orElse(null);
 
         if (vanillaBiomeSource == null) {
             CraftWorld worldFinal = (CraftWorld) Bukkit.getWorld(Underilla.getUnderillaConfig().getString(StringKeys.FINAL_WORLD_NAME));
@@ -47,23 +52,20 @@ public class CustomBiomeSource {
             Underilla.getInstance().getLogger().warning("VanillaBiomeSource was null. It is now set to " + vanillaBiomeSource);
         }
 
-        if (vanillaBiomeSource != null) {
+        if (vanillaBiomeSource != null && !Underilla.CONFIG.preserveBiomes.contains(surfaceWorldBiome.getName())) {
             Biome vanillaBiome = vanillaBiomeSource.getBiome(worldInfo, x, y, z);
             String vanillaBiomeName = vanillaBiome == null ? "null" : vanillaBiome.getKey().asString();
             // info("Currently tested vanillaBiome: " + vanillaBiomeName + " at " + x + " " + y + " " + z);
             // If is a cave biome that we should preserve & is below the surface of surface world.
-            // TODO only below the surface of the surface world.
             if (vanillaBiomeName != null && Underilla.getUnderillaConfig()
-                    .isBiomeInSet(SetBiomeStringKeys.BIOME_MERGING_FROM_CAVES_GENERATION_ONLY_ON_BIOMES, vanillaBiomeName)) {
+                    .isBiomeInSet(SetBiomeStringKeys.BIOME_MERGING_FROM_CAVES_GENERATION_ONLY_ON_BIOMES, vanillaBiomeName)
+                    && y < topYOfSurfaceWorld(worldSurfaceReader, x, z)) {
                 String key = "cavesGeneration:" + vanillaBiomeName;
                 info("Use vanillaBiome because it's a cavesGeneration biome: " + vanillaBiomeName + " at " + x + " " + y + " " + z);
                 biomesPlaced.put(key, biomesPlaced.getOrDefault(key, 0L) + 1);
                 return vanillaBiome;
             }
         }
-
-        // Needed to get surface biome & test if caves biome will override a preserved biome.
-        BukkitBiome surfaceWorldBiome = (BukkitBiome) worldSurfaceReader.biomeAt(x, y, z).orElse(null);
 
         // // Get biome from cave world if it's in the list of transferWorldFromCavesWorld.
         // // & surface biome does not have a preserved biome here.
@@ -96,6 +98,14 @@ public class CustomBiomeSource {
         String key = "error:" + BukkitBiome.DEFAULT.getName();
         biomesPlaced.put(key, biomesPlaced.getOrDefault(key, 0L) + 1);
         return BukkitBiome.DEFAULT.getBiome();
+    }
+
+    private int topYOfSurfaceWorld(BukkitWorldReader worldSurfaceReader, int x, int z) {
+        int chunkX = MCAUtil.blockToChunk(x);
+        int chunkZ = MCAUtil.blockToChunk(z);
+        ChunkReader surfaceReader = worldSurfaceReader.readChunk(chunkX, chunkZ).orElse(null);
+        return AbsoluteMerger.getLowerBlockOfSurfaceWorldYLevel(surfaceReader, x % Underilla.CHUNK_SIZE, z % Underilla.CHUNK_SIZE,
+                Underilla.CONFIG.mergeDepth, Underilla.CONFIG.mergeLimit);
     }
 
     private synchronized void info(String message) {

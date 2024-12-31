@@ -143,5 +143,5 @@ Create a working jar with `./gradlew assemble`
 - Allow to generate the 2nd world on the fly.
 
 ```sh
-rm Underilla-Spigot/run/world_surface/ -fr; cp testMap/testMap/ Underilla-Spigot/run/world_surface/; rm -fr Underilla-Spigot/run/world/; mkdir -pv Underilla-Spigot/run/world/datapacks; cp UnderillaBaseDataPack/ Underilla-Spigot/run/world/datapacks; ./gradlew runServer
+rm Underilla-Spigot/run/world_surface/ -fr; cp testMap/world/ Underilla-Spigot/run/world_surface/; rm -fr Underilla-Spigot/run/world/; mkdir -pv Underilla-Spigot/run/world/datapacks; cp UnderillaBaseDataPack/ Underilla-Spigot/run/world/datapacks; ./gradlew runServer
 ```

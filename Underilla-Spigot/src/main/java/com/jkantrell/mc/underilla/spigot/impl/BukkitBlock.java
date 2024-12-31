@@ -14,6 +14,7 @@ import com.jkantrell.mc.underilla.spigot.Underilla;
 
 public class BukkitBlock implements Block {
     private static Collection<Material> ignoredBlockForSurfaceCalculation;
+    public static final BukkitBlock AIR = new BukkitBlock(Material.AIR.createBlockData());
 
     // FIELDS
     private BlockData blockData_;

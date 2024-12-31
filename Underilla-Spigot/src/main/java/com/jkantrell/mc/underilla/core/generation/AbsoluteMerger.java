@@ -11,10 +11,10 @@ import com.jkantrell.mc.underilla.core.vector.IntVector;
 import com.jkantrell.mc.underilla.core.vector.Vector;
 import com.jkantrell.mc.underilla.core.vector.VectorIterable;
 import com.jkantrell.mc.underilla.spigot.Underilla;
+import com.jkantrell.mc.underilla.spigot.impl.BukkitBlock;
 import com.jkantrell.mc.underilla.spigot.io.UnderillaConfig.SetBiomeStringKeys;
-import com.jkantrell.mca.MCAUtil;
 
-class AbsoluteMerger implements Merger {
+public class AbsoluteMerger implements Merger {
 
     // FIELDS
     private final int height_;
@@ -33,10 +33,9 @@ class AbsoluteMerger implements Merger {
     @Override
     public void mergeLand(ChunkReader surfaceReader, ChunkData chunkData, @Nullable ChunkReader cavesReader) {
         long startTime = System.currentTimeMillis();
-        Block airBlock = surfaceReader.blockFromTag(MCAUtil.airBlockTag()).get();
         // int airColumn = Math.max(reader.airSectionsBottom(), -64);
         int airColumn = surfaceReader.airSectionsBottom();
-        chunkData.setRegion(0, airColumn, 0, 16, chunkData.getMaxHeight(), 16, airBlock);
+        chunkData.setRegion(0, airColumn, 0, 16, chunkData.getMaxHeight(), 16, BukkitBlock.AIR);
 
         VectorIterable iterable = new VectorIterable(0, 16, -64, airColumn, 0, 16);
         int columnHeigth = this.height_;
@@ -45,10 +44,10 @@ class AbsoluteMerger implements Merger {
         Generator.addTime("Create VectorIterable to merge land", startTime);
         for (Vector<Integer> v : iterable) {
             startTime = System.currentTimeMillis();
-            Block customBlock = surfaceReader.blockAt(v).orElse(airBlock);
+            Block customBlock = surfaceReader.blockAt(v).orElse(BukkitBlock.AIR);
             Generator.addTime("Read block data from custom world", startTime);
             startTime = System.currentTimeMillis();
-            Block vanillaBlock = cavesReader == null ? chunkData.getBlock(v) : cavesReader.blockAt(v).orElse(airBlock);
+            Block vanillaBlock = cavesReader == null ? chunkData.getBlock(v) : cavesReader.blockAt(v).orElse(BukkitBlock.AIR);
             Generator.addTime("Read block data from vanilla world", startTime);
 
             // For every collumn of bloc calculate the lower block to remove that migth be lower than height_.
@@ -56,7 +55,7 @@ class AbsoluteMerger implements Merger {
             if (v.x() != lastX || v.z() != lastZ) {
                 lastX = v.x();
                 lastZ = v.z();
-                columnHeigth = (isPreservedBiome(surfaceReader, v) ? -64 : getLowerBlockToRemove(surfaceReader, v.x(), v.z(), airBlock));
+                columnHeigth = (isPreservedBiome(surfaceReader, v) ? -64 : getLowerBlockToRemove(surfaceReader, v.x(), v.z()));
             }
             Generator.addTime("Calculate lower block to remove", startTime);
 
@@ -88,12 +87,15 @@ class AbsoluteMerger implements Merger {
     }
 
     /** return the 1st block mergeDepth_ blocks under surface or heigth_ */
-    private int getLowerBlockToRemove(Reader surfaceReader, int x, int z, Block defaultBlock) {
-        int lbtr = this.height_ + mergeDepth_;
-        while (!surfaceReader.blockAt(x, lbtr, z).orElse(defaultBlock).isSolidAndSurfaceBlock() && lbtr > -64) {
+    private int getLowerBlockToRemove(Reader surfaceReader, int x, int z) {
+        return getLowerBlockOfSurfaceWorldYLevel(surfaceReader, x, z, mergeDepth_, height_);
+    }
+    public static int getLowerBlockOfSurfaceWorldYLevel(Reader surfaceReader, int localX, int localZ, int mergeDepth, int height) {
+        int lbtr = height + mergeDepth;
+        while (!surfaceReader.blockAt(localX, lbtr, localZ).orElse(BukkitBlock.AIR).isSolidAndSurfaceBlock() && lbtr > -64) {
             lbtr--;
         }
-        return lbtr - mergeDepth_;
+        return lbtr - mergeDepth;
     }
 
 
