@@ -55,24 +55,16 @@ transfered_caves_world_biomes:
 
 # How to merge vanilla and reference worlds.
 #   - SURFACE: Generation will be based on the custom word surface. It have a top limits with surface_and_absolute.limit and always generate world at least x blocks below the custom world surface (see relative_and_surface.depth). This is the best choice for most cases.
+#   - ABSOLUTE: At a fixed Y height.
 #   - NONE: Just... don't merge. Reference world will be re-generated without vanilla underground.
 strategy: "SURFACE"
-
-# RELATIVE strategy exclusive settings
-relative:
-  # Above this height the RELATIVE strategy will be ignored, and only reference world terrain will be placed.
-  # No effect if > 319
-  upper_limit: 320
-  # Below this height the RELATIVE strategy will be ignored, and only vanilla world terrain will be placed.
-  # No effect if <= -64
-  lower_limit: -64
 
 
 # Mix strategy exclusive settings
 surface_and_absolute:
   # The Y height dividing reference terrain above and vanilla worlds below.
   # Increasing this value way above 60 won't have much effect as the caves are only generated in vanilla world.
-  limit: 60
+  limit: 320
 
 # How deep reference world terrain should dig into vanilla word.
 surface:
