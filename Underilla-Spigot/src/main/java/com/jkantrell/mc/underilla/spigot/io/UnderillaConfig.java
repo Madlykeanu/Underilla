@@ -12,6 +12,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.generator.structure.Structure;
+import com.jkantrell.mc.underilla.core.generation.MergeStrategy;
 import com.jkantrell.mc.underilla.spigot.Underilla;
 
 public class UnderillaConfig {
@@ -21,6 +23,8 @@ public class UnderillaConfig {
     private final EnumMap<SetStringKeys, Set<String>> listStringMap;
     private final EnumMap<SetBiomeStringKeys, Set<String>> listBiomeStringMap;
     private final EnumMap<SetMaterialKeys, Set<Material>> listMaterialMap;
+    private final EnumMap<SetStructureKeys, Set<Structure>> listStructureMap;
+    private MergeStrategy mergeStrategy;
 
 
     public UnderillaConfig(FileConfiguration fileConfiguration) {
@@ -30,6 +34,7 @@ public class UnderillaConfig {
         listStringMap = new EnumMap<>(SetStringKeys.class);
         listBiomeStringMap = new EnumMap<>(SetBiomeStringKeys.class);
         listMaterialMap = new EnumMap<>(SetMaterialKeys.class);
+        listStructureMap = new EnumMap<>(SetStructureKeys.class);
         reload(fileConfiguration);
     }
 
@@ -38,8 +43,13 @@ public class UnderillaConfig {
     public String getString(StringKeys key) { return stringMap.get(key); }
     public Set<String> getSetString(SetStringKeys key) { return listStringMap.get(key); }
     public Set<String> getSetBiomeString(SetBiomeStringKeys key) { return listBiomeStringMap.get(key); }
+    public Set<Material> getSetMaterial(SetMaterialKeys key) { return listMaterialMap.get(key); }
+    public Set<Structure> getSetStructure(SetStructureKeys key) { return listStructureMap.get(key); }
     public boolean isStringInSet(SetStringKeys key, String value) { return getSetString(key).contains(value); }
     public boolean isBiomeInSet(SetBiomeStringKeys key, String biome) { return getSetBiomeString(key).contains(biome); }
+    public boolean isMaterialInSet(SetMaterialKeys key, Material material) { return getSetMaterial(key).contains(material); }
+    public boolean isStructureInSet(SetStructureKeys key, Structure structure) { return getSetStructure(key).contains(structure); }
+    public MergeStrategy getMergeStrategy() { return mergeStrategy; }
 
 
     public void reload(FileConfiguration fileConfiguration) {
@@ -75,6 +85,7 @@ public class UnderillaConfig {
             }
             stringMap.put(key, fileConfiguration.getString(key.path));
         }
+        mergeStrategy = MergeStrategy.valueOf(getString(StringKeys.STRATEGY));
 
         listStringMap.clear();
         for (SetStringKeys key : SetStringKeys.values()) {
@@ -100,12 +111,29 @@ public class UnderillaConfig {
             listMaterialMap.put(key, materialSet);
         }
 
-        initListBiomeStringMap(fileConfiguration);
+        initSetStructures(fileConfiguration);
+
+        initSetBiomeStringMap(fileConfiguration);
+
+        if (mergeStrategy == MergeStrategy.NONE) {
+            // If strategy is NONE, we need to set the max height of caves to the minimal possible height.
+            integerMap.put(IntegerKeys.MAX_HEIGHT_OF_CAVES, getInt(IntegerKeys.GENERATION_AREA_MIN_Y));
+        } else {
+            // Check if the value is in the range of the final world.
+            if (getInt(IntegerKeys.MAX_HEIGHT_OF_CAVES) < getInt(IntegerKeys.GENERATION_AREA_MIN_Y)) {
+                integerMap.put(IntegerKeys.MAX_HEIGHT_OF_CAVES, getInt(IntegerKeys.GENERATION_AREA_MIN_Y));
+            } else if (getInt(IntegerKeys.MAX_HEIGHT_OF_CAVES) > getInt(IntegerKeys.GENERATION_AREA_MAX_Y)) {
+                integerMap.put(IntegerKeys.MAX_HEIGHT_OF_CAVES, getInt(IntegerKeys.GENERATION_AREA_MAX_Y));
+            }
+        }
+        if (mergeStrategy != MergeStrategy.SURFACE) {
+            integerMap.put(IntegerKeys.MERGE_DEPTH, 0);
+        }
 
         Underilla.info("Config reloaded with values: " + this);
     }
 
-    private void initListBiomeStringMap(FileConfiguration fileConfiguration) {
+    private void initSetBiomeStringMap(FileConfiguration fileConfiguration) {
         Set<String> allBiomes = NMSBiomeUtils.getAllBiomes().keySet();
         listBiomeStringMap.clear();
         for (SetBiomeStringKeys key : SetBiomeStringKeys.values()) {
@@ -157,12 +185,49 @@ public class UnderillaConfig {
         }
     }
 
+    private void initSetStructures(FileConfiguration fileConfiguration) {
+        List<Structure> allStructures = io.papermc.paper.registry.RegistryAccess.registryAccess()
+                .getRegistry(io.papermc.paper.registry.RegistryKey.STRUCTURE).stream().toList();
+        for (SetStructureKeys key : SetStructureKeys.values()) {
+            List<String> regexList = new ArrayList<>();
+            if (fileConfiguration.contains(key.path)) {
+                regexList.addAll(fileConfiguration.getStringList(key.path));
+            } else {
+                Underilla.warning("Key " + key + " not found in config");
+                regexList.addAll(key.defaultValue);
+            }
+
+            Set<Structure> structureSet = allStructures.stream().filter(
+                    structure -> regexList.stream().anyMatch(s -> structure.key().toString().toUpperCase().matches(s.toUpperCase())))
+                    .collect(Collectors.toSet());
+            listStructureMap.put(key, structureSet);
+        }
+
+        if (getBoolean(BooleanKeys.STRUCTURES_ENABLED)) {
+            // If no only or except is set, we keep all structures.
+            if (listStructureMap.get(SetStructureKeys.SURUCTURE_ONLY).isEmpty()
+                    && listStructureMap.get(SetStructureKeys.SURUCTURE_EXCEPT).isEmpty()) {
+                listStructureMap.put(SetStructureKeys.SURUCTURE_ONLY, new HashSet<>(allStructures));
+            } else if (listStructureMap.get(SetStructureKeys.SURUCTURE_ONLY).isEmpty()) {
+                // if only is empty, we keep all structures except the ones in except.
+                listStructureMap.put(SetStructureKeys.SURUCTURE_ONLY,
+                        allStructures.stream()
+                                .filter(structure -> !listStructureMap.get(SetStructureKeys.SURUCTURE_EXCEPT).contains(structure))
+                                .collect(Collectors.toSet()));
+            }
+        } else {
+            listStructureMap.put(SetStructureKeys.SURUCTURE_ONLY, Set.of());
+        }
+        listStructureMap.remove(SetStructureKeys.SURUCTURE_EXCEPT);
+    }
+
 
     @Override
     public String toString() {
         return "UnderillaConfig{" + "booleanMap=" + booleanMap + "\nintegerMap=" + integerMap + "\nstringMap=" + stringMap
                 + "\nlistStringMap=" + toString(listStringMap) + "\nlistBiomeStringMap=" + toString(listBiomeStringMap)
-                + "\nlistMaterialMap=" + toString(listMaterialMap) + '}';
+                + "\nlistMaterialMap=" + toString(listMaterialMap) + "\nlistStructureMap=" + listStructureMap + "\nmergeStrategy="
+                + mergeStrategy + '}';
     }
     private String toString(Map<?, ? extends Collection<?>> map) {
         return map.entrySet().stream().map(e -> e.getKey() + " (" + e.getValue().size() + ") = " + e.getValue().stream().sorted().toList())
@@ -200,6 +265,7 @@ public class UnderillaConfig {
         STRUCTURES_ENABLED("structures.enabled", true),
         CARVERS_ENABLED("carvers.enabled", true),
         PRESERVE_SURFACE_WORLD_FROM_CAVERS("carvers.preserveSurfaceWorldFromCavers", true),
+        PRESERVE_LIQUID_FROM_CAVERS("carvers.preserveLiquidFromCavers", true),
         BIOME_MERGING_FROM_CAVES_GENERATION_ENABLED("structures.enabled", true);
         // @formatter:on
 
@@ -215,8 +281,12 @@ public class UnderillaConfig {
         SURFACE_LAYER_THICKNESS("surface.depth", 6, 0, Integer.MAX_VALUE),
         GENERATION_AREA_MIN_X("generationArea.minX", 0),
         GENERATION_AREA_MIN_Z("generationArea.minZ", 0),
-        GENERATION_AREA_MAX_X("generationArea.maxX", 512),
-        GENERATION_AREA_MAX_Z("generationArea.maxZ", 512);
+        GENERATION_AREA_MAX_X("generationArea.maxX", Underilla.REGION_SIZE),
+        GENERATION_AREA_MAX_Z("generationArea.maxZ", Underilla.REGION_SIZE),
+        GENERATION_AREA_MIN_Y("generationArea.minY", -64),
+        GENERATION_AREA_MAX_Y("generationArea.maxY", 320),
+        MERGE_DEPTH("surface.depth", 6),
+        MAX_HEIGHT_OF_CAVES("surface_and_absolute.limit", Integer.MAX_VALUE);
         // @formatter:on
 
         private final String path;
@@ -251,7 +321,7 @@ public class UnderillaConfig {
     }
     public enum SetStringKeys {
         // @formatter:off
-        IGNORED_BLOCK_FOR_SURFACE_CALCULATION("ignored_block_for_surface_calculation");
+        NULL("null");
         // @formatter:on
 
         private final String path;
@@ -284,7 +354,8 @@ public class UnderillaConfig {
     }
     public enum SetMaterialKeys {
         // @formatter:off
-        IGNORED_BLOCK_FOR_SURFACE_CALCULATION("ignored_block_for_surface_calculation");
+        IGNORED_BLOCK_FOR_SURFACE_CALCULATION("ignored_block_for_surface_calculation"),
+        BLOCK_TO_KEEP_FROM_SURFACE_WORLD_IN_CAVES("kept_reference_world_blocks");
         // @formatter:on
         private final String path;
         private final Set<String> defaultValue;
@@ -293,5 +364,20 @@ public class UnderillaConfig {
             this.defaultValue = defaultValue;
         }
         SetMaterialKeys(String path) { this(path, Set.of()); }
+    }
+
+    public enum SetStructureKeys {
+        // @formatter:off
+        SURUCTURE_EXCEPT("structures.except"),
+        SURUCTURE_ONLY("structures.only");
+        // @formatter:on
+
+        private final String path;
+        private final Set<String> defaultValue;
+        SetStructureKeys(String path, Set<String> defaultValue) {
+            this.path = path;
+            this.defaultValue = defaultValue;
+        }
+        SetStructureKeys(String path) { this(path, Set.of()); }
     }
 }

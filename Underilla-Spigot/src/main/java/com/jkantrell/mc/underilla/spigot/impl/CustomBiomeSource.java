@@ -10,12 +10,9 @@ import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.generator.BiomeProvider;
 import org.bukkit.generator.WorldInfo;
 import org.jetbrains.annotations.NotNull;
-import com.jkantrell.mc.underilla.core.generation.AbsoluteMerger;
-import com.jkantrell.mc.underilla.core.reader.ChunkReader;
 import com.jkantrell.mc.underilla.spigot.Underilla;
 import com.jkantrell.mc.underilla.spigot.io.UnderillaConfig.SetBiomeStringKeys;
 import com.jkantrell.mc.underilla.spigot.io.UnderillaConfig.StringKeys;
-import com.jkantrell.mca.MCAUtil;
 
 public class CustomBiomeSource {
     private BiomeProvider vanillaBiomeSource;
@@ -52,7 +49,8 @@ public class CustomBiomeSource {
             Underilla.getInstance().getLogger().warning("VanillaBiomeSource was null. It is now set to " + vanillaBiomeSource);
         }
 
-        if (vanillaBiomeSource != null && !Underilla.CONFIG.preserveBiomes.contains(surfaceWorldBiome.getName())) {
+        if (vanillaBiomeSource != null && !Underilla.getUnderillaConfig().isBiomeInSet(SetBiomeStringKeys.SURFACE_WORLD_ONLY_ON_THIS_BIOMES,
+                surfaceWorldBiome.getName())) {
             Biome vanillaBiome = vanillaBiomeSource.getBiome(worldInfo, x, y, z);
             String vanillaBiomeName = vanillaBiome == null ? "null" : vanillaBiome.getKey().asString();
             // info("Currently tested vanillaBiome: " + vanillaBiomeName + " at " + x + " " + y + " " + z);
@@ -100,11 +98,7 @@ public class CustomBiomeSource {
     }
 
     private int topYOfSurfaceWorld(BukkitWorldReader worldSurfaceReader, int x, int z) {
-        int chunkX = MCAUtil.blockToChunk(x);
-        int chunkZ = MCAUtil.blockToChunk(z);
-        ChunkReader surfaceReader = worldSurfaceReader.readChunk(chunkX, chunkZ).orElse(null);
-        return AbsoluteMerger.getLowerBlockOfSurfaceWorldYLevel(surfaceReader, x % Underilla.CHUNK_SIZE, z % Underilla.CHUNK_SIZE,
-                Underilla.CONFIG.mergeDepth, Underilla.CONFIG.mergeLimit);
+        return worldSurfaceReader.getLowerBlockOfSurfaceWorldYLevel(x, z);
     }
 
     private synchronized void info(String message) {

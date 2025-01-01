@@ -1,9 +1,6 @@
 package com.jkantrell.mc.underilla.spigot;
 
-import fr.formiko.mc.biomeutils.NMSBiomeUtils;
 import fr.formiko.mc.voidworldgenerator.VoidWorldGeneratorPlugin;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.Map;
 import java.util.function.Supplier;
 import java.util.logging.Level;
@@ -13,20 +10,20 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.jkantrell.mc.underilla.core.generation.Generator;
 import com.jkantrell.mc.underilla.spigot.generation.UnderillaChunkGenerator;
 import com.jkantrell.mc.underilla.spigot.impl.BukkitWorldReader;
-import com.jkantrell.mc.underilla.spigot.io.Config;
 import com.jkantrell.mc.underilla.spigot.io.UnderillaConfig;
+import com.jkantrell.mc.underilla.spigot.io.UnderillaConfig.BooleanKeys;
 import com.jkantrell.mc.underilla.spigot.io.UnderillaConfig.StringKeys;
 import com.jkantrell.mc.underilla.spigot.listener.StructureEventListener;
 import com.jkantrell.mc.underilla.spigot.preparing.ServerSetup;
 
 public final class Underilla extends JavaPlugin {
 
-    public static final Config CONFIG = new Config("");
     private UnderillaConfig underillaConfig;
     private BukkitWorldReader worldSurfaceReader;
     private @Nullable BukkitWorldReader worldCavesReader;
-    // private com.jkantrell.mc.underilla.spigot.generation.WorldInitListener worldInitListener;
     public static final int CHUNK_SIZE = 16;
+    public static final int REGION_SIZE = 512;
+    public static final int BIOME_AREA_SIZE = 4;
 
 
     @Override
@@ -56,16 +53,6 @@ public final class Underilla extends JavaPlugin {
         this.saveDefaultConfig();
         reloadConfig();
 
-        // Loading config
-        Underilla.CONFIG.setFilePath(this.getDataFolder() + File.separator + "config.yml");
-        try {
-            Underilla.CONFIG.load();
-            Underilla.CONFIG.transferCavesWorldBiomes = NMSBiomeUtils.normalizeBiomeNameList(Underilla.CONFIG.transferCavesWorldBiomes);
-            Underilla.CONFIG.preserveBiomes = NMSBiomeUtils.normalizeBiomeNameList(Underilla.CONFIG.preserveBiomes);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-
         // Loading reference world
         try {
             this.worldSurfaceReader = new BukkitWorldReader(Underilla.getUnderillaConfig().getString(StringKeys.SURFACE_WORLD_NAME));
@@ -76,7 +63,8 @@ public final class Underilla extends JavaPlugin {
             e.printStackTrace();
         }
         // Loading caves world if we should use it.
-        if (Underilla.CONFIG.transferBlocksFromCavesWorld || Underilla.CONFIG.transferBiomesFromCavesWorld) {
+        if (Underilla.getUnderillaConfig().getBoolean(BooleanKeys.TRANSFER_BLOCKS_FROM_CAVES_WORLD)
+                || Underilla.getUnderillaConfig().getBoolean(BooleanKeys.TRANSFER_BIOMES_FROM_CAVES_WORLD)) {
             try {
                 getLogger().info("Loading caves world");
                 this.worldCavesReader = new BukkitWorldReader(Underilla.getUnderillaConfig().getString(StringKeys.CAVES_WORLD_NAME));
@@ -88,8 +76,8 @@ public final class Underilla extends JavaPlugin {
         }
 
         // Registering listeners
-        if (CONFIG.generateStructures) {
-            this.getServer().getPluginManager().registerEvents(new StructureEventListener(CONFIG.structureBlackList), this);
+        if (Underilla.getUnderillaConfig().getBoolean(BooleanKeys.STRUCTURES_ENABLED)) {
+            this.getServer().getPluginManager().registerEvents(new StructureEventListener(), this);
         }
 
         runSteps();

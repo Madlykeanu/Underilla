@@ -21,26 +21,24 @@ public class Generator {
 
 
     // FIELDS
-    private final WorldReader worldReader_;
+    private final WorldReader worldSurfaceReader;
     private final Merger merger_;
-    private final GenerationConfig config_;
     public static Map<String, Long> times;
 
     // CONSTRUCTORS
-    public Generator(WorldReader worldReader, GenerationConfig config) {
-        this.worldReader_ = worldReader;
-        this.config_ = config;
-        this.merger_ = switch (config_.mergeStrategy) {
-            case SURFACE, ABSOLUTE, NONE -> new AbsoluteMerger(config_.mergeStrategy.equals(MergeStrategy.NONE) ? -64 : config_.mergeLimit,
-                    config_.keptReferenceWorldBlocks, config_.mergeStrategy.equals(MergeStrategy.SURFACE) ? config_.mergeDepth : 0);
-        };
+    public Generator(WorldReader worldSurfaceReader) {
+        this.worldSurfaceReader = worldSurfaceReader;
+        // this.merger_ = switch (config_.mergeStrategy) {
+        // case SURFACE, ABSOLUTE, NONE -> new AbsoluteMerger(worldSurfaceReader);
+        // };
+        this.merger_ = new AbsoluteMerger(worldSurfaceReader);
         times = new HashMap<>();
     }
 
     // TODO fix issue with short grass making village houses 1 block higher
     public int getBaseHeight(WorldInfo worldInfo, int x, int z, HeightMapType heightMap) {
         int chunkX = MCAUtil.blockToChunk(x), chunkZ = MCAUtil.blockToChunk(z);
-        ChunkReader chunkReader = this.worldReader_.readChunk(chunkX, chunkZ).orElse(null);
+        ChunkReader chunkReader = this.worldSurfaceReader.readChunk(chunkX, chunkZ).orElse(null);
         if (chunkReader == null) {
             return 0;
         }
@@ -74,9 +72,14 @@ public class Generator {
         // }
     }
 
-    public void reInsertLiquids(ChunkReader reader, ChunkData chunkData) {
+    public void reInsertLiquidsOverWorldSurface(WorldReader worldReader, ChunkData chunkData) {
+        ChunkReader reader = worldReader.readChunk(chunkData.getChunkX(), chunkData.getChunkZ()).orElse(null);
         // Getting watter and lava blocks in the chunk
-        List<LocatedBlock> locations = reader.locationsOf(Block::isLiquid);
+        // Filter blocks that are not over the surface
+        List<LocatedBlock> locations = reader.locationsOf(Block::isLiquid).stream()
+                .filter(l -> l.y() > worldReader.getLowerBlockOfSurfaceWorldYLevel(chunkData.getChunkX() * Underilla.CHUNK_SIZE + l.x(),
+                        chunkData.getChunkZ() * Underilla.CHUNK_SIZE + l.z()))
+                .toList();
 
         // Placing them back
         locations.forEach(l -> {
@@ -86,7 +89,9 @@ public class Generator {
         });
     }
 
-    public boolean shouldGenerateNoise(int chunkX, int chunkZ) { return !this.config_.mergeStrategy.equals(MergeStrategy.NONE); }
+    public boolean shouldGenerateNoise(int chunkX, int chunkZ) {
+        return Underilla.getUnderillaConfig().getMergeStrategy() != MergeStrategy.NONE;
+    }
 
     public boolean shouldGenerateSurface(int chunkX, int chunkZ) {
         // Must always return true, bedrock and deepslate layers are generated in this step
@@ -97,11 +102,15 @@ public class Generator {
         return Underilla.getUnderillaConfig().getBoolean(BooleanKeys.CARVERS_ENABLED);
     }
 
-    public boolean shouldGenerateDecorations(int chunkX, int chunkZ) { return this.config_.vanillaPopulation; }
+    public boolean shouldGenerateDecorations(int chunkX, int chunkZ) {
+        return Underilla.getUnderillaConfig().getBoolean(BooleanKeys.VANILLA_POPULATION);
+    }
 
     public boolean shouldGenerateMobs(int chunkX, int chunkZ) { return true; }
 
-    public boolean shouldGenerateStructures(int chunkX, int chunkZ) { return this.config_.generateStructures; }
+    public boolean shouldGenerateStructures(int chunkX, int chunkZ) {
+        return Underilla.getUnderillaConfig().getBoolean(BooleanKeys.STRUCTURES_ENABLED);
+    }
 
     public static void addTime(String name, long startTime) {
         times.put(name, times.getOrDefault(name, 0l) + (System.currentTimeMillis() - startTime));

@@ -29,6 +29,9 @@ generationArea:
   minZ: 0
   maxX: 512
   maxZ: 512
+  # minY & maxY are the final world limits.
+  minY: -64
+  maxY: 320
 
 # Which world generator to use for the chunks that are out of the surface world.
 # Possible values: "VoidWorldGenerator", "VANILLA" or any other world generator plugin name that is installed on your server.
@@ -63,7 +66,6 @@ strategy: "SURFACE"
 # Mix strategy exclusive settings
 surface_and_absolute:
   # The Y height dividing reference terrain above and vanilla worlds below.
-  # Increasing this value way above 60 won't have much effect as the caves are only generated in vanilla world.
   limit: 320
 
 # How deep reference world terrain should dig into vanilla word.
@@ -129,6 +131,9 @@ carvers:
     onlyOn: []
     # Preserve the surface world from cavers on all biomes except the ones listed here.
     exceptOn: []
+
+  # If true, the liquid blocks will be preserved from the carvers. This avoid having holes in oceans even when the surface is carved.
+  preserveLiquidFromCavers: true
 
 # Biomes transfer -----------------------------------------------------------------------------------------------------
 biomesMerging:

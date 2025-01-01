@@ -24,9 +24,11 @@ import com.jkantrell.mc.underilla.core.reader.ChunkReader;
 import com.jkantrell.mc.underilla.core.reader.WorldReader;
 import com.jkantrell.mc.underilla.spigot.Underilla;
 import com.jkantrell.mc.underilla.spigot.impl.BukkitChunkData;
+import com.jkantrell.mc.underilla.spigot.impl.BukkitRegionChunkData;
 import com.jkantrell.mc.underilla.spigot.impl.BukkitWorldInfo;
 import com.jkantrell.mc.underilla.spigot.impl.BukkitWorldReader;
 import com.jkantrell.mc.underilla.spigot.impl.CustomBiomeSource;
+import com.jkantrell.mc.underilla.spigot.io.UnderillaConfig.BooleanKeys;
 import com.jkantrell.mc.underilla.spigot.io.UnderillaConfig.IntegerKeys;
 import com.jkantrell.mc.underilla.spigot.io.UnderillaConfig.SetBiomeStringKeys;
 
@@ -54,7 +56,7 @@ public class UnderillaChunkGenerator extends ChunkGenerator {
         this.worldSurfaceReader = worldSurfaceReader;
         this.worldCavesReader = worldCavesReader;
         this.outOfTheSurfaceWorldGenerator = outOfTheSurfaceWorldGenerator;
-        this.delegate_ = new Generator(worldSurfaceReader, Underilla.CONFIG.toGenerationConfig());
+        this.delegate_ = new Generator(worldSurfaceReader);
     }
 
 
@@ -110,12 +112,12 @@ public class UnderillaChunkGenerator extends ChunkGenerator {
         }
         BukkitChunkData data = new BukkitChunkData(chunkData);
         ChunkReader cavesReader = null;
-        if (this.worldCavesReader != null && Underilla.CONFIG.transferBlocksFromCavesWorld) {
+        if (this.worldCavesReader != null && Underilla.getUnderillaConfig().getBoolean(BooleanKeys.TRANSFER_BLOCKS_FROM_CAVES_WORLD)) {
             cavesReader = this.worldCavesReader.readChunk(chunkX, chunkZ).orElse(null);
         }
         this.delegate_.generateSurface(reader.get(), data, cavesReader);
     }
-    private String getBiomeKeyStringFromChunkCoordinates(@NotNull WorldInfo worldInfo, int chunkX, int chunkZ) {
+    private static String getBiomeKeyStringFromChunkCoordinates(@NotNull WorldInfo worldInfo, int chunkX, int chunkZ) {
         return NMSBiomeUtils.getBiomeKeyString(chunkX * Underilla.CHUNK_SIZE, 0, chunkZ * Underilla.CHUNK_SIZE,
                 Bukkit.getWorld(worldInfo.getUID()));
     }
@@ -242,16 +244,20 @@ public class UnderillaChunkGenerator extends ChunkGenerator {
         // OVERRITES
         @Override
         public void populate(WorldInfo worldInfo, Random random, int chunkX, int chunkZ, LimitedRegion limitedRegion) {
-            // if (!CONFIG.generateCaves) {
-            // return;
-            // }
-            // ChunkReader reader = this.worldReader_.readChunk(chunkX, chunkZ).orElse(null);
-            // if (reader == null) {
-            // return;
-            // }
-            // BukkitRegionChunkData chunkData = new BukkitRegionChunkData(limitedRegion, chunkX, chunkZ, worldInfo.getMinHeight(),
-            // worldInfo.getMaxHeight());
-            // this.generator_.reInsertLiquids(reader, chunkData);
+            // If carvers are enabled in this biome & surface was not preserved from carvers & liquids are preserved from carvers.
+            // => we need to re-insert the water blocks from surface world over the limits between the 2 world.
+
+            if (Underilla.getUnderillaConfig().getBoolean(BooleanKeys.PRESERVE_LIQUID_FROM_CAVERS)) {
+                String biomeKey = getBiomeKeyStringFromChunkCoordinates(worldInfo, chunkX, chunkZ);
+                if (Underilla.getUnderillaConfig().isBiomeInSet(SetBiomeStringKeys.APPLY_CARVERS_ONLY_ON_BIOMES, biomeKey)
+                        && !Underilla.getUnderillaConfig()
+                                .isBiomeInSet(SetBiomeStringKeys.PRESERVE_SURFACE_WORLD_FROM_CAVERS_ONLY_ON_BIOMES, biomeKey)) {
+
+                    BukkitRegionChunkData chunkData = new BukkitRegionChunkData(limitedRegion, chunkX, chunkZ, worldInfo.getMinHeight(),
+                            worldInfo.getMaxHeight());
+                    this.generator_.reInsertLiquidsOverWorldSurface(this.worldReader_, chunkData);
+                }
+            }
         }
     }
 

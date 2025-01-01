@@ -38,6 +38,8 @@ public class BukkitRegionChunkData implements ChunkData {
     public int getMaxHeight() { return this.maxHeight_; }
     @Override
     public int getMinHeight() { return this.minHeight_; }
+    public int getChunkX() { return this.chunkX_; }
+    public int getChunkZ() { return this.chunkZ_; }
     @Override
     public Block getBlock(int x, int y, int z) {
         // TODO also save state of block if needed (for structure chests).

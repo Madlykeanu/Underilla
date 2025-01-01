@@ -2,14 +2,10 @@ package com.jkantrell.mc.underilla.spigot.impl;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
-import org.bukkit.block.CreatureSpawner;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.craftbukkit.CraftWorld;
-import org.bukkit.craftbukkit.block.CraftBlock;
-import org.bukkit.craftbukkit.block.CraftBlockState;
 import com.jkantrell.mc.underilla.core.api.Block;
 import com.jkantrell.mc.underilla.core.api.ChunkData;
-import com.jkantrell.mc.underilla.spigot.Underilla;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 
@@ -32,6 +28,10 @@ public class BukkitChunkData implements ChunkData {
 
     @Override
     public int getMinHeight() { return this.chunkData.getMinHeight(); }
+    @Override
+    public int getChunkX() { throw new UnsupportedOperationException(); }
+    @Override
+    public int getChunkZ() { throw new UnsupportedOperationException(); }
 
     @Override
     public Block getBlock(int x, int y, int z) {
@@ -81,19 +81,19 @@ public class BukkitChunkData implements ChunkData {
 
 
             // Underilla.getInstance().getLogger()
-            //         .info("setBlock: Spawner block detected at " + x + ", " + y + ", " + z + " with class " + bblock.getClass()
-            //                 + ", material " + bblock.getType() + ", state " + bblock.getState() + ", blockData " + bblock.getBlockData()
-            //                 + ", blockData class " + bblock.getBlockData().getClass() + ", blockData material "
-            //                 + bblock.getBlockData().getMaterial() + ", blockData class " + bblock.getBlockData().getClass());
+            // .info("setBlock: Spawner block detected at " + x + ", " + y + ", " + z + " with class " + bblock.getClass()
+            // + ", material " + bblock.getType() + ", state " + bblock.getState() + ", blockData " + bblock.getBlockData()
+            // + ", blockData class " + bblock.getBlockData().getClass() + ", blockData material "
+            // + bblock.getBlockData().getMaterial() + ", blockData class " + bblock.getBlockData().getClass());
             // // CreatureSpawner creatureSpawner = new CraftCreatureSpawner(world,
             // // new SpawnerBlockEntity(craftBlock.getPosition(), craftBlock.getState()));
             // // creatureSpawner.
 
             // // TODO it's not a CreatureSpawner, it's stay at the previous block type (Deepslate, mostly).
             // if (bblock.getState() instanceof CreatureSpawner creatureSpawner) {
-            //     creatureSpawner.setSpawnedType(bukkitBlock.getSpawnedType().orElse(org.bukkit.entity.EntityType.ZOMBIE));
-            //     // creatureSpawner.update();
-            //     Underilla.getInstance().getLogger().info("setBlock: Spawner type set to " + creatureSpawner.getSpawnedType());
+            // creatureSpawner.setSpawnedType(bukkitBlock.getSpawnedType().orElse(org.bukkit.entity.EntityType.ZOMBIE));
+            // // creatureSpawner.update();
+            // Underilla.getInstance().getLogger().info("setBlock: Spawner type set to " + creatureSpawner.getSpawnedType());
             // }
         }
 

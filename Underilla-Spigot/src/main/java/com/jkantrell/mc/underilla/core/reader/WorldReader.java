@@ -11,6 +11,10 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import com.jkantrell.mc.underilla.core.api.Biome;
 import com.jkantrell.mc.underilla.core.api.Block;
+import com.jkantrell.mc.underilla.spigot.Underilla;
+import com.jkantrell.mc.underilla.spigot.impl.BukkitBlock;
+import com.jkantrell.mc.underilla.spigot.io.UnderillaConfig.IntegerKeys;
+import com.jkantrell.mc.underilla.spigot.io.UnderillaConfig.SetBiomeStringKeys;
 import com.jkantrell.mca.Chunk;
 import com.jkantrell.mca.MCAFile;
 import com.jkantrell.mca.MCAUtil;
@@ -25,7 +29,8 @@ public abstract class WorldReader implements Reader {
     private final File regions_;
     private final RLUCache<MCAFile> regionCache_;
     private final RLUCache<ChunkReader> chunkCache_;
-
+    private final RLUCache<Integer> yLevelCache_;
+    private final RLUCache<String> biomeCache_;
 
     // CONSTRUCTORS
     protected WorldReader(String worldPath) throws NoSuchFieldException { this(new File(worldPath)); }
@@ -43,6 +48,8 @@ public abstract class WorldReader implements Reader {
         this.regions_ = regionDir;
         this.regionCache_ = new RLUCache<>(cacheSize);
         this.chunkCache_ = new RLUCache<>(cacheSize * 8);
+        this.yLevelCache_ = new RLUCache<>(cacheSize * 8 * Underilla.CHUNK_SIZE * Underilla.CHUNK_SIZE);
+        this.biomeCache_ = new RLUCache<>(cacheSize * 8 * 4 * 4);
     }
 
 
@@ -83,6 +90,59 @@ public abstract class WorldReader implements Reader {
         return Optional.of(chunkReader);
     }
 
+    public int getLowerBlockOfSurfaceWorldYLevel(int globalX, int globalZ) {
+        Integer cached = yLevelCache_.get(globalX, globalZ);
+        if (cached != null) {
+            return cached;
+        }
+        int r;
+
+        int maxHeightOfCaves = Underilla.getUnderillaConfig().getInt(IntegerKeys.MAX_HEIGHT_OF_CAVES);
+        int minimalPossibleY = Underilla.getUnderillaConfig().getInt(IntegerKeys.GENERATION_AREA_MIN_Y);
+        if (maxHeightOfCaves <= minimalPossibleY) {
+            r = minimalPossibleY;
+            yLevelCache_.put(globalX, globalZ, r);
+            return r;
+        }
+        int mergeDepth = Underilla.getUnderillaConfig().getInt(IntegerKeys.MERGE_DEPTH);
+
+        // Optional<Biome> optionalBiome = surfaceReader.biomeAt(globalX, 0, globalZ);
+        // Unkown biome or preserved biome.
+        if (Underilla.getUnderillaConfig().isBiomeInSet(SetBiomeStringKeys.SURFACE_WORLD_ONLY_ON_THIS_BIOMES,
+                getBiomeName(globalX, globalZ))) {
+            r = minimalPossibleY;
+            yLevelCache_.put(globalX, globalZ, r);
+            return r;
+        }
+
+
+        // While is AIR, LEAVES, non solid block, etc, go down.
+        int lbtr = maxHeightOfCaves + mergeDepth;
+        while (!blockAt(globalX, lbtr, globalZ).orElse(BukkitBlock.AIR).isSolidAndSurfaceBlock() && lbtr > minimalPossibleY) {
+            lbtr--;
+        }
+
+        r = lbtr - mergeDepth;
+        yLevelCache_.put(globalX, globalZ, r);
+        return r;
+    }
+
+    public String getBiomeName(int globalX, int globalZ) {
+        // make globalX and globalZ multiple of BIOME_AREA_SIZE ot avoid storing duplicate data.
+        globalX = globalX - globalX % Underilla.CHUNK_SIZE;
+        globalZ = globalZ - globalZ % Underilla.CHUNK_SIZE;
+
+        String cached = biomeCache_.get(globalX, globalZ);
+        if (cached != null) {
+            return cached;
+        }
+
+        Optional<Biome> optionalBiome = biomeAt(globalX, 0, globalZ);
+        String r = optionalBiome.isEmpty() ? null : optionalBiome.get().getName();
+        biomeCache_.put(globalX, globalZ, r);
+        return r;
+    }
+
 
     // ABSTRACT
     protected abstract ChunkReader newChunkReader(Chunk chunk);
@@ -110,7 +170,7 @@ public abstract class WorldReader implements Reader {
 
 
     // CLASSES
-    private static class RLUCache<T> {
+    public static class RLUCache<T> {
 
         // FIELDS
         private final Map<Pair<Integer, Integer>, T> map_ = new HashMap<>();
@@ -129,13 +189,16 @@ public abstract class WorldReader implements Reader {
         T get(int x, int z) {
             Pair<Integer, Integer> pair = ImmutablePair.of(x, z);
             synchronized (this) {
-                T cached = this.map_.get(pair);
-                if (cached == null) {
-                    return null;
-                }
-                this.queue_.remove(pair);
-                this.queue_.addFirst(pair);
-                return cached;
+                // Set the pair to the front of the queue to avoid it to be removed soon.
+                // T cached = this.map_.get(pair);
+                // if (cached == null) {
+                // return null;
+                // }
+                // this.queue_.remove(pair);
+                // this.queue_.addFirst(pair);
+                // return cached;
+                // Do not edit the queue to be faster.
+                return this.map_.get(pair);
             }
         }
         void put(int x, int z, T file) {

@@ -1,44 +1,38 @@
 package com.jkantrell.mc.underilla.core.generation;
 
-import fr.formiko.mc.biomeutils.NMSBiomeUtils;
-import java.util.List;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.bukkit.Material;
 import com.jkantrell.mc.underilla.core.api.Block;
 import com.jkantrell.mc.underilla.core.api.ChunkData;
 import com.jkantrell.mc.underilla.core.reader.ChunkReader;
-import com.jkantrell.mc.underilla.core.reader.Reader;
-import com.jkantrell.mc.underilla.core.vector.IntVector;
+import com.jkantrell.mc.underilla.core.reader.WorldReader;
 import com.jkantrell.mc.underilla.core.vector.Vector;
 import com.jkantrell.mc.underilla.core.vector.VectorIterable;
 import com.jkantrell.mc.underilla.spigot.Underilla;
 import com.jkantrell.mc.underilla.spigot.impl.BukkitBlock;
-import com.jkantrell.mc.underilla.spigot.io.UnderillaConfig.SetBiomeStringKeys;
+import com.jkantrell.mc.underilla.spigot.io.UnderillaConfig.IntegerKeys;
+import com.jkantrell.mc.underilla.spigot.io.UnderillaConfig.SetMaterialKeys;
 
 public class AbsoluteMerger implements Merger {
 
     // FIELDS
-    private final int height_;
-    private final List<String> keptReferenceWorldBlocks_;
-    private final int mergeDepth_;
+    private final WorldReader worldSurfaceReader;
 
     // CONSTRUCTORS
-    AbsoluteMerger(int height, List<String> keptReferenceWorldBlocks, int mergeDepth) {
-        this.height_ = height;
-        this.keptReferenceWorldBlocks_ = keptReferenceWorldBlocks;
-        this.mergeDepth_ = mergeDepth;
-    }
+    AbsoluteMerger(WorldReader worldSurfaceReader) { this.worldSurfaceReader = worldSurfaceReader; }
 
 
     // IMPLEMENTATIONS
     @Override
-    public void mergeLand(ChunkReader surfaceReader, ChunkData chunkData, @Nullable ChunkReader cavesReader) {
+    public void mergeLand(@Nonnull ChunkReader surfaceReader, @Nonnull ChunkData chunkData, @Nullable ChunkReader cavesReader) {
         long startTime = System.currentTimeMillis();
-        // int airColumn = Math.max(reader.airSectionsBottom(), -64);
         int airColumn = surfaceReader.airSectionsBottom();
-        chunkData.setRegion(0, airColumn, 0, 16, chunkData.getMaxHeight(), 16, BukkitBlock.AIR);
+        chunkData.setRegion(0, airColumn, 0, Underilla.CHUNK_SIZE, chunkData.getMaxHeight(), Underilla.CHUNK_SIZE, BukkitBlock.AIR);
 
-        VectorIterable iterable = new VectorIterable(0, 16, -64, airColumn, 0, 16);
-        int columnHeigth = this.height_;
+        VectorIterable iterable = new VectorIterable(0, Underilla.CHUNK_SIZE,
+                Underilla.getUnderillaConfig().getInt(IntegerKeys.GENERATION_AREA_MIN_Y), airColumn, 0, Underilla.CHUNK_SIZE);
+        int columnHeigth = Underilla.getUnderillaConfig().getInt(IntegerKeys.MAX_HEIGHT_OF_CAVES);
         int lastX = -1;
         int lastZ = -1;
         Generator.addTime("Create VectorIterable to merge land", startTime);
@@ -55,7 +49,7 @@ public class AbsoluteMerger implements Merger {
             if (v.x() != lastX || v.z() != lastZ) {
                 lastX = v.x();
                 lastZ = v.z();
-                columnHeigth = (isPreservedBiome(surfaceReader, v) ? -64 : getLowerBlockToRemove(surfaceReader, v.x(), v.z()));
+                columnHeigth = getLowerBlockToRemove(surfaceReader.getGlobalX(v.x()), surfaceReader.getGlobalZ(v.z()));
             }
             Generator.addTime("Calculate lower block to remove", startTime);
 
@@ -65,13 +59,16 @@ public class AbsoluteMerger implements Merger {
             // and do not replace liquid vanilla blocks by air. (to preserve water and lava lackes)
             if (((v.y() > columnHeigth) // block over surface or close to surface are kept from custom surface world.
                     || (isCustomWorldOreOutOfVanillaCaves(customBlock, vanillaBlock)) // custom world ores are kept from custom world.
-                    // vanilla sea ground are replaced by custom world blocks.
-                    || (v.y() > 30 && (vanillaBlock.isLiquid() || vanillaBlock.getName().equalsIgnoreCase("GRASS_BLOCK")
-                            || vanillaBlock.getName().equalsIgnoreCase("SAND") || vanillaBlock.getName().equalsIgnoreCase("SAND_STONE")
-                            || vanillaBlock.getName().equalsIgnoreCase("GRAVEL"))))
-                    // Keep custom block if it's air to preserve custom world caves if there is any. (If vanilla block is liquid, we
-                    // preserve vanilla block as we want to avoid holes in vanilla underground lakes)
-                    || (customBlock.isAir() && !vanillaBlock.isLiquid())) {
+            // No need to remove surface block since we can use datapack to have much hier caves.
+            // // vanilla sea ground are replaced by custom world blocks.
+            // || (v.y() > 30 && (vanillaBlock.isLiquid() || vanillaBlock.getName().equalsIgnoreCase("GRASS_BLOCK")
+            // || vanillaBlock.getName().equalsIgnoreCase("SAND") || vanillaBlock.getName().equalsIgnoreCase("SAND_STONE")
+            // || vanillaBlock.getName().equalsIgnoreCase("GRAVEL")))
+            )
+            // // Keep custom block if it's air to preserve custom world caves if there is any. (If vanilla block is liquid, we
+            // // preserve vanilla block as we want to avoid holes in vanilla underground lakes)
+            // || (customBlock.isAir() && !vanillaBlock.isLiquid())
+            ) {
                 // Use custom block
                 chunkData.setBlock(v, customBlock);
             } else {
@@ -87,17 +84,9 @@ public class AbsoluteMerger implements Merger {
     }
 
     /** return the 1st block mergeDepth_ blocks under surface or heigth_ */
-    private int getLowerBlockToRemove(Reader surfaceReader, int x, int z) {
-        return getLowerBlockOfSurfaceWorldYLevel(surfaceReader, x, z, mergeDepth_, height_);
+    private int getLowerBlockToRemove(int x, int z) {
+        return worldSurfaceReader.getLowerBlockOfSurfaceWorldYLevel(x, z);
     }
-    public static int getLowerBlockOfSurfaceWorldYLevel(Reader surfaceReader, int localX, int localZ, int mergeDepth, int height) {
-        int lbtr = height + mergeDepth;
-        while (!surfaceReader.blockAt(localX, lbtr, localZ).orElse(BukkitBlock.AIR).isSolidAndSurfaceBlock() && lbtr > -64) {
-            lbtr--;
-        }
-        return lbtr - mergeDepth;
-    }
-
 
     // private --------------------------------------------------------------------------------------------------------
     /**
@@ -108,21 +97,9 @@ public class AbsoluteMerger implements Merger {
      * @param vanillaBlock the block in vanilla world
      */
     private boolean isCustomWorldOreOutOfVanillaCaves(Block customBlock, Block vanillaBlock) {
-        return keptReferenceWorldBlocks_.contains(customBlock.getName().toUpperCase()) && (vanillaBlock == null || vanillaBlock.isSolid());
-    }
-    /** Return true if this biome need to be only custom world */
-    private boolean isPreservedBiome(ChunkReader reader, Vector<Integer> v) {
-        String biomeKey = NMSBiomeUtils.normalizeBiomeName(reader.biomeAt(v).orElseThrow().getName());
-        return Underilla.getUnderillaConfig().isBiomeInSet(SetBiomeStringKeys.SURFACE_WORLD_ONLY_ON_THIS_BIOMES, biomeKey);
-    }
-
-    /** Return true if all the collumn is air. */
-    private boolean isAirCollumn(ChunkData chunkData, Vector<Integer> v, int len) {
-        for (int i = 0; i < len; i++) {
-            if (!chunkData.getBlock(new IntVector(v.x(), v.y() - i, v.z())).isAir()) {
-                return false;
-            }
-        }
-        return true;
+        // return keptReferenceWorldBlocks_.contains(customBlock.getName().toUpperCase()) && (vanillaBlock == null ||
+        // vanillaBlock.isSolid());
+        return (Underilla.getUnderillaConfig().isMaterialInSet(SetMaterialKeys.BLOCK_TO_KEEP_FROM_SURFACE_WORLD_IN_CAVES,
+                Material.getMaterial(customBlock.getName().toUpperCase())) && (vanillaBlock == null || vanillaBlock.isSolid()));
     }
 }
