@@ -29,14 +29,15 @@ It's original purpose is adding vanilla caves to custom [WorldPainter](https://w
 
 - Java 21.
 - A pre-generated world to use as a reference (Such as a WorldPainter world).
-- A [Paper](https://papermc.io/software/paper) (or forks) Minecraft Server of version [1.21 - 1.21.1]. It might work with upper version, but only 1.21.1 have been tested. Use old release for [1.19 - 1.20.6] compatibility.
+- A [Paper](https://papermc.io/software/paper) (or forks) Minecraft Server. Supported Minecraft version are in the release name.
 
-### Single player or non-Bukkit
-Underilla is currently only implemented as a Paper plugin, so it runs only on Paper (or fork) servers. If you have a Vanilla, Forge or non Bukkit-based server; or looking for a single player experience; you may [use a local Paper server](https://papermc.io/software/paper) to pre-generate a fully-merged world and then copy the resulting world folder to your actual `saves` folder.
+### Single player or non-Paper
+Underilla is currently only implemented as a Paper plugin. It support datapacks and most plugins. It does not support mods and might be incompatible with some generation plugins that modify minecraft source code.
+Once the map have been generated with a Paper server, you're free to use it in signle player or on modded server.
 
 ### Installation
 
-1. Set up your Spigot (or fork) server.
+1. Set up your Paper (or fork) server.
 2. Download Underilla's `.jar`.
 3. Place Underilla's `.jar` file into the `./plugins` directory of your server. Create the folder if it doesn't exist already.
 4. Into the `./plugins` folder, create a new folder called `Underilla` and place a `config.yml` file in it. You may get the file from [this repo](Underilla-Spigot/src/main/resources/config.yml).
@@ -46,7 +47,7 @@ Underilla is currently only implemented as a Paper plugin, so it runs only on Pa
      world:
        generator: Underilla
    ```
-   This will tell Spigot to use Underilla's chunk generator.
+   This will tell Paper to use Underilla's chunk generator.
 6. In your server's root, create a new folder called `world_surface`.
 7. From the folder of your reference world, copy the `region` folder, and paste it into the `world_surface` folder you just created.
 8. If existing, delete the `world` folder fom your server's root.
@@ -92,7 +93,7 @@ If you are strugeling with world generation, you can ask for help on the Discord
 12. Start the world generation with `chunky start`.
 13. Wait until world generation is over. World generation might takes hours or even days if your world is huge. You can do the 2 nexts steps while waiting for the world generation to be over.
 15. If you haven't export your Underilla world yet, export it with no water or lava underground, no ores, no caves and no underground special stone (diorite, gravel). We will let Minecraft generation take care of the underground. This might take hours, you can do the next steps while waiting.
-16. Create an empty datapack. Then add the vanilla biome files into your datapack and edit them to remove the unwanted features. You probably want to remove all trees if you have some in your custom world. If you don't, you will have vanilla tree & custom world tree on the final world. It is recommand to set the depth to 320 everywher to be sur that there will be caves where you have custom world moutains. See [UnderillaBaseDataPack].
+16. Create an empty datapack. Then add the [vanilla biome files](https://github.com/misode/mcmeta/tree/data) into your datapack and edit them to remove the unwanted features. You probably want to remove all trees if you have some in your custom world. If you don't, you will have vanilla tree & custom world tree on the final world. It is recommand to set the depth to 320 everywhere to be sur that there will be caves where you have custom world moutains. See [UnderillaBaseDataPack].
 17. All previous steps need to be done here. Rename your `world` directory to `world_caves`. We will use this vanilla world to have caves biome in our final world.
 18. Rename your exported custom world to `world_surface/`
 19. Download [Underilla latest release](https://github.com/HydrolienF/Underilla/releases) & place it in your `plugins/` directory.
@@ -116,8 +117,7 @@ If you are strugeling with world generation, you can ask for help on the Discord
 
 ## Known issues
 
-- Underilla's generation disables Minecraft's chunk blender, which means there will be sharp old-school chunk borders at the edge of the reference world's chunks. This may be tackled by trimming your custom world chunks around the edges to generate blended chunks ahead of time.
-- Due to Spigot's generation API, outside the reference world's area, heightmaps are broken, which has an impact on structures. You may work around this by pre-generating the whole reference world area, and then disabling Underilla.
+- Due to Paper's generation API, outside the reference world's area, heightmaps are broken, which has an impact on structures. You may work around this by pre-generating the whole reference world area, and then disabling Underilla. Commands as `/locate` might timeout the server.
 - Olds map before 1.19 won't be load by Underilla. To use an old map, generate the full map without Underilla in the right version, then use the generated map. This will let minecraft update the map files and Underilla will be able to read them as expected.
 
 ## WorldPainter considerations
@@ -129,19 +129,17 @@ If you're going to plug your custom WorldPainter world into Underilla, consider 
 
 ## Custom biome
 Cave generation on custom biomes is now working. Features (ores, flowers etc) will be placed according to the custom surface world biome but structures won't.
-If you have a custom world with custom biomes, you should enable custom biome it in the config.
 
 ## Feature fiter
-If you want to remove some of the game features, for example the `monster_room` you can create a datapack where you have customine witch feature can spawn in each biome. Underilla will generate feature according to your cusomized biome.
+If you want to remove some of the game features, for example the `monster_room` you can create a datapack where you have customize witch feature can spawn in each biome. Underilla will generate feature according to your cusomized biome.
 It can also be used to add feature to some biome. For example a quartz_ore feature if your nether is disabled you you still want your builder to have quartz.
 
 ## Build
-Create a working jar with `./gradlew assemble`
-
-## TODO
-- Build-in pre-generation system.
-- Allow to generate the 2nd world on the fly.
-
+Create a working jar with `./gradlew assemble`.
+Run a local paper server with the example map & datapack on Linux.
 ```sh
 rm Underilla-Spigot/run/world_surface/ -fr; cp testMap/world/ Underilla-Spigot/run/world_surface/; rm -fr Underilla-Spigot/run/world/; mkdir -pv Underilla-Spigot/run/world/datapacks; cp UnderillaBaseDataPack/ Underilla-Spigot/run/world/datapacks; ./gradlew runServer
 ```
+
+## TODO
+- Build-in pre-generation system.
