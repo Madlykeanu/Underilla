@@ -105,9 +105,9 @@ If you are strugeling with world generation, you can ask for help on the Discord
     ```
     This will tell Paper to use Underilla's chunk generator.
 21. Copy the [Underilla config](Underilla-Spigot/src/main/resources/config.yml) into `plugins/Underilla/config.yml`.
-22. Edit Underilla config by setting `transfer_biomes_from_caves_world: true`.
-23. Underilla config: Remove some transfered_caves_world_biomes if you don't want all of them.
-24. Underilla config: Add ignored_block_for_surface_calculation if needed.
+22. Edit Underilla config by setting `transferBiomesFromCavesWorld: true`.
+23. Underilla config: Remove some transferedCavesWorldBiomes if you don't want all of them.
+24. Underilla config: Add ignoredBlockForSurfaceCalculation if needed.
 25. Underilla config: Add blacklisted structures if needed.
 26. It's know time to merge your custom world surface and a vanilla world underground. Start Chunky again with the 2 same commands. Underilla world generation might takes hours or even days if your world is huge. *The magic happends now, Underilla generate default caves then add your custom world surface. Then mixt your custom world biomes & the caves biomes from `world_caves` onto the final world. Then add structures witch will be placed according to the new surface shape & the new biome mixt. Then add the features (tree, flower, ores, grass, gravel etc) according to your datapack. Then spawn mobs according to the new biome mixt.*
 27. Once the underilla generation is done, you should do a save of `world`, then check if you like it.
@@ -122,8 +122,8 @@ If you are strugeling with world generation, you can ask for help on the Discord
 
 ## WorldPainter considerations
 If you're going to plug your custom WorldPainter world into Underilla, consider before exporting:
-- Disable caves, caverns, and chasms altogether, allow Underilla to take over that step. This is due to biome placement, every underground non-solid block in the reference_world drags its biome over along with it, this interferes with proper underground vanilla biomes.
-- Always disable the `Allow Minecraft to populate the entire terrain` option. Rather use the `vanilla_population` option in Underilla's `config.yml` file.
+- Disable caves, caverns, and chasms altogether, allow Underilla to take over that step. This is due to biome placement, every underground non-solid block in the surfaceWorld drags its biome over along with it, this interferes with proper underground vanilla biomes.
+- Always disable the `Allow Minecraft to populate the entire terrain` option. Rather use the `vanillaPopulation` option in Underilla's `config.yml` file.
 - Don't user the resource layer. Underilla will have the vanilla generator take care of that for you.
 - The Populate layer has no effect. Weather all or none of the terrain will be populated based on the above point.
 

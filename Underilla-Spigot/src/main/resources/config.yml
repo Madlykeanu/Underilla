@@ -16,10 +16,10 @@ steps:
 
 
 # The world to merge the terrain into
-final_world: "world"
+finalWorld: "world"
 
 # The world to copy the surface from
-reference_world: "world_surface"
+surfaceWorld: "world_surface"
 
 # Set this area to match the surface world coordinates if you want to merge the entire surface world.
 # You can do test with a smaller area to speed up the process.
@@ -39,32 +39,32 @@ generationArea:
 # VoidWorldGenerator will generate void chunks. It's not possible to never generate chunks, so the best way to avoid having blocks outside of the surface world is to use this generator.
 outOfTheSurfaceWorldGenerator: "VoidWorldGenerator"
 
-# If true caves block will be transferred from caves_world to the merged world. Else it will be generated from a new vanilla world.
+# If true caves block will be transferred from cavesWorld to the merged world. Else it will be generated from a new vanilla world.
 # This is useful if you want to have a custom underground from an existing world. This is mandatory if you wich to transfer underground biomes as "LUSH_CAVES".
-transfer_blocks_from_caves_world: false
-# If true caves biomes in the list transfered_caves_world_biomes will be transferred from caves_world to the merged world.
-transfer_biomes_from_caves_world: false
+transferBlocksFromCavesWorld: false
+# If true caves biomes in the list transferedCavesWorldBiomes will be transferred from cavesWorld to the merged world.
+transferBiomesFromCavesWorld: false
 # Directory where the caves world is stored. It must be in the same directory as the reference world.
-caves_world: "world_caves"
-# Witch biome to transfer from caves_world to the merged world.
+cavesWorld: "world_caves"
+# Witch biome to transfer from cavesWorld to the merged world.
 # Biomes must be defined as spigot Biome enum constants or as biome resource key for example `minecraft:plains`. https://hub.spigotmc.org/javadocs/spigot/org/bukkit/block/Biome.html
-# Caves world biomes won't be transferred in preserve_biomes.
-# Caves world won't be transferred over surface_and_absolute.limit.
-transfered_caves_world_biomes:
+# Caves world biomes won't be transferred in preserveBiomes.
+# Caves world won't be transferred over surfaceAndAbsolute.limit.
+transferedCavesWorldBiomes:
   - "LUSH_CAVES"
   - "DRIPSTONE_CAVES"
   - "DEEP_DARK"
 
 
 # How to merge vanilla and reference worlds.
-#   - SURFACE: Generation will be based on the custom word surface. It have a top limits with surface_and_absolute.limit and always generate world at least x blocks below the custom world surface (see relative_and_surface.depth). This is the best choice for most cases.
+#   - SURFACE: Generation will be based on the custom word surface. It have a top limits with surfaceAndAbsolute.limit and always generate world at least x blocks below the custom world surface (see relative_and_surface.depth). This is the best choice for most cases.
 #   - ABSOLUTE: At a fixed Y height.
 #   - NONE: Just... don't merge. Reference world will be re-generated without vanilla underground.
 strategy: "SURFACE"
 
 
 # Mix strategy exclusive settings
-surface_and_absolute:
+surfaceAndAbsolute:
   # The Y height dividing reference terrain above and vanilla worlds below.
   limit: 320
 
@@ -73,7 +73,7 @@ surface:
   depth: 6
 
 # Non solid blocks are always ignored for surface calculation.
-ignored_block_for_surface_calculation:
+ignoredBlockForSurfaceCalculation:
   - ".*_LEAVES"
   - ".*_LOG"
   - ".*_WOOD"
@@ -89,14 +89,15 @@ ignored_block_for_surface_calculation:
 
 # The biomes where vanilla underground will not be generated.
 # Biomes must be defined as spigot Biome enum constants or as biome resource key for example `minecraft:plains`. https://hub.spigotmc.org/javadocs/spigot/org/bukkit/block/Biome.html
-preserve_biomes: []
+preserveBiomes: []
 
 # Weather or not to allow vanilla Minecraft populate/decorate over the reference world.
-vanilla_population: true
+vanillaPopulation:
+  enabled: true
 
 # Weather or not to keep ores from reference world underground.
-# It is usefull when vanilla_population is set to false.
-kept_reference_world_blocks: []
+# It is usefull when vanillaPopulation is set to false.
+keptReferenceWorldBlocks: []
 
 structures:
   # Weather or not to allow vanilla Minecraft generate structures in the world.

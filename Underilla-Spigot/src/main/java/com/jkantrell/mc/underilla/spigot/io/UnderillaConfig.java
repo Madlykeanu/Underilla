@@ -259,9 +259,9 @@ public class UnderillaConfig {
         // @formatter:off
         DEBUG("debug", false),
         TRANSFER_BIOMES("transfer_biomes", false),
-        TRANSFER_BLOCKS_FROM_CAVES_WORLD("transfer_blocks_from_caves_world", false),
-        TRANSFER_BIOMES_FROM_CAVES_WORLD("transfer_biomes_from_caves_world", false),
-        VANILLA_POPULATION("vanilla_population", true),
+        TRANSFER_BLOCKS_FROM_CAVES_WORLD("transferBlocksFromCavesWorld", false),
+        TRANSFER_BIOMES_FROM_CAVES_WORLD("transferBiomesFromCavesWorld", false),
+        VANILLA_POPULATION_ENABLED("vanillaPopulation.enabled", true),
         STRUCTURES_ENABLED("structures.enabled", true),
         CARVERS_ENABLED("carvers.enabled", true),
         PRESERVE_SURFACE_WORLD_FROM_CAVERS("carvers.preserveSurfaceWorldFromCavers", true),
@@ -286,7 +286,7 @@ public class UnderillaConfig {
         GENERATION_AREA_MIN_Y("generationArea.minY", -64),
         GENERATION_AREA_MAX_Y("generationArea.maxY", 320),
         MERGE_DEPTH("surface.depth", 6),
-        MAX_HEIGHT_OF_CAVES("surface_and_absolute.limit", Integer.MAX_VALUE);
+        MAX_HEIGHT_OF_CAVES("surfaceAndAbsolute.limit", Integer.MAX_VALUE);
         // @formatter:on
 
         private final String path;
@@ -304,9 +304,9 @@ public class UnderillaConfig {
     }
     public enum StringKeys {
         // @formatter:off
-        FINAL_WORLD_NAME("final_world", "world"),
-        SURFACE_WORLD_NAME("reference_world", "world_surface"),
-        CAVES_WORLD_NAME("caves_world", "world_caves"),
+        FINAL_WORLD_NAME("finalWorld", "world"),
+        SURFACE_WORLD_NAME("surfaceWorld", "world_surface"),
+        CAVES_WORLD_NAME("cavesWorld", "world_caves"),
         OUT_OF_THE_SURFACE_WORLD_GENERATOR("outOfTheSurfaceWorldGenerator", "VoidWorldGenerator"),
         STRATEGY("strategy", "SURFACE");
         // @formatter:on
@@ -334,8 +334,8 @@ public class UnderillaConfig {
     }
     public enum SetBiomeStringKeys {
         // @formatter:off
-        TRANSFERED_CAVES_WORLD_BIOMES("transfered_caves_world_biomes", Set.of("minecraft:deep_dark", "minecraft:dripstone_caves", "minecraft:lush_caves")),
-        SURFACE_WORLD_ONLY_ON_THIS_BIOMES("preserve_biomes"),
+        TRANSFERED_CAVES_WORLD_BIOMES("transferedCavesWorldBiomes", Set.of("minecraft:deep_dark", "minecraft:dripstone_caves", "minecraft:lush_caves")),
+        SURFACE_WORLD_ONLY_ON_THIS_BIOMES("preserveBiomes"),
         APPLY_CARVERS_ONLY_ON_BIOMES("carvers.applyCarversOnBiomes.onlyOn"),
         APPLY_CARVERS_EXCEPT_ON_BIOMES("carvers.applyCarversOnBiomes.exceptOn"),
         PRESERVE_SURFACE_WORLD_FROM_CAVERS_ONLY_ON_BIOMES("carvers.preserveSurfaceWorldFromCaversOnBiomes.onlyOn"),
@@ -354,8 +354,8 @@ public class UnderillaConfig {
     }
     public enum SetMaterialKeys {
         // @formatter:off
-        IGNORED_BLOCK_FOR_SURFACE_CALCULATION("ignored_block_for_surface_calculation"),
-        BLOCK_TO_KEEP_FROM_SURFACE_WORLD_IN_CAVES("kept_reference_world_blocks");
+        IGNORED_BLOCK_FOR_SURFACE_CALCULATION("ignoredBlockForSurfaceCalculation"),
+        BLOCK_TO_KEEP_FROM_SURFACE_WORLD_IN_CAVES("keptReferenceWorldBlocks");
         // @formatter:on
         private final String path;
         private final Set<String> defaultValue;

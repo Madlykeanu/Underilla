@@ -103,7 +103,7 @@ public class Generator {
     }
 
     public boolean shouldGenerateDecorations(int chunkX, int chunkZ) {
-        return Underilla.getUnderillaConfig().getBoolean(BooleanKeys.VANILLA_POPULATION);
+        return Underilla.getUnderillaConfig().getBoolean(BooleanKeys.VANILLA_POPULATION_ENABLED);
     }
 
     public boolean shouldGenerateMobs(int chunkX, int chunkZ) { return true; }
