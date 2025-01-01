@@ -65,8 +65,8 @@ tasks {
     }
 
     assemble {
-        // dependsOn(shadowJar) // Not needed, probably because reobfJar depends on shadowJar
-        dependsOn(reobfJar)
+        dependsOn(shadowJar) // Not needed, probably because reobfJar depends on shadowJar
+        // dependsOn(reobfJar)
     }
 
     processResources {
@@ -78,7 +78,7 @@ tasks {
             "group" to project.group
         )
         inputs.properties(props)
-        filesMatching("plugin.yml") {
+        filesMatching("paper-plugin.yml") {
             expand(props)
         }
     }

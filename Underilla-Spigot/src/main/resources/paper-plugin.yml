@@ -5,4 +5,12 @@ main: ${group}.spigot.Underilla
 description: $description
 api-version: "$apiVersion"
 load: STARTUP
-depend: [ VoidWorldGenerator, Chunky ]
+
+dependencies:
+  server:
+    VoidWorldGenerator:
+      load: BEFORE
+      required: true
+    Chunky:
+      load: BEFORE
+      required: true
