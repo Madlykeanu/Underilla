@@ -1,5 +1,6 @@
 package com.jkantrell.mc.underilla.spigot.cleaning;
 
+import java.time.Duration;
 import java.util.EnumMap;
 import java.util.Map;
 import org.bukkit.Bukkit;
@@ -31,7 +32,8 @@ public class CleanEntitiesTask extends FollowableProgressTask {
                 long execTime = System.currentTimeMillis();
                 if (selector == null || selector.progress() >= 1) {
                     printProgress(processedBlocks, startTime);
-                    Underilla.info("Cleaning entities task " + taskID + " finished in " + (System.currentTimeMillis() - startTime) + "ms");
+                    Underilla.info("Cleaning entities task " + taskID + " finished in "
+                            + Duration.ofMillis(System.currentTimeMillis() - startTime) + "ms");
                     Underilla.info("Removed entities: " + removedEntity);
                     Underilla.info("Final entities: " + finalEntity);
                     cancel();

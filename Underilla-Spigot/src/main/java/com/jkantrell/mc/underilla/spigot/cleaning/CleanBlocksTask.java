@@ -1,5 +1,6 @@
 package com.jkantrell.mc.underilla.spigot.cleaning;
 
+import java.time.Duration;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.Set;
@@ -34,7 +35,9 @@ public class CleanBlocksTask extends FollowableProgressTask {
                 long execTime = System.currentTimeMillis();
                 if (selector == null || selector.progress() >= 1) {
                     printProgress(processedBlocks, startTime);
-                    Underilla.info("Cleaning blocks task " + taskID + " finished in " + (System.currentTimeMillis() - startTime) + "ms");
+
+                    Underilla.info("Cleaning blocks task " + taskID + " finished in "
+                            + Duration.ofMillis(System.currentTimeMillis() - startTime) + "ms");
                     Underilla.info("Replaced blocks: " + replacedBlock);
                     Underilla.info("Final blocks: " + finalBlock);
                     cancel();
