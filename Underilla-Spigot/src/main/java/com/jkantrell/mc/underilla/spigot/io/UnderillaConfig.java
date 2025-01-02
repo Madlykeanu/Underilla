@@ -64,6 +64,12 @@ public class UnderillaConfig {
     public boolean isStructureInSet(SetStructureKeys key, Structure structure) { return getSetStructure(key).contains(structure); }
     public boolean isEntityTypeInSet(SetEntityTypeKeys key, EntityType entityType) { return getSetEntityType(key).contains(entityType); }
 
+    public void saveNewValue(StringKeys key, String value) {
+        stringMap.put(key, value);
+        Underilla.getInstance().getConfig().set(key.path, value);
+        Underilla.getInstance().saveConfig();
+    }
+
     public MergeStrategy getMergeStrategy() { return mergeStrategy; }
     public Selector getSelector() {
         return new Selector(getInt(IntegerKeys.GENERATION_AREA_MIN_X), getInt(IntegerKeys.GENERATION_AREA_MIN_Y),
@@ -104,7 +110,7 @@ public class UnderillaConfig {
             if (!fileConfiguration.contains(key.path)) {
                 Underilla.warning("Key " + key + " not found in config");
             }
-            stringMap.put(key, fileConfiguration.getString(key.path));
+            stringMap.put(key, fileConfiguration.getString(key.path, key.defaultValue));
         }
         mergeStrategy = MergeStrategy.valueOf(getString(StringKeys.STRATEGY));
 
@@ -375,6 +381,9 @@ public class UnderillaConfig {
     }
     public enum StringKeys {
         // @formatter:off
+        STEP_UNDERILLA_GENERATION("steps.underillaGeneration", "skip"),
+        STEP_CLEANING_BLOCKS("steps.cleaningBlocks", "skip"),
+        STEP_CLEANING_ENTITIES("steps.cleaingEntities", "skip"),
         FINAL_WORLD_NAME("finalWorld", "world"),
         SURFACE_WORLD_NAME("surfaceWorld", "world_surface"),
         CAVES_WORLD_NAME("cavesWorld", "world_caves"),

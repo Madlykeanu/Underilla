@@ -12,6 +12,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import com.jkantrell.mc.underilla.spigot.Underilla;
 import com.jkantrell.mc.underilla.spigot.io.UnderillaConfig.BooleanKeys;
 import com.jkantrell.mc.underilla.spigot.io.UnderillaConfig.MapMaterialKeys;
+import com.jkantrell.mc.underilla.spigot.io.UnderillaConfig.StringKeys;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.LevelReader;
 
@@ -37,9 +38,7 @@ public class CleanBlocksTask extends FollowableProgressTask {
                     Underilla.info("Replaced blocks: " + replacedBlock);
                     Underilla.info("Final blocks: " + finalBlock);
                     cancel();
-                    if (Underilla.getUnderillaConfig().getBoolean(BooleanKeys.CLEAN_ENTITIES_ENABLED)) {
-                        Underilla.getInstance().runCleanEntities();
-                    }
+                    Underilla.getInstance().validateTask(StringKeys.STEP_CLEANING_BLOCKS);
                     return;
                 }
 

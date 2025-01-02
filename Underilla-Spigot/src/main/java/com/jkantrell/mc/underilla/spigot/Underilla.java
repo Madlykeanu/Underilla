@@ -90,7 +90,7 @@ public final class Underilla extends JavaPlugin {
         }
         this.getServer().getPluginManager().registerEvents(new WorldListener(), this);
 
-        runSteps();
+        runStepsOnEnabled();
     }
 
     @Override
@@ -147,12 +147,37 @@ public final class Underilla extends JavaPlugin {
     public static void error(String message, Throwable e) { log(Level.SEVERE, message, e); }
 
 
-    private void runSteps() {
+    private void runStepsOnEnabled() {
         // TODO If there is config steps todo:
         ServerSetup.setupPaper();
         // runChunky();
     }
-    public void runChunky() {
+    public void runNextStepsAfterWorldInit() {
+        if (Underilla.getUnderillaConfig().getString(StringKeys.STEP_UNDERILLA_GENERATION).equals("todo")) {
+            runChunky();
+        } else if (Underilla.getUnderillaConfig().getString(StringKeys.STEP_UNDERILLA_GENERATION).equals("doing")) {
+            restartChunky();
+        } else if (Underilla.getUnderillaConfig().getString(StringKeys.STEP_CLEANING_BLOCKS).equals("todo")) {
+            runCleanBlocks();
+        } else if (Underilla.getUnderillaConfig().getString(StringKeys.STEP_CLEANING_BLOCKS).equals("doing")) {
+            Underilla.warning("Tasks can't be restarted from last state. Restarting from the beginning.");
+            runCleanBlocks();
+        } else if (Underilla.getUnderillaConfig().getString(StringKeys.STEP_CLEANING_ENTITIES).equals("todo")) {
+            runCleanEntities();
+        } else if (Underilla.getUnderillaConfig().getString(StringKeys.STEP_CLEANING_ENTITIES).equals("doing")) {
+            Underilla.warning("Tasks can't be restarted from last state. Restarting from the beginning.");
+            runCleanEntities();
+        }
+    }
+    public void validateTask(StringKeys taskKey, boolean done) {
+        getUnderillaConfig().saveNewValue(taskKey, done ? "done" : "failed");
+        runNextStepsAfterWorldInit();
+    }
+    public void validateTask(StringKeys taskKey) { validateTask(taskKey, true); }
+    public void setToDoingTask(StringKeys taskKey) { getUnderillaConfig().saveNewValue(taskKey, "doing"); }
+
+    // run tasks ------------------------------------------------------------------------------------------------------
+    private void runChunky(boolean restart) {
         Chunky chunky = ChunkyProvider.get();
         // startTask(String world, String shape, double centerX, double centerZ, double radiusX, double radiusZ, String pattern)
         String worldName = Underilla.getUnderillaConfig().getString(StringKeys.FINAL_WORLD_NAME);
@@ -184,30 +209,40 @@ public final class Underilla extends JavaPlugin {
 
         chunky.getApi().onGenerationComplete(generationCompleteEvent -> {
             info("Chunky task for world " + worldName + " has finished");
-            if (Underilla.getUnderillaConfig().getBoolean(BooleanKeys.CLEAN_BLOCKS_ENABLED)) {
-                runCleanBlocks();
-            } else if (Underilla.getUnderillaConfig().getBoolean(BooleanKeys.CLEAN_ENTITIES_ENABLED)) {
-                runCleanEntities();
-            }
+            validateTask(StringKeys.STEP_UNDERILLA_GENERATION);
         });
 
-        boolean worked = chunky.getApi().startTask(worldName, "rectangle", centerX, centerZ, radiusX, radiusZ, "region");
+        boolean worked;
+        if (restart) {
+            worked = chunky.getApi().continueTask(worldName);
+        } else {
+            worked = chunky.getApi().startTask(worldName, "rectangle", centerX, centerZ, radiusX, radiusZ, "region");
+            setToDoingTask(StringKeys.STEP_UNDERILLA_GENERATION);
+        }
         if (worked) {
             info("Started Chunky task for world " + worldName);
         } else {
             warning("Failed to start Chunky task for world " + worldName);
+            validateTask(StringKeys.STEP_UNDERILLA_GENERATION, false);
         }
-
-
     }
-    public void runCleanBlocks() {
+    private void runChunky() { runChunky(false); }
+    private void runCleanBlocks() {
+        setToDoingTask(StringKeys.STEP_CLEANING_BLOCKS);
         info("Starting clean blocks task");
         CleanBlocksTask cleanBlocksTask = new CleanBlocksTask(2, 3);
         cleanBlocksTask.run();
     }
-    public void runCleanEntities() {
+    private void runCleanEntities() {
+        setToDoingTask(StringKeys.STEP_CLEANING_ENTITIES);
         info("Starting clean entities task");
         CleanEntitiesTask cleanBlocksTask = new CleanEntitiesTask(3, 3);
         cleanBlocksTask.run();
+    }
+
+    // restart tasks --------------------------------------------------------------------------------------------------
+    private void restartChunky() {
+        info("Restarting Chunky task");
+        runChunky(true);
     }
 }

@@ -10,6 +10,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.scheduler.BukkitRunnable;
 import com.jkantrell.mc.underilla.spigot.Underilla;
 import com.jkantrell.mc.underilla.spigot.io.UnderillaConfig.SetEntityTypeKeys;
+import com.jkantrell.mc.underilla.spigot.io.UnderillaConfig.StringKeys;
 import net.minecraft.world.level.LevelReader;
 
 public class CleanEntitiesTask extends FollowableProgressTask {
@@ -34,6 +35,7 @@ public class CleanEntitiesTask extends FollowableProgressTask {
                     Underilla.info("Removed entities: " + removedEntity);
                     Underilla.info("Final entities: " + finalEntity);
                     cancel();
+                    Underilla.getInstance().validateTask(StringKeys.STEP_CLEANING_ENTITIES);
                     return;
                 }
 

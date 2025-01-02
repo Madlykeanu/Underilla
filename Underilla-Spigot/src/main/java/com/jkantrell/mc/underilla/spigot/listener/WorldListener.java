@@ -7,5 +7,5 @@ import com.jkantrell.mc.underilla.spigot.Underilla;
 
 public class WorldListener implements Listener {
     @EventHandler
-    public void onServerEndLoading(ServerLoadEvent event) { Underilla.getInstance().runChunky(); }
+    public void onServerEndLoading(ServerLoadEvent event) { Underilla.getInstance().runNextStepsAfterWorldInit(); }
 }
