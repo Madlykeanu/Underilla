@@ -14,6 +14,7 @@ import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.EntityType;
 import org.bukkit.generator.structure.Structure;
 import com.jkantrell.mc.underilla.core.generation.MergeStrategy;
 import com.jkantrell.mc.underilla.spigot.Underilla;
@@ -28,6 +29,7 @@ public class UnderillaConfig {
     private final EnumMap<SetMaterialKeys, Set<Material>> listMaterialMap;
     private final EnumMap<MapMaterialKeys, Map<Material, Material>> listMapMaterialMap;
     private final EnumMap<SetStructureKeys, Set<Structure>> listStructureMap;
+    private final EnumMap<SetEntityTypeKeys, Set<EntityType>> listEntityTypeMap;
     private MergeStrategy mergeStrategy;
 
 
@@ -40,6 +42,7 @@ public class UnderillaConfig {
         listMaterialMap = new EnumMap<>(SetMaterialKeys.class);
         listMapMaterialMap = new EnumMap<>(MapMaterialKeys.class);
         listStructureMap = new EnumMap<>(SetStructureKeys.class);
+        listEntityTypeMap = new EnumMap<>(SetEntityTypeKeys.class);
         reload(fileConfiguration);
     }
 
@@ -51,6 +54,7 @@ public class UnderillaConfig {
     public Set<Material> getSetMaterial(SetMaterialKeys key) { return listMaterialMap.get(key); }
     public Map<Material, Material> getMapMaterial(MapMaterialKeys key) { return listMapMaterialMap.get(key); }
     public Set<Structure> getSetStructure(SetStructureKeys key) { return listStructureMap.get(key); }
+    public Set<EntityType> getSetEntityType(SetEntityTypeKeys key) { return listEntityTypeMap.get(key); }
     public boolean isStringInSet(SetStringKeys key, String value) { return getSetString(key).contains(value); }
     public boolean isBiomeInSet(SetBiomeStringKeys key, String biome) { return getSetBiomeString(key).contains(biome); }
     public boolean isMaterialInSet(SetMaterialKeys key, Material material) { return getSetMaterial(key).contains(material); }
@@ -58,6 +62,8 @@ public class UnderillaConfig {
         return getMapMaterial(key).getOrDefault(material, null);
     }
     public boolean isStructureInSet(SetStructureKeys key, Structure structure) { return getSetStructure(key).contains(structure); }
+    public boolean isEntityTypeInSet(SetEntityTypeKeys key, EntityType entityType) { return getSetEntityType(key).contains(entityType); }
+
     public MergeStrategy getMergeStrategy() { return mergeStrategy; }
     public Selector getSelector() {
         return new Selector(getInt(IntegerKeys.GENERATION_AREA_MIN_X), getInt(IntegerKeys.GENERATION_AREA_MIN_Y),
@@ -130,6 +136,8 @@ public class UnderillaConfig {
 
         initSetStructures(fileConfiguration);
 
+        initSetEntityType(fileConfiguration);
+
         initSetBiomeStringMap(fileConfiguration);
 
         if (mergeStrategy == MergeStrategy.NONE) {
@@ -148,6 +156,21 @@ public class UnderillaConfig {
         }
 
         Underilla.info("Config reloaded with values: " + this);
+    }
+
+    public void initSetEntityType(FileConfiguration fileConfiguration) {
+        for (SetEntityTypeKeys key : SetEntityTypeKeys.values()) {
+            List<String> regexList = new ArrayList<>();
+            if (fileConfiguration.contains(key.path)) {
+                regexList.addAll(fileConfiguration.getStringList(key.path));
+            } else {
+                Underilla.warning("Key " + key + " not found in config");
+                regexList.addAll(key.defaultValue);
+            }
+            Set<EntityType> entityTypeSet = Arrays.stream(EntityType.values())
+                    .filter(entityType -> regexList.stream().anyMatch(s -> entityType.toString().matches(s))).collect(Collectors.toSet());
+            listEntityTypeMap.put(key, entityTypeSet);
+        }
     }
 
     public void initMapMaterialMap(FileConfiguration fileConfiguration) {
@@ -441,5 +464,19 @@ public class UnderillaConfig {
             this.defaultValue = defaultValue;
         }
         SetStructureKeys(String path) { this(path, Set.of()); }
+    }
+
+    public enum SetEntityTypeKeys {
+        // @formatter:off
+        CLEAN_ENTITY_TO_REMOVE("clean.entity.toRemove", Set.of("ITEM"));
+        // @formatter:on
+
+        private final String path;
+        private final Set<String> defaultValue;
+        SetEntityTypeKeys(String path, Set<String> defaultValue) {
+            this.path = path;
+            this.defaultValue = defaultValue;
+        }
+        SetEntityTypeKeys(String path) { this(path, Set.of()); }
     }
 }

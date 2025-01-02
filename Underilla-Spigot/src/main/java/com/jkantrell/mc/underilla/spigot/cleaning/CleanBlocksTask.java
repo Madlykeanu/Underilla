@@ -42,6 +42,8 @@ public class CleanBlocksTask extends FollowableProgressTask {
                     }
                     return;
                 }
+
+
                 while (execTime + 45 > System.currentTimeMillis() && selector.hasNextBlock()) {
                     Block currentBlock = selector.nextBlock();
                     Block underCurrentBlock = currentBlock.getRelative(BlockFace.DOWN);

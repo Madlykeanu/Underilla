@@ -178,7 +178,9 @@ clean:
 
   entity:
     enabled: true
-    # TODO
+    # Must be define as an EntityType from Paper API: https://jd.papermc.io/paper/1.21.4/org/bukkit/entity/EntityType.html. Regular expression is allowed.
+    toRemove:
+      - "ITEM" # Items resting on the ground.
 
 # Cache settings ------------------------------------------------------------------------------------------------------
 # Most memory is used by the server itself to interact with the world, we have no control over this.
