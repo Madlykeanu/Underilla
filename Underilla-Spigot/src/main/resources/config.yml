@@ -19,10 +19,19 @@ steps:
 
 
 # The world to merge the terrain into
-finalWorld: "world"
+finalWorld:
+  name: "world"
 
 # The world to copy the surface from
-surfaceWorld: "world_surface"
+surfaceWorld:
+  name: "world_surface"
+  blocks:
+    # List of blocks of surface world to replace by another block. It will replace the block defined here by the block defined in the value.
+    # Remove blocks by replacing them with AIR.
+    # You might use a world that you didn't build yourself in world painter. Often that world will contains some blocks that you don't want in your final world.
+    # Must be define as Material from Paper API: https://jd.papermc.io/paper/1.21.4/org/bukkit/Material.html.
+    toReplace:
+
 
 # Set this area to match the surface world coordinates if you want to merge the entire surface world.
 # You can do test with a smaller area to speed up the process.
@@ -49,7 +58,8 @@ transferBlocksFromCavesWorld: false
 # DISABLED FOR NOW.
 transferBiomesFromCavesWorld: false
 # Directory where the caves world is stored. It must be in the same directory as the reference world.
-cavesWorld: "world_caves"
+cavesWorld:
+  name: "world_caves"
 # Witch biome to transfer from cavesWorld to the merged world.
 # Biomes must be defined as Paper Biome enum constants or as biome resource key for example `minecraft:plains`. https://jd.papermc.io/paper/1.21.4/org/bukkit/block/Biome.html
 # Caves world biomes won't be transferred in preserveBiomes.

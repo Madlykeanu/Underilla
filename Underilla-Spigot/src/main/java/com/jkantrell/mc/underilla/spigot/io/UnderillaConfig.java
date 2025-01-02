@@ -384,9 +384,9 @@ public class UnderillaConfig {
         STEP_UNDERILLA_GENERATION("steps.underillaGeneration", "skip"),
         STEP_CLEANING_BLOCKS("steps.cleaningBlocks", "skip"),
         STEP_CLEANING_ENTITIES("steps.cleaingEntities", "skip"),
-        FINAL_WORLD_NAME("finalWorld", "world"),
-        SURFACE_WORLD_NAME("surfaceWorld", "world_surface"),
-        CAVES_WORLD_NAME("cavesWorld", "world_caves"),
+        FINAL_WORLD_NAME("finalWorld.name", "world"),
+        SURFACE_WORLD_NAME("surfaceWorld.name", "world_surface"),
+        CAVES_WORLD_NAME("cavesWorld.name", "world_caves"),
         OUT_OF_THE_SURFACE_WORLD_GENERATOR("outOfTheSurfaceWorldGenerator", "VoidWorldGenerator"),
         STRATEGY("strategy", "SURFACE");
         // @formatter:on
@@ -448,7 +448,8 @@ public class UnderillaConfig {
     public enum MapMaterialKeys {
         // @formatter:off
         CLEAN_BLOCK_TO_SUPPORT("clean.blocks.toSupport", Map.of(Material.SAND, Material.SANDSTONE, Material.RED_SAND, Material.RED_SANDSTONE, Material.GRAVEL, Material.ANDESITE)),
-        CLEAN_BLOCK_TO_REPLACE("clean.blocks.toReplace");
+        CLEAN_BLOCK_TO_REPLACE("clean.blocks.toReplace"),
+        SURFACE_WORLD_BLOCK_TO_REPLACE("surfaceWorld.blocks.toReplace");
         // @formatter:on
 
         private final String path;

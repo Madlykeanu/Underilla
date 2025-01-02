@@ -12,6 +12,7 @@ import com.jkantrell.mc.underilla.core.vector.VectorIterable;
 import com.jkantrell.mc.underilla.spigot.Underilla;
 import com.jkantrell.mc.underilla.spigot.impl.BukkitBlock;
 import com.jkantrell.mc.underilla.spigot.io.UnderillaConfig.IntegerKeys;
+import com.jkantrell.mc.underilla.spigot.io.UnderillaConfig.MapMaterialKeys;
 import com.jkantrell.mc.underilla.spigot.io.UnderillaConfig.SetMaterialKeys;
 
 public class AbsoluteMerger implements Merger {
@@ -39,6 +40,7 @@ public class AbsoluteMerger implements Merger {
         for (Vector<Integer> v : iterable) {
             startTime = System.currentTimeMillis();
             Block customBlock = surfaceReader.blockAt(v).orElse(BukkitBlock.AIR);
+            customBlock = replaceSurfaceBlockIfNecessary(customBlock);
             Generator.addTime("Read block data from custom world", startTime);
             startTime = System.currentTimeMillis();
             Block vanillaBlock = cavesReader == null ? chunkData.getBlock(v) : cavesReader.blockAt(v).orElse(BukkitBlock.AIR);
@@ -101,5 +103,14 @@ public class AbsoluteMerger implements Merger {
         // vanillaBlock.isSolid());
         return (Underilla.getUnderillaConfig().isMaterialInSet(SetMaterialKeys.BLOCK_TO_KEEP_FROM_SURFACE_WORLD_IN_CAVES,
                 Material.getMaterial(customBlock.getName().toUpperCase())) && (vanillaBlock == null || vanillaBlock.isSolid()));
+    }
+
+    private Block replaceSurfaceBlockIfNecessary(Block block) {
+        Material replaceWith = Underilla.getUnderillaConfig().getMaterialFromMap(MapMaterialKeys.SURFACE_WORLD_BLOCK_TO_REPLACE,
+                Material.getMaterial(block.getName().toUpperCase()));
+        if (replaceWith != null) {
+            return new BukkitBlock(replaceWith.createBlockData());
+        }
+        return block;
     }
 }
