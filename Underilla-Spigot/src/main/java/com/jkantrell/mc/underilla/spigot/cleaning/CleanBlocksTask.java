@@ -10,6 +10,7 @@ import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.scheduler.BukkitRunnable;
 import com.jkantrell.mc.underilla.spigot.Underilla;
 import com.jkantrell.mc.underilla.spigot.io.UnderillaConfig.BooleanKeys;
+import com.jkantrell.mc.underilla.spigot.io.UnderillaConfig.MapMaterialKeys;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.LevelReader;
 
@@ -45,16 +46,29 @@ public class CleanBlocksTask extends FollowableProgressTask {
                     Block currentBlock = selector.nextBlock();
                     Material startMaterial = currentBlock.getType();
 
-                    // Replace currentBlock by an other one if it need to be removed.
+
                     if (underCurrentBlock != null && underCurrentBlock.isEmpty() && !currentBlock.isEmpty()) {
-                        // TODO if currentBlock is a block to support (sand, gravel, etc)
+                        // if currentBlock is a block to support (sand, gravel, etc)
                         // replave it by the support block
+                        Material toSupport = Underilla.getUnderillaConfig().getMaterialFromMap(MapMaterialKeys.CLEAN_BLOCK_TO_REPLACE,
+                                startMaterial);
+                        if (toSupport != null) {
+                            currentBlock.setType(toSupport);
+                        }
+                    }
+
+                    // Replace currentBlock by an other one if it is need.
+                    Material toReplace = Underilla.getUnderillaConfig().getMaterialFromMap(MapMaterialKeys.CLEAN_BLOCK_TO_REPLACE,
+                            startMaterial);
+                    if (toReplace != null) {
+                        currentBlock.setType(toReplace);
                     }
 
                     // Check with NMS that the block is stable, else remove it.
                     if (Underilla.getUnderillaConfig().getBoolean(BooleanKeys.CLEAN_BLOCKS_REMOVE_UNSTABLE_BLOCKS)) {
                         removeUnstableBlock(currentBlock, startMaterial);
                     }
+
 
                     // Keep track of removed and final blocks
                     Material finalMaterial = currentBlock.getType();

@@ -35,7 +35,9 @@ public abstract class WorldReader implements Reader {
     // CONSTRUCTORS
     protected WorldReader(String worldPath) throws NoSuchFieldException { this(new File(worldPath)); }
     protected WorldReader(String worldPath, int cacheSize) throws NoSuchFieldException { this(new File(worldPath), cacheSize); }
-    protected WorldReader(File worldDir) throws NoSuchFieldException { this(worldDir, 16); }
+    protected WorldReader(File worldDir) throws NoSuchFieldException {
+        this(worldDir, Underilla.getUnderillaConfig().getInt(IntegerKeys.CACHE_SIZE));
+    }
     protected WorldReader(File worldDir, int cacheSize) throws NoSuchFieldException {
         if (!(worldDir.exists() && worldDir.isDirectory())) {
             throw new NoSuchFieldException("World directory '" + worldDir.getPath() + "' does not exist.");
@@ -47,9 +49,13 @@ public abstract class WorldReader implements Reader {
         this.world_ = worldDir;
         this.regions_ = regionDir;
         this.regionCache_ = new RLUCache<>(cacheSize);
-        this.chunkCache_ = new RLUCache<>(cacheSize * 8);
-        this.yLevelCache_ = new RLUCache<>(cacheSize * 8 * Underilla.CHUNK_SIZE * Underilla.CHUNK_SIZE);
-        this.biomeCache_ = new RLUCache<>(cacheSize * 8 * 4 * 4);
+        // There is 32*32 chunks in a region. We probably don't need to cache all of them.
+        int chunkCacheSize = cacheSize * 64;
+        this.chunkCache_ = new RLUCache<>(chunkCacheSize);
+        // Cache as many y levels as it can fit in all the loaded chunks.
+        this.yLevelCache_ = new RLUCache<>(chunkCacheSize * Underilla.CHUNK_SIZE * Underilla.CHUNK_SIZE);
+        // Cache as many biomes as it can fit in all the loaded chunks.
+        this.biomeCache_ = new RLUCache<>(chunkCacheSize * 4 * 4);
     }
 
 

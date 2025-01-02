@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -25,6 +26,7 @@ public class UnderillaConfig {
     private final EnumMap<SetStringKeys, Set<String>> listStringMap;
     private final EnumMap<SetBiomeStringKeys, Set<String>> listBiomeStringMap;
     private final EnumMap<SetMaterialKeys, Set<Material>> listMaterialMap;
+    private final EnumMap<MapMaterialKeys, Map<Material, Material>> listMapMaterialMap;
     private final EnumMap<SetStructureKeys, Set<Structure>> listStructureMap;
     private MergeStrategy mergeStrategy;
 
@@ -36,6 +38,7 @@ public class UnderillaConfig {
         listStringMap = new EnumMap<>(SetStringKeys.class);
         listBiomeStringMap = new EnumMap<>(SetBiomeStringKeys.class);
         listMaterialMap = new EnumMap<>(SetMaterialKeys.class);
+        listMapMaterialMap = new EnumMap<>(MapMaterialKeys.class);
         listStructureMap = new EnumMap<>(SetStructureKeys.class);
         reload(fileConfiguration);
     }
@@ -46,10 +49,14 @@ public class UnderillaConfig {
     public Set<String> getSetString(SetStringKeys key) { return listStringMap.get(key); }
     public Set<String> getSetBiomeString(SetBiomeStringKeys key) { return listBiomeStringMap.get(key); }
     public Set<Material> getSetMaterial(SetMaterialKeys key) { return listMaterialMap.get(key); }
+    public Map<Material, Material> getMapMaterial(MapMaterialKeys key) { return listMapMaterialMap.get(key); }
     public Set<Structure> getSetStructure(SetStructureKeys key) { return listStructureMap.get(key); }
     public boolean isStringInSet(SetStringKeys key, String value) { return getSetString(key).contains(value); }
     public boolean isBiomeInSet(SetBiomeStringKeys key, String biome) { return getSetBiomeString(key).contains(biome); }
     public boolean isMaterialInSet(SetMaterialKeys key, Material material) { return getSetMaterial(key).contains(material); }
+    public @Nullable Material getMaterialFromMap(MapMaterialKeys key, Material material) {
+        return getMapMaterial(key).getOrDefault(material, null);
+    }
     public boolean isStructureInSet(SetStructureKeys key, Structure structure) { return getSetStructure(key).contains(structure); }
     public MergeStrategy getMergeStrategy() { return mergeStrategy; }
     public Selector getSelector() {
@@ -119,6 +126,8 @@ public class UnderillaConfig {
             listMaterialMap.put(key, materialSet);
         }
 
+        initMapMaterialMap(fileConfiguration);
+
         initSetStructures(fileConfiguration);
 
         initSetBiomeStringMap(fileConfiguration);
@@ -139,6 +148,32 @@ public class UnderillaConfig {
         }
 
         Underilla.info("Config reloaded with values: " + this);
+    }
+
+    public void initMapMaterialMap(FileConfiguration fileConfiguration) {
+        for (MapMaterialKeys key : MapMaterialKeys.values()) {
+            Map<Material, Material> map = new EnumMap<>(Material.class);
+            if (fileConfiguration.contains(key.path)) {
+                fileConfiguration.getConfigurationSection(key.path).getKeys(false).forEach(materialKey -> {
+                    Material material = Material.matchMaterial(materialKey);
+                    if (material == null) {
+                        Underilla.warning("Material " + materialKey + " not found in the material list of the server.");
+                        return;
+                    }
+                    String value = fileConfiguration.getString(key.path + "." + materialKey);
+                    Material valueMaterial = Material.matchMaterial(value);
+                    if (valueMaterial == null) {
+                        Underilla.warning("Material " + value + " not found in the material list of the server.");
+                        return;
+                    }
+                    map.put(material, valueMaterial);
+                });
+            } else {
+                Underilla.warning("Key " + key + " not found in config");
+                map.putAll(key.defaultValue);
+            }
+            listMapMaterialMap.put(key, map);
+        }
     }
 
     private void initSetBiomeStringMap(FileConfiguration fileConfiguration) {
@@ -234,8 +269,8 @@ public class UnderillaConfig {
     public String toString() {
         return "UnderillaConfig{" + "booleanMap=" + booleanMap + "\nintegerMap=" + integerMap + "\nstringMap=" + stringMap
                 + "\nlistStringMap=" + toString(listStringMap) + "\nlistBiomeStringMap=" + toString(listBiomeStringMap)
-                + "\nlistMaterialMap=" + toString(listMaterialMap) + "\nlistStructureMap=" + listStructureMap + "\nmergeStrategy="
-                + mergeStrategy + '}';
+                + "\nlistMaterialMap=" + toString(listMaterialMap) + "\nlistMapMaterialMap=" + listMapMaterialMap + "\nlistStructureMap="
+                + listStructureMap + "\nmergeStrategy=" + mergeStrategy + '}';
     }
     private String toString(Map<?, ? extends Collection<?>> map) {
         return map.entrySet().stream().map(e -> e.getKey() + " (" + e.getValue().size() + ") = " + e.getValue().stream().sorted().toList())
@@ -298,7 +333,8 @@ public class UnderillaConfig {
         GENERATION_AREA_MIN_Y("generationArea.minY", -64),
         GENERATION_AREA_MAX_Y("generationArea.maxY", 320),
         MERGE_DEPTH("surface.depth", 6),
-        MAX_HEIGHT_OF_CAVES("surfaceAndAbsolute.limit", Integer.MAX_VALUE);
+        MAX_HEIGHT_OF_CAVES("surfaceAndAbsolute.limit", Integer.MAX_VALUE),
+        CACHE_SIZE("cacheSize", 16, 1, Integer.MAX_VALUE);
         // @formatter:on
 
         private final String path;
@@ -376,6 +412,20 @@ public class UnderillaConfig {
             this.defaultValue = defaultValue;
         }
         SetMaterialKeys(String path) { this(path, Set.of()); }
+    }
+    public enum MapMaterialKeys {
+        // @formatter:off
+        CLEAN_BLOCK_TO_SUPPORT("clean.blocks.toSupport", Map.of(Material.SAND, Material.SANDSTONE, Material.RED_SAND, Material.RED_SANDSTONE, Material.GRAVEL, Material.ANDESITE)),
+        CLEAN_BLOCK_TO_REPLACE("clean.blocks.toReplace");
+        // @formatter:on
+
+        private final String path;
+        private final Map<Material, Material> defaultValue;
+        MapMaterialKeys(String path, Map<Material, Material> defaultValue) {
+            this.path = path;
+            this.defaultValue = defaultValue;
+        }
+        MapMaterialKeys(String path) { this(path, Map.of()); }
     }
 
     public enum SetStructureKeys {
