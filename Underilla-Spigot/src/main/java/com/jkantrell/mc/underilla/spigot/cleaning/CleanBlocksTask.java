@@ -6,6 +6,7 @@ import java.util.Set;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.scheduler.BukkitRunnable;
 import com.jkantrell.mc.underilla.spigot.Underilla;
@@ -30,7 +31,6 @@ public class CleanBlocksTask extends FollowableProgressTask {
             @Override
             public void run() {
                 long execTime = System.currentTimeMillis();
-                Block underCurrentBlock = null;
                 if (selector == null || selector.progress() >= 1) {
                     printProgress(processedBlocks, startTime);
                     Underilla.info("Cleaning blocks task " + taskID + " finished in " + (System.currentTimeMillis() - startTime) + "ms");
@@ -44,13 +44,14 @@ public class CleanBlocksTask extends FollowableProgressTask {
                 }
                 while (execTime + 45 > System.currentTimeMillis() && selector.hasNextBlock()) {
                     Block currentBlock = selector.nextBlock();
+                    Block underCurrentBlock = currentBlock.getRelative(BlockFace.DOWN);
                     Material startMaterial = currentBlock.getType();
 
 
-                    if (underCurrentBlock != null && underCurrentBlock.isEmpty() && !currentBlock.isEmpty()) {
+                    if (underCurrentBlock.isEmpty() && !currentBlock.isEmpty()) {
                         // if currentBlock is a block to support (sand, gravel, etc)
                         // replave it by the support block
-                        Material toSupport = Underilla.getUnderillaConfig().getMaterialFromMap(MapMaterialKeys.CLEAN_BLOCK_TO_REPLACE,
+                        Material toSupport = Underilla.getUnderillaConfig().getMaterialFromMap(MapMaterialKeys.CLEAN_BLOCK_TO_SUPPORT,
                                 startMaterial);
                         if (toSupport != null) {
                             currentBlock.setType(toSupport);
