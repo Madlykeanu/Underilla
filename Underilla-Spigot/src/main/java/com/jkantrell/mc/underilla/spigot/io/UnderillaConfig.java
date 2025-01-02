@@ -10,11 +10,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.generator.structure.Structure;
 import com.jkantrell.mc.underilla.core.generation.MergeStrategy;
 import com.jkantrell.mc.underilla.spigot.Underilla;
+import com.jkantrell.mc.underilla.spigot.selector.Selector;
 
 public class UnderillaConfig {
     private final EnumMap<BooleanKeys, Boolean> booleanMap;
@@ -50,6 +52,12 @@ public class UnderillaConfig {
     public boolean isMaterialInSet(SetMaterialKeys key, Material material) { return getSetMaterial(key).contains(material); }
     public boolean isStructureInSet(SetStructureKeys key, Structure structure) { return getSetStructure(key).contains(structure); }
     public MergeStrategy getMergeStrategy() { return mergeStrategy; }
+    public Selector getSelector() {
+        return new Selector(getInt(IntegerKeys.GENERATION_AREA_MIN_X), getInt(IntegerKeys.GENERATION_AREA_MIN_Y),
+                getInt(IntegerKeys.GENERATION_AREA_MIN_Z), getInt(IntegerKeys.GENERATION_AREA_MAX_X),
+                getInt(IntegerKeys.GENERATION_AREA_MAX_Y), getInt(IntegerKeys.GENERATION_AREA_MAX_Z),
+                Bukkit.getWorld(getString(StringKeys.FINAL_WORLD_NAME)).getUID());
+    }
 
 
     public void reload(FileConfiguration fileConfiguration) {
@@ -266,7 +274,10 @@ public class UnderillaConfig {
         CARVERS_ENABLED("carvers.enabled", true),
         PRESERVE_SURFACE_WORLD_FROM_CAVERS("carvers.preserveSurfaceWorldFromCavers", true),
         PRESERVE_LIQUID_FROM_CAVERS("carvers.preserveLiquidFromCavers", true),
-        BIOME_MERGING_FROM_CAVES_GENERATION_ENABLED("structures.enabled", true);
+        BIOME_MERGING_FROM_CAVES_GENERATION_ENABLED("structures.enabled", true),
+        CLEAN_BLOCKS_ENABLED("clean.blocks.enabled", true),
+        CLEAN_BLOCKS_REMOVE_UNSTABLE_BLOCKS("clean.blocks.removeUnstableBlocks", true),
+        CLEAN_ENTITIES_ENABLED("clean.entities.enabled", true);
         // @formatter:on
 
         private final String path;
@@ -278,6 +289,7 @@ public class UnderillaConfig {
     }
     public enum IntegerKeys {
         // @formatter:off
+        PRINT_PROGRESS_EVERY_X_SECONDS("printProgressEveryXSeconds", 10),
         SURFACE_LAYER_THICKNESS("surface.depth", 6, 0, Integer.MAX_VALUE),
         GENERATION_AREA_MIN_X("generationArea.minX", 0),
         GENERATION_AREA_MIN_Z("generationArea.minZ", 0),

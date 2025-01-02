@@ -1,5 +1,8 @@
 debug: true
 
+# The number of seconds between each progress message. < 1 values will disable the progress messages.
+printProgressEveryXSeconds: 10 
+
 # Steps to merge the worlds -------------------------------------------------------------------------------------------
 # steps can be "todo", "doing", "done", "failed" or "skip"
 # If you don't want a step to be done, set it to "skip"
@@ -43,6 +46,7 @@ outOfTheSurfaceWorldGenerator: "VoidWorldGenerator"
 # This is useful if you want to have a custom underground from an existing world. This is mandatory if you wich to transfer underground biomes as "LUSH_CAVES".
 transferBlocksFromCavesWorld: false
 # If true caves biomes in the list transferedCavesWorldBiomes will be transferred from cavesWorld to the merged world.
+# DISABLED FOR NOW.
 transferBiomesFromCavesWorld: false
 # Directory where the caves world is stored. It must be in the same directory as the reference world.
 cavesWorld: "world_caves"
@@ -149,3 +153,13 @@ biomesMerging:
       - "minecraft:dripstone_caves"
       - "minecraft:deep_dark"
     exceptOn: []
+
+# Cleaning after generation --------------------------------------------------------------------------------------------
+clean:
+  blocks:
+    enabled: true
+    # If removeUnstableBlocks is true, the blocks that are not stable, as flowers over an air block, will be removed.
+    removeUnstableBlocks: true
+  entity:
+    enabled: true
+    # TODO

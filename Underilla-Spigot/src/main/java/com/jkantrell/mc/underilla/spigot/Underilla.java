@@ -2,18 +2,27 @@ package com.jkantrell.mc.underilla.spigot;
 
 import fr.formiko.mc.voidworldgenerator.VoidWorldGeneratorPlugin;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 import javax.annotation.Nullable;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.popcraft.chunky.Chunky;
+import org.popcraft.chunky.ChunkyProvider;
+import org.popcraft.chunky.api.event.task.GenerationProgressEvent;
 import com.jkantrell.mc.underilla.core.generation.Generator;
+import com.jkantrell.mc.underilla.spigot.cleaning.CleanBlocksTask;
+import com.jkantrell.mc.underilla.spigot.cleaning.CleanEntitiesTask;
+import com.jkantrell.mc.underilla.spigot.cleaning.FollowableProgressTask;
 import com.jkantrell.mc.underilla.spigot.generation.UnderillaChunkGenerator;
 import com.jkantrell.mc.underilla.spigot.impl.BukkitWorldReader;
 import com.jkantrell.mc.underilla.spigot.io.UnderillaConfig;
 import com.jkantrell.mc.underilla.spigot.io.UnderillaConfig.BooleanKeys;
+import com.jkantrell.mc.underilla.spigot.io.UnderillaConfig.IntegerKeys;
 import com.jkantrell.mc.underilla.spigot.io.UnderillaConfig.StringKeys;
 import com.jkantrell.mc.underilla.spigot.listener.StructureEventListener;
+import com.jkantrell.mc.underilla.spigot.listener.WorldListener;
 import com.jkantrell.mc.underilla.spigot.preparing.ServerSetup;
 
 public final class Underilla extends JavaPlugin {
@@ -79,6 +88,7 @@ public final class Underilla extends JavaPlugin {
         if (Underilla.getUnderillaConfig().getBoolean(BooleanKeys.STRUCTURES_ENABLED)) {
             this.getServer().getPluginManager().registerEvents(new StructureEventListener(), this);
         }
+        this.getServer().getPluginManager().registerEvents(new WorldListener(), this);
 
         runSteps();
     }
@@ -140,6 +150,64 @@ public final class Underilla extends JavaPlugin {
     private void runSteps() {
         // TODO If there is config steps todo:
         ServerSetup.setupPaper();
-        // ChunkyBukkit chunky = new ChunkyBukkit();
+        // runChunky();
+    }
+    public void runChunky() {
+        Chunky chunky = ChunkyProvider.get();
+        // startTask(String world, String shape, double centerX, double centerZ, double radiusX, double radiusZ, String pattern)
+        String worldName = Underilla.getUnderillaConfig().getString(StringKeys.FINAL_WORLD_NAME);
+        int minX = Underilla.getUnderillaConfig().getInt(IntegerKeys.GENERATION_AREA_MIN_X);
+        int minZ = Underilla.getUnderillaConfig().getInt(IntegerKeys.GENERATION_AREA_MIN_Z);
+        int maxX = Underilla.getUnderillaConfig().getInt(IntegerKeys.GENERATION_AREA_MAX_X);
+        int maxZ = Underilla.getUnderillaConfig().getInt(IntegerKeys.GENERATION_AREA_MAX_Z);
+        int centerX = (minX + maxX) / 2;
+        int centerZ = (minZ + maxZ) / 2;
+        int radiusX = (maxX - minX) / 2;
+        int radiusZ = (maxZ - minZ) / 2;
+        final long startTime = System.currentTimeMillis();
+        // Set chunky silent
+        chunky.getConfig().setSilent(true);
+
+        chunky.getApi().onGenerationProgress(new Consumer<GenerationProgressEvent>() {
+            long printTime = 0;
+            long printTimeEachXMs = 1000 * Underilla.getUnderillaConfig().getInt(IntegerKeys.PRINT_PROGRESS_EVERY_X_SECONDS);
+            @Override
+            public void accept(GenerationProgressEvent generationProgressEvent) {
+                if (printTime + printTimeEachXMs < System.currentTimeMillis()) {
+                    printTime = System.currentTimeMillis();
+                    FollowableProgressTask.printProgress(generationProgressEvent.chunks(), startTime,
+                            generationProgressEvent.progress() / 100, 1, 3, "Rate: " + (int) (generationProgressEvent.rate())
+                                    + ", Current: " + generationProgressEvent.x() + " " + generationProgressEvent.z());
+                }
+            }
+        });
+
+        chunky.getApi().onGenerationComplete(generationCompleteEvent -> {
+            info("Chunky task for world " + worldName + " has finished");
+            if (Underilla.getUnderillaConfig().getBoolean(BooleanKeys.CLEAN_BLOCKS_ENABLED)) {
+                runCleanBlocks();
+            } else if (Underilla.getUnderillaConfig().getBoolean(BooleanKeys.CLEAN_ENTITIES_ENABLED)) {
+                runCleanEntities();
+            }
+        });
+
+        boolean worked = chunky.getApi().startTask(worldName, "rectangle", centerX, centerZ, radiusX, radiusZ, "region");
+        if (worked) {
+            info("Started Chunky task for world " + worldName);
+        } else {
+            warning("Failed to start Chunky task for world " + worldName);
+        }
+
+
+    }
+    public void runCleanBlocks() {
+        info("Starting clean blocks task");
+        CleanBlocksTask cleanBlocksTask = new CleanBlocksTask(2, 3);
+        cleanBlocksTask.run();
+    }
+    public void runCleanEntities() {
+        info("Starting clean entities task");
+        CleanEntitiesTask cleanBlocksTask = new CleanEntitiesTask(3, 3);
+        cleanBlocksTask.run();
     }
 }
