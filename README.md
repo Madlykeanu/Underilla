@@ -138,10 +138,14 @@ It can also be used to add feature to some biome. For example a quartz_ore featu
 Create a working jar with `./gradlew assemble`.
 Run a local paper server with the example map & datapack on Linux.
 ```sh
-rm Underilla-Spigot/run/world_surface/ -fr; cp testMap/world/ Underilla-Spigot/run/world_surface/; rm -fr Underilla-Spigot/run/world/; mkdir -pv Underilla-Spigot/run/world/datapacks; cp UnderillaBaseDataPack/ Underilla-Spigot/run/world/datapacks; ./gradlew runServer
+rm Underilla-Spigot/run/world_surface/ -fr; cp testMap/world/ Underilla-Spigot/run/world_surface/; rm -fr Underilla-Spigot/run/world/; mkdir -p Underilla-Spigot/run/world/datapacks; cp UnderillaBaseDataPack/ Underilla-Spigot/run/world/datapacks; ./gradlew runServer
 ```
 ```sh
-rm Underilla-Spigot/run/world_surface/ -fr; cp testMap/worldY/ Underilla-Spigot/run/world_surface/; rm -fr Underilla-Spigot/run/world/; mkdir -pv Underilla-Spigot/run/world/datapacks; cp UnderillaHighYDataPack/ Underilla-Spigot/run/world/datapacks; ./gradlew runServer
+rm Underilla-Spigot/run/world_surface/ -fr; cp testMap/worldY/ Underilla-Spigot/run/world_surface/; rm -fr Underilla-Spigot/run/world/; mkdir -p Underilla-Spigot/run/world/datapacks; cp UnderillaHighYDataPack/ Underilla-Spigot/run/world/datapacks; ./gradlew runServer
+```
+
+```sh
+rm -fr Underilla-Spigot/run/world/; mkdir -p Underilla-Spigot/run/world/datapacks; cp ../MvndiSeasons/datapacks/* Underilla-Spigot/run/world/datapacks/; ./gradlew runServer
 ```
 
 ## TODO

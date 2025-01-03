@@ -1,4 +1,4 @@
-debug: true
+debug: fakse
 
 # The number of seconds between each progress message. < 1 values will disable the progress messages.
 printProgressEveryXSeconds: 10 
@@ -57,34 +57,42 @@ transferBlocksFromCavesWorld: false
 # If true caves biomes in the list transferedCavesWorldBiomes will be transferred from cavesWorld to the merged world.
 # DISABLED FOR NOW.
 transferBiomesFromCavesWorld: false
-# Directory where the caves world is stored. It must be in the same directory as the reference world.
+# Directory where the caves world is stored. It must be in the same directory as the surface world.
 cavesWorld:
   name: "world_caves"
 # Witch biome to transfer from cavesWorld to the merged world.
 # Biomes must be defined as Paper Biome enum constants or as biome resource key for example `minecraft:plains`. https://jd.papermc.io/paper/1.21.4/org/bukkit/block/Biome.html
 # Caves world biomes won't be transferred in preserveBiomes.
 # Caves world won't be transferred over surfaceAndAbsolute.limit.
-transferedCavesWorldBiomes:
-  - "LUSH_CAVES"
-  - "DRIPSTONE_CAVES"
-  - "DEEP_DARK"
+transferedCavesWorldBiomes: []
 
 
-# How to merge vanilla and reference worlds.
+# How to merge vanilla/caves and surface worlds.
 #   - SURFACE: Generation will be based on the custom word surface. It have a top limits with surfaceAndAbsolute.limit and always generate world at least x blocks below the custom world surface (see relative_and_surface.depth). This is the best choice for most cases.
 #   - ABSOLUTE: At a fixed Y height.
-#   - NONE: Just... don't merge. Reference world will be re-generated without vanilla underground.
+#   - NONE: Just... don't merge. Surface world will be re-generated without vanilla underground.
 strategy: "SURFACE"
 
 
-# Mix strategy exclusive settings
+# Only for SURFACE & ABSOLUTE strategy
 surfaceAndAbsolute:
-  # The Y height dividing reference terrain above and vanilla worlds below.
+  # The Y height dividing surface world above and vanilla worlds below.
+  # On SURFACE strategy, this is just the max value. Surface will be calculated from the surface world.
   limit: 320
 
-# How deep reference world terrain should dig into vanilla word.
+# Only for SURFACE strategy
 surface:
+  # How deep surface world terrain should dig into vanilla word.
   depth: 6
+  # How deep surface world terrain should dig into vanilla word if there is air next to that block.
+  # This is useful for cliffs or any terrain that have more than depth block of difference bewteen 2 close columns.
+  # If you are sure that you don't have any cliffs, you should disable this feature to speed up the generation.
+  adaptativeDepth:
+    enabled: true
+    # How many blocks can be placed to hide caves blocks on a cliff.
+    maxDepth: 50
+    # How many blocks will be hidden under the surface at least.
+    minHiddenBlocksDepth: 2
 
 # Non solid blocks are always ignored for surface calculation.
 # Must be define as Material from Paper API: https://jd.papermc.io/paper/1.21.4/org/bukkit/Material.html. Regular expression is allowed.
@@ -106,7 +114,7 @@ ignoredBlockForSurfaceCalculation:
 # Biomes must be defined as Paper Biome or as biome resource key for example `minecraft:plains`. https://jd.papermc.io/paper/1.21.4/org/bukkit/block/Biome.html
 preserveBiomes: []
 
-# Weather or not to allow vanilla Minecraft populate/decorate over the reference world.
+# Weather or not to allow vanilla Minecraft populate/decorate over the surface world.
 vanillaPopulation:
   enabled: true
 

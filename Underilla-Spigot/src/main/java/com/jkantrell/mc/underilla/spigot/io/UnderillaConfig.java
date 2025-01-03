@@ -159,7 +159,19 @@ public class UnderillaConfig {
         }
         if (mergeStrategy != MergeStrategy.SURFACE) {
             integerMap.put(IntegerKeys.MERGE_DEPTH, 0);
+            booleanMap.put(BooleanKeys.ADAPTATIVE_MERGE_DEPTH_ENABLED, false);
         }
+        if (!getBoolean(BooleanKeys.ADAPTATIVE_MERGE_DEPTH_ENABLED)) {
+            integerMap.put(IntegerKeys.ADAPTATIVE_MAX_MERGE_DEPTH, 0);
+            integerMap.put(IntegerKeys.ADAPTATIVE_MIN_HIDDEN_BLOCKS_MERGE_DEPTH, 0);
+        }
+        if (getInt(IntegerKeys.ADAPTATIVE_MIN_HIDDEN_BLOCKS_MERGE_DEPTH) > getInt(IntegerKeys.ADAPTATIVE_MAX_MERGE_DEPTH)) {
+            integerMap.put(IntegerKeys.ADAPTATIVE_MIN_HIDDEN_BLOCKS_MERGE_DEPTH, getInt(IntegerKeys.ADAPTATIVE_MAX_MERGE_DEPTH));
+        }
+        if (getInt(IntegerKeys.ADAPTATIVE_MIN_HIDDEN_BLOCKS_MERGE_DEPTH) > getInt(IntegerKeys.MERGE_DEPTH)) {
+            integerMap.put(IntegerKeys.ADAPTATIVE_MIN_HIDDEN_BLOCKS_MERGE_DEPTH, getInt(IntegerKeys.MERGE_DEPTH));
+        }
+
 
         Underilla.info("Config reloaded with values: " + this);
     }
@@ -333,6 +345,7 @@ public class UnderillaConfig {
         TRANSFER_BIOMES("transfer_biomes", false),
         TRANSFER_BLOCKS_FROM_CAVES_WORLD("transferBlocksFromCavesWorld", false),
         TRANSFER_BIOMES_FROM_CAVES_WORLD("transferBiomesFromCavesWorld", false),
+        ADAPTATIVE_MERGE_DEPTH_ENABLED("surface.adaptativeDepth.enabled", true),
         VANILLA_POPULATION_ENABLED("vanillaPopulation.enabled", true),
         STRUCTURES_ENABLED("structures.enabled", true),
         CARVERS_ENABLED("carvers.enabled", true),
@@ -362,6 +375,8 @@ public class UnderillaConfig {
         GENERATION_AREA_MIN_Y("generationArea.minY", -64),
         GENERATION_AREA_MAX_Y("generationArea.maxY", 320),
         MERGE_DEPTH("surface.depth", 6),
+        ADAPTATIVE_MAX_MERGE_DEPTH("surface.adaptativeDepth.maxDepth", 50),
+        ADAPTATIVE_MIN_HIDDEN_BLOCKS_MERGE_DEPTH("surface.adaptativeDepth.minHiddenBlocksDepth", 2),
         MAX_HEIGHT_OF_CAVES("surfaceAndAbsolute.limit", Integer.MAX_VALUE),
         CACHE_SIZE("cacheSize", 16, 1, Integer.MAX_VALUE);
         // @formatter:on

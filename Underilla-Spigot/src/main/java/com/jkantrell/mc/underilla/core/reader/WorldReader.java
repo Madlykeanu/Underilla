@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.stream.Stream;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import com.jkantrell.mc.underilla.core.api.Biome;
@@ -128,9 +129,36 @@ public abstract class WorldReader implements Reader {
             lbtr--;
         }
 
-        r = lbtr - mergeDepth;
+        // Cliffs surface fixer to avoid cave blocks being visible on cliffs.
+        int extraAdaptativeMaxMergeDepth = Underilla.getUnderillaConfig().getInt(IntegerKeys.ADAPTATIVE_MAX_MERGE_DEPTH) - mergeDepth;
+        final int finalDepth;
+        if (extraAdaptativeMaxMergeDepth > 0) {
+            int minHiddenBlocksDepth = Underilla.getUnderillaConfig().getInt(IntegerKeys.ADAPTATIVE_MIN_HIDDEN_BLOCKS_MERGE_DEPTH);
+            int countHowManyBlocksAreExposed = 0;
+            // While there is air or grass etc near the block, go down.
+            while (extraAdaptativeMaxMergeDepth > 0 && haveNonSolidNeighbour(globalX, lbtr - countHowManyBlocksAreExposed, globalZ)
+                    && lbtr > minimalPossibleY) {
+                countHowManyBlocksAreExposed++;
+                extraAdaptativeMaxMergeDepth--;
+            }
+            finalDepth = Math.max(mergeDepth, countHowManyBlocksAreExposed + minHiddenBlocksDepth);
+        } else {
+            finalDepth = mergeDepth;
+        }
+
+
+        r = lbtr - finalDepth;
+        if (globalX == 12883 && globalZ == 11684) {
+            Underilla.info("r: " + r + " lbtr: " + lbtr + " finalDepth: " + finalDepth);
+        }
         yLevelCache_.put(globalX, globalZ, r);
         return r;
+    }
+
+    private boolean haveNonSolidNeighbour(int x, int y, int z) {
+        // Is there blocks next to that block that are not solid (air, leaves, etc). If no block are found, return false.
+        return Stream.of(blockAt(x + 1, y, z), blockAt(x - 1, y, z), blockAt(x, y, z + 1), blockAt(x, y, z - 1)).filter(Optional::isPresent)
+                .map(Optional::get).filter(b -> !b.isSolid()).findAny().isPresent();
     }
 
     public String getBiomeName(int globalX, int globalZ) {

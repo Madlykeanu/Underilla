@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "com.jkantrell.mc.underilla"
-version = "1.7.1"
+version = "1.8.0"
 description="Generate vanilla cave in custom world."
 val mainMinecraftVersion = "1.21.4"
 val supportedMinecraftVersions = "1.21.3 - 1.21.4"
