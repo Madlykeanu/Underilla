@@ -45,7 +45,8 @@ public class CleanBlocksTask extends FollowableProgressTask {
                     Material startMaterial = currentBlock.getType();
 
 
-                    if (underCurrentBlock.isEmpty() && !currentBlock.isEmpty()) {
+                    // if (underCurrentBlock.isEmpty() && !currentBlock.isEmpty()) {
+                    if (!underCurrentBlock.isSolid() && !currentBlock.isEmpty()) {
                         // if currentBlock is a block to support (sand, gravel, etc)
                         // replave it by the support block
                         Material toSupport = Underilla.getUnderillaConfig().getMaterialFromMap(MapMaterialKeys.CLEAN_BLOCK_TO_SUPPORT,
