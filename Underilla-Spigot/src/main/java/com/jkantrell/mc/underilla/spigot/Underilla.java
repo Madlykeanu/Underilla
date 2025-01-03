@@ -36,6 +36,7 @@ public final class Underilla extends JavaPlugin {
     public static final int BIOME_AREA_SIZE = 4;
     private CleanBlocksTask cleanBlocksTask;
     private CleanEntitiesTask cleanEntitiesTask;
+    private StructureEventListener structureEventListener;
 
 
     @Override
@@ -89,7 +90,8 @@ public final class Underilla extends JavaPlugin {
 
         // Registering listeners
         if (Underilla.getUnderillaConfig().getBoolean(BooleanKeys.STRUCTURES_ENABLED)) {
-            this.getServer().getPluginManager().registerEvents(new StructureEventListener(), this);
+            structureEventListener = new StructureEventListener();
+            this.getServer().getPluginManager().registerEvents(structureEventListener, this);
         }
         this.getServer().getPluginManager().registerEvents(new WorldListener(), this);
 
@@ -145,10 +147,13 @@ public final class Underilla extends JavaPlugin {
         }
     }
     public static void info(String message) { log(Level.INFO, message); }
+    public static void info(Supplier<String> messageProvider) { log(Level.INFO, messageProvider.get()); }
     public static void info(String message, Throwable e) { log(Level.INFO, message, e); }
     public static void warning(String message) { log(Level.WARNING, message); }
+    public static void warning(Supplier<String> messageProvider) { log(Level.WARNING, messageProvider.get()); }
     public static void warning(String message, Throwable e) { log(Level.WARNING, message, e); }
     public static void error(String message) { log(Level.SEVERE, message); }
+    public static void error(Supplier<String> messageProvider) { log(Level.SEVERE, messageProvider.get()); }
     public static void error(String message, Throwable e) { log(Level.SEVERE, message, e); }
 
 
@@ -212,6 +217,7 @@ public final class Underilla extends JavaPlugin {
 
         chunky.getApi().onGenerationComplete(generationCompleteEvent -> {
             info("Chunky task for world " + worldName + " has finished");
+            info("Structure generation: " + structureEventListener.getStructureCount());
             validateTask(StringKeys.STEP_UNDERILLA_GENERATION);
         });
 
