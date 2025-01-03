@@ -10,7 +10,7 @@ public class StructureEventListener implements Listener {
 
     public StructureEventListener() {}
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onStructureSpawn(AsyncStructureSpawnEvent e) {
         // Location location = e.getWorld().getBlockAt(e.getChunkX() * 16, 0, e.getChunkZ() * 16).getLocation();
         // String biomeKey = NMSBiomeUtils.getBiomeKey(location).toString();

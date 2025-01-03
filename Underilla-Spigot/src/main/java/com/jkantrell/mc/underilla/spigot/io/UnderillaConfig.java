@@ -24,7 +24,7 @@ public class UnderillaConfig {
     private final EnumMap<BooleanKeys, Boolean> booleanMap;
     private final EnumMap<IntegerKeys, Integer> integerMap;
     private final EnumMap<StringKeys, String> stringMap;
-    private final EnumMap<SetStringKeys, Set<String>> listStringMap;
+    // private final EnumMap<SetStringKeys, Set<String>> listStringMap;
     private final EnumMap<SetBiomeStringKeys, Set<String>> listBiomeStringMap;
     private final EnumMap<SetMaterialKeys, Set<Material>> listMaterialMap;
     private final EnumMap<MapMaterialKeys, Map<Material, Material>> listMapMaterialMap;
@@ -37,7 +37,7 @@ public class UnderillaConfig {
         booleanMap = new EnumMap<>(BooleanKeys.class);
         integerMap = new EnumMap<>(IntegerKeys.class);
         stringMap = new EnumMap<>(StringKeys.class);
-        listStringMap = new EnumMap<>(SetStringKeys.class);
+        // listStringMap = new EnumMap<>(SetStringKeys.class);
         listBiomeStringMap = new EnumMap<>(SetBiomeStringKeys.class);
         listMaterialMap = new EnumMap<>(SetMaterialKeys.class);
         listMapMaterialMap = new EnumMap<>(MapMaterialKeys.class);
@@ -49,13 +49,13 @@ public class UnderillaConfig {
     public boolean getBoolean(BooleanKeys key) { return booleanMap.get(key); }
     public int getInt(IntegerKeys key) { return integerMap.get(key); }
     public String getString(StringKeys key) { return stringMap.get(key); }
-    public Set<String> getSetString(SetStringKeys key) { return listStringMap.get(key); }
+    // public Set<String> getSetString(SetStringKeys key) { return listStringMap.get(key); }
     public Set<String> getSetBiomeString(SetBiomeStringKeys key) { return listBiomeStringMap.get(key); }
     public Set<Material> getSetMaterial(SetMaterialKeys key) { return listMaterialMap.get(key); }
     public Map<Material, Material> getMapMaterial(MapMaterialKeys key) { return listMapMaterialMap.get(key); }
     public Set<Structure> getSetStructure(SetStructureKeys key) { return listStructureMap.get(key); }
     public Set<EntityType> getSetEntityType(SetEntityTypeKeys key) { return listEntityTypeMap.get(key); }
-    public boolean isStringInSet(SetStringKeys key, String value) { return getSetString(key).contains(value); }
+    // public boolean isStringInSet(SetStringKeys key, String value) { return getSetString(key).contains(value); }
     public boolean isBiomeInSet(SetBiomeStringKeys key, String biome) { return getSetBiomeString(key).contains(biome); }
     public boolean isMaterialInSet(SetMaterialKeys key, Material material) { return getSetMaterial(key).contains(material); }
     public @Nullable Material getMaterialFromMap(MapMaterialKeys key, Material material) {
@@ -114,15 +114,15 @@ public class UnderillaConfig {
         }
         mergeStrategy = MergeStrategy.valueOf(getString(StringKeys.STRATEGY));
 
-        listStringMap.clear();
-        for (SetStringKeys key : SetStringKeys.values()) {
-            if (fileConfiguration.contains(key.path)) {
-                listStringMap.put(key, new HashSet<>(fileConfiguration.getStringList(key.path)));
-            } else {
-                Underilla.warning("Key " + key + " not found in config");
-                listStringMap.put(key, key.defaultValue);
-            }
-        }
+        // listStringMap.clear();
+        // for (SetStringKeys key : SetStringKeys.values()) {
+        // if (fileConfiguration.contains(key.path)) {
+        // listStringMap.put(key, new HashSet<>(fileConfiguration.getStringList(key.path)));
+        // } else {
+        // Underilla.warning("Key " + key + " not found in config");
+        // listStringMap.put(key, key.defaultValue);
+        // }
+        // }
 
         listMaterialMap.clear();
         for (SetMaterialKeys key : SetMaterialKeys.values()) {
@@ -221,20 +221,22 @@ public class UnderillaConfig {
         Set<String> allBiomes = NMSBiomeUtils.getAllBiomes().keySet();
         listBiomeStringMap.clear();
         for (SetBiomeStringKeys key : SetBiomeStringKeys.values()) {
-            List<String> biomes = new ArrayList<>();
+            List<String> biomesOrTags = new ArrayList<>();
             if (fileConfiguration.contains(key.path)) {
-                biomes.addAll(fileConfiguration.getStringList(key.path));
+                biomesOrTags.addAll(fileConfiguration.getStringList(key.path));
             } else {
                 Underilla.warning("Key " + key + " not found in config");
-                biomes.addAll(key.defaultValue);
+                biomesOrTags.addAll(key.defaultValue);
             }
-            biomes = NMSBiomeUtils.normalizeBiomeNameList(biomes);
+            biomesOrTags = NMSBiomeUtils.normalizeBiomeNameList(biomesOrTags);
             Set<String> existingBiomes = new HashSet<>();
-            for (String biome : biomes) {
-                if (allBiomes.contains(biome)) {
-                    existingBiomes.add(biome);
+            for (String biomeOrTag : biomesOrTags) {
+                if (biomeOrTag.startsWith("#")) {
+                    existingBiomes.addAll(NMSBiomeUtils.getAllBiomesKeyStringMatchingTag(biomeOrTag.substring(1)));
+                } else if (allBiomes.contains(biomeOrTag)) {
+                    existingBiomes.add(biomeOrTag);
                 } else {
-                    Underilla.warning("Biome " + biome + " not found in the biome list of the server.");
+                    Underilla.warning("Biome or tag " + biomeOrTag + " not found in the biome list of the server.");
                 }
             }
             listBiomeStringMap.put(key, existingBiomes);
@@ -281,8 +283,10 @@ public class UnderillaConfig {
                 regexList.addAll(key.defaultValue);
             }
 
-            Set<Structure> structureSet = allStructures.stream().filter(
-                    structure -> regexList.stream().anyMatch(s -> structure.key().toString().toUpperCase().matches(s.toUpperCase())))
+            Set<Structure> structureSet = allStructures.stream()
+                    .filter(structure -> regexList.stream().anyMatch(s -> structure.key().toString()
+                            // Not biomes but normalizeBiomeName does exacly what we want.
+                            .matches(NMSBiomeUtils.normalizeBiomeName(s))))
                     .collect(Collectors.toSet());
             listStructureMap.put(key, structureSet);
         }
@@ -309,9 +313,14 @@ public class UnderillaConfig {
     @Override
     public String toString() {
         return "UnderillaConfig{" + "booleanMap=" + booleanMap + "\nintegerMap=" + integerMap + "\nstringMap=" + stringMap
-                + "\nlistStringMap=" + toString(listStringMap) + "\nlistBiomeStringMap=" + toString(listBiomeStringMap)
-                + "\nlistMaterialMap=" + toString(listMaterialMap) + "\nlistMapMaterialMap=" + listMapMaterialMap + "\nlistStructureMap="
-                + listStructureMap + "\nmergeStrategy=" + mergeStrategy + '}';
+        // + "\nlistStringMap=" + toString(listStringMap)
+                + "\nlistBiomeStringMap=" + toString(listBiomeStringMap) + "\nlistMaterialMap=" + toString(listMaterialMap)
+                + "\nlistMapMaterialMap=" + listMapMaterialMap + "\nlistStructureMap="
+                + listStructureMap.entrySet().stream()
+                        .map(e -> e.getKey() + " (" + e.getValue().size() + ") = "
+                                + e.getValue().stream().map(s -> s.getKey().asString()).sorted().toList())
+                        .collect(Collectors.joining(",\n", "{", "}"))
+                + "\nmergeStrategy=" + mergeStrategy + '}';
     }
     private String toString(Map<?, ? extends Collection<?>> map) {
         return map.entrySet().stream().map(e -> e.getKey() + " (" + e.getValue().size() + ") = " + e.getValue().stream().sorted().toList())
@@ -342,7 +351,6 @@ public class UnderillaConfig {
     public enum BooleanKeys {
         // @formatter:off
         DEBUG("debug", false),
-        TRANSFER_BIOMES("transfer_biomes", false),
         TRANSFER_BLOCKS_FROM_CAVES_WORLD("transferBlocksFromCavesWorld", false),
         TRANSFER_BIOMES_FROM_CAVES_WORLD("transferBiomesFromCavesWorld", false),
         ADAPTATIVE_MERGE_DEPTH_ENABLED("surface.adaptativeDepth.enabled", true),
@@ -378,7 +386,7 @@ public class UnderillaConfig {
         ADAPTATIVE_MAX_MERGE_DEPTH("surface.adaptativeDepth.maxDepth", 50),
         ADAPTATIVE_MIN_HIDDEN_BLOCKS_MERGE_DEPTH("surface.adaptativeDepth.minHiddenBlocksDepth", 2),
         MAX_HEIGHT_OF_CAVES("surfaceAndAbsolute.limit", Integer.MAX_VALUE),
-        CACHE_SIZE("cacheSize", 16, 1, Integer.MAX_VALUE);
+        CACHE_SIZE("cache.size", 16, 1, Integer.MAX_VALUE);
         // @formatter:on
 
         private final String path;
@@ -414,19 +422,19 @@ public class UnderillaConfig {
         }
         StringKeys(String path) { this(path, ""); }
     }
-    public enum SetStringKeys {
-        // @formatter:off
-        NULL("null");
-        // @formatter:on
+    // public enum SetStringKeys {
+    //     // @formatter:off
+    //     NULL("null");
+    //     // @formatter:on
 
-        private final String path;
-        private final Set<String> defaultValue;
-        SetStringKeys(String path, Set<String> defaultValue) {
-            this.path = path;
-            this.defaultValue = defaultValue;
-        }
-        SetStringKeys(String path) { this(path, Set.of()); }
-    }
+    // private final String path;
+    // private final Set<String> defaultValue;
+    // SetStringKeys(String path, Set<String> defaultValue) {
+    // this.path = path;
+    // this.defaultValue = defaultValue;
+    // }
+    // SetStringKeys(String path) { this(path, Set.of()); }
+    // }
     public enum SetBiomeStringKeys {
         // @formatter:off
         TRANSFERED_CAVES_WORLD_BIOMES("transferedCavesWorldBiomes", Set.of("minecraft:deep_dark", "minecraft:dripstone_caves", "minecraft:lush_caves")),
@@ -493,7 +501,7 @@ public class UnderillaConfig {
 
     public enum SetEntityTypeKeys {
         // @formatter:off
-        CLEAN_ENTITY_TO_REMOVE("clean.entity.toRemove", Set.of("ITEM"));
+        CLEAN_ENTITY_TO_REMOVE("clean.entities.toRemove", Set.of("ITEM"));
         // @formatter:on
 
         private final String path;
