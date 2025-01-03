@@ -9,18 +9,26 @@ public abstract class FollowableProgressTask {
     protected final Selector selector;
     protected final int taskID;
     protected final int tasksCount;
-    private long printTime;
-    private long printTimeEachXMs;
+    protected long printTime;
+    protected long printTimeEachXMs;
+    protected boolean stop;
 
-    public FollowableProgressTask(int taskID, int tasksCount) {
+    public FollowableProgressTask(int taskID, int tasksCount, Selector selector) {
         this.taskID = taskID;
         this.tasksCount = tasksCount;
-        selector = Underilla.getUnderillaConfig().getSelector();
+        this.selector = selector;
         printTime = 0;
         printTimeEachXMs = 1000 * Underilla.getUnderillaConfig().getInt(IntegerKeys.PRINT_PROGRESS_EVERY_X_SECONDS);
+        stop = false;
     }
+    public FollowableProgressTask(int taskID, int tasksCount) { this(taskID, tasksCount, Underilla.getUnderillaConfig().getSelector()); }
 
     abstract public void run();
+
+    public Selector stop() {
+        stop = true;
+        return selector;
+    }
 
     protected void printProgress(long processed, long startTime) {
         printProgress(processed, startTime, selector.progress(), taskID, tasksCount, null);

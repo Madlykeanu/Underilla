@@ -1,5 +1,11 @@
 package com.jkantrell.mc.underilla.spigot.selector;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.UUID;
 import org.bukkit.Bukkit;
@@ -104,4 +110,28 @@ public class Selector implements Serializable {
         }
         return c;
     }
+
+    // Save to file & load from file
+    public void saveIn(String path) {
+        // Use serialization to save the selector
+        File file = new File(getSaveFolder(), path + ".dat");
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) {
+            oos.writeObject(this);
+            Underilla.info("Selector saved to file: " + file.getAbsolutePath());
+        } catch (IOException e) {
+            Underilla.error("Error while saving selector to file: " + file.getAbsolutePath());
+        }
+    }
+    public static Selector loadFrom(String path) {
+        File file = new File(Underilla.getInstance().getDataFolder(), path + ".dat");
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
+            Selector selector = (Selector) ois.readObject();
+            Underilla.info("Selector loaded from file: " + file.getAbsolutePath());
+            return selector;
+        } catch (IOException | ClassNotFoundException e) {
+            Underilla.error("Error while loading selector from file: " + file.getAbsolutePath());
+        }
+        return null;
+    }
+    private File getSaveFolder() { return Underilla.getInstance().getDataFolder(); }
 }

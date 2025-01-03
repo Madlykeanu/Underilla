@@ -14,6 +14,7 @@ import com.jkantrell.mc.underilla.spigot.Underilla;
 import com.jkantrell.mc.underilla.spigot.io.UnderillaConfig.BooleanKeys;
 import com.jkantrell.mc.underilla.spigot.io.UnderillaConfig.MapMaterialKeys;
 import com.jkantrell.mc.underilla.spigot.io.UnderillaConfig.StringKeys;
+import com.jkantrell.mc.underilla.spigot.selector.Selector;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.LevelReader;
 
@@ -21,6 +22,10 @@ public class CleanBlocksTask extends FollowableProgressTask {
     private LevelReader levelReader;
     public CleanBlocksTask(int taskID, int tasksCount) {
         super(taskID, tasksCount);
+        levelReader = ((CraftWorld) Bukkit.getWorld(selector.getWorldUUID())).getHandle();
+    }
+    public CleanBlocksTask(int taskID, int tasksCount, Selector selector) {
+        super(taskID, tasksCount, selector);
         levelReader = ((CraftWorld) Bukkit.getWorld(selector.getWorldUUID())).getHandle();
     }
 
@@ -33,20 +38,8 @@ public class CleanBlocksTask extends FollowableProgressTask {
             @Override
             public void run() {
                 long execTime = System.currentTimeMillis();
-                if (selector == null || selector.progress() >= 1) {
-                    printProgress(processedBlocks, startTime);
 
-                    Underilla.info("Cleaning blocks task " + taskID + " finished in "
-                            + Duration.ofMillis(System.currentTimeMillis() - startTime) + "ms");
-                    Underilla.info("Replaced blocks: " + replacedBlock);
-                    Underilla.info("Final blocks: " + finalBlock);
-                    cancel();
-                    Underilla.getInstance().validateTask(StringKeys.STEP_CLEANING_BLOCKS);
-                    return;
-                }
-
-
-                while (execTime + 45 > System.currentTimeMillis() && selector.hasNextBlock()) {
+                while (execTime + 45 > System.currentTimeMillis() && selector.hasNextBlock() && !stop) {
                     Block currentBlock = selector.nextBlock();
                     Block underCurrentBlock = currentBlock.getRelative(BlockFace.DOWN);
                     Material startMaterial = currentBlock.getType();
@@ -92,7 +85,21 @@ public class CleanBlocksTask extends FollowableProgressTask {
                     }
                     finalBlock.put(finalMaterial, finalBlock.getOrDefault(finalMaterial, 0L) + 1L);
                 }
-                printProgressIfNeeded(processedBlocks, startTime);
+
+                if (selector == null || selector.progress() >= 1 || stop) {
+                    printProgress(processedBlocks, startTime);
+
+                    Underilla.info("Cleaning blocks task " + taskID + " finished in "
+                            + Duration.ofMillis(System.currentTimeMillis() - startTime) + "ms");
+                    Underilla.info("Replaced blocks: " + replacedBlock);
+                    Underilla.info("Final blocks: " + finalBlock);
+                    cancel();
+                    Underilla.getInstance().validateTask(StringKeys.STEP_CLEANING_BLOCKS);
+                    return;
+                } else {
+                    printProgressIfNeeded(processedBlocks, startTime);
+                }
+
             }
 
             private Set<Material> returnToDirt = Set.of(Material.GRASS_BLOCK, Material.PODZOL, Material.DIRT_PATH);

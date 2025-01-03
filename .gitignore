@@ -127,3 +127,6 @@ build
 
 .vscode/
 bin/
+
+testMap/worldY/
+UnderillaHighYDataPack/

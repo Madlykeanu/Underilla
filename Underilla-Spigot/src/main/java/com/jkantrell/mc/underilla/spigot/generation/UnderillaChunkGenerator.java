@@ -215,7 +215,12 @@ public class UnderillaChunkGenerator extends ChunkGenerator {
         return new BiomeProviderFromFile(outOfTheSurfaceWorldBiomeProdiver);
     }
 
-    public static Map<String, Long> getBiomesPlaced() { return customBiomeSource.getBiomesPlaced(); }
+    public static Map<String, Long> getBiomesPlaced() {
+        if (customBiomeSource == null) {
+            return null;
+        }
+        return customBiomeSource.getBiomesPlaced();
+    }
 
 
     private boolean isOutsideOfTheSurfaceWorld(int x, int z) {

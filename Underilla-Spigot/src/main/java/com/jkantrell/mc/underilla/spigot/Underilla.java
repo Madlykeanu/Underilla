@@ -24,6 +24,7 @@ import com.jkantrell.mc.underilla.spigot.io.UnderillaConfig.StringKeys;
 import com.jkantrell.mc.underilla.spigot.listener.StructureEventListener;
 import com.jkantrell.mc.underilla.spigot.listener.WorldListener;
 import com.jkantrell.mc.underilla.spigot.preparing.ServerSetup;
+import com.jkantrell.mc.underilla.spigot.selector.Selector;
 
 public final class Underilla extends JavaPlugin {
 
@@ -33,6 +34,8 @@ public final class Underilla extends JavaPlugin {
     public static final int CHUNK_SIZE = 16;
     public static final int REGION_SIZE = 512;
     public static final int BIOME_AREA_SIZE = 4;
+    private CleanBlocksTask cleanBlocksTask;
+    private CleanEntitiesTask cleanEntitiesTask;
 
 
     @Override
@@ -96,17 +99,19 @@ public final class Underilla extends JavaPlugin {
     @Override
     public void onDisable() {
         try {
+            stopTasks();
             if (Generator.times != null) {
                 long totalTime = Generator.times.entrySet().stream().mapToLong(Map.Entry::getValue).sum();
                 for (Map.Entry<String, Long> entry : Generator.times.entrySet()) {
                     getLogger().info(entry.getKey() + " took " + entry.getValue() + "ms (" + (entry.getValue() * 100 / totalTime) + "%)");
                 }
             }
-            // Map<String, Long> biomesPlaced = worldInitListener != null ? worldInitListener.getCustomBiomeSource().getBiomesPlaced()
-            // : UnderillaChunkGenerator.getBiomesPlaced();
             Map<String, Long> biomesPlaced = UnderillaChunkGenerator.getBiomesPlaced();
-            getLogger().info("Map of chunks: " + biomesPlaced.entrySet().stream().sorted((a, b) -> Long.compare(b.getValue(), a.getValue()))
-                    .map(entry -> entry.getKey() + ": " + entry.getValue()).reduce((a, b) -> a + ", " + b).orElse(""));
+            if (biomesPlaced != null) {
+                getLogger().info("Map of biome placed: "
+                        + biomesPlaced.entrySet().stream().sorted((a, b) -> Long.compare(b.getValue(), a.getValue()))
+                                .map(entry -> entry.getKey() + ": " + entry.getValue()).reduce((a, b) -> a + ", " + b).orElse(""));
+            }
         } catch (Exception e) {
             getLogger().info("Fail to print times or biomes placed.");
             e.printStackTrace();
@@ -160,13 +165,11 @@ public final class Underilla extends JavaPlugin {
         } else if (Underilla.getUnderillaConfig().getString(StringKeys.STEP_CLEANING_BLOCKS).equals("todo")) {
             runCleanBlocks();
         } else if (Underilla.getUnderillaConfig().getString(StringKeys.STEP_CLEANING_BLOCKS).equals("doing")) {
-            Underilla.warning("Tasks can't be restarted from last state. Restarting from the beginning.");
-            runCleanBlocks();
+            restartCleanBlocks();
         } else if (Underilla.getUnderillaConfig().getString(StringKeys.STEP_CLEANING_ENTITIES).equals("todo")) {
             runCleanEntities();
         } else if (Underilla.getUnderillaConfig().getString(StringKeys.STEP_CLEANING_ENTITIES).equals("doing")) {
-            Underilla.warning("Tasks can't be restarted from last state. Restarting from the beginning.");
-            runCleanEntities();
+            restartCleanEntities();
         }
     }
     public void validateTask(StringKeys taskKey, boolean done) {
@@ -227,22 +230,54 @@ public final class Underilla extends JavaPlugin {
         }
     }
     private void runChunky() { runChunky(false); }
-    private void runCleanBlocks() {
+    private void runCleanBlocks(Selector selector) {
         setToDoingTask(StringKeys.STEP_CLEANING_BLOCKS);
         info("Starting clean blocks task");
-        CleanBlocksTask cleanBlocksTask = new CleanBlocksTask(2, 3);
+        cleanBlocksTask = new CleanBlocksTask(2, 3, selector);
         cleanBlocksTask.run();
     }
-    private void runCleanEntities() {
+    private void runCleanBlocks() { runCleanBlocks(Underilla.getUnderillaConfig().getSelector()); }
+    private void runCleanEntities(Selector selector) {
         setToDoingTask(StringKeys.STEP_CLEANING_ENTITIES);
         info("Starting clean entities task");
-        CleanEntitiesTask cleanBlocksTask = new CleanEntitiesTask(3, 3);
-        cleanBlocksTask.run();
+        cleanEntitiesTask = new CleanEntitiesTask(3, 3);
+        cleanEntitiesTask.run();
+    }
+    private void runCleanEntities() { runCleanEntities(Underilla.getUnderillaConfig().getSelector()); }
+
+    // stop tasks -----------------------------------------------------------------------------------------------------
+    private void stopTasks() {
+        if (cleanBlocksTask != null && Underilla.getUnderillaConfig().getString(StringKeys.STEP_CLEANING_BLOCKS).equals("doing")) {
+            Selector selector = cleanBlocksTask.stop();
+            selector.saveIn("cleanBlocksTask");
+        }
+        if (cleanEntitiesTask != null && Underilla.getUnderillaConfig().getString(StringKeys.STEP_CLEANING_ENTITIES).equals("doing")) {
+            Selector selector = cleanEntitiesTask.stop();
+            selector.saveIn("cleanEntitiesTask");
+        }
     }
 
     // restart tasks --------------------------------------------------------------------------------------------------
     private void restartChunky() {
         info("Restarting Chunky task");
         runChunky(true);
+    }
+    private void restartCleanBlocks() {
+        info("Restarting clean blocks task");
+        try {
+            runCleanBlocks(Selector.loadFrom("cleanBlocksTask"));
+        } catch (Exception e) {
+            Underilla.warning("Tasks can't be restarted from last state. Restarting from the beginning.");
+            runCleanBlocks();
+        }
+    }
+    private void restartCleanEntities() {
+        info("Restarting clean entities task");
+        try {
+            runCleanEntities(Selector.loadFrom("cleanEntitiesTask"));
+        } catch (Exception e) {
+            Underilla.warning("Tasks can't be restarted from last state. Restarting from the beginning.");
+            runCleanEntities();
+        }
     }
 }
