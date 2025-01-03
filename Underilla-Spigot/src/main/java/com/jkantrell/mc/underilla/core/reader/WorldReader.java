@@ -148,9 +148,6 @@ public abstract class WorldReader implements Reader {
 
 
         r = lbtr - finalDepth;
-        if (globalX == 12883 && globalZ == 11684) {
-            Underilla.info("r: " + r + " lbtr: " + lbtr + " finalDepth: " + finalDepth);
-        }
         yLevelCache_.put(globalX, globalZ, r);
         return r;
     }
