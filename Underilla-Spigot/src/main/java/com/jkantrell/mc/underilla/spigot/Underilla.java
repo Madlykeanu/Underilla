@@ -5,6 +5,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 import javax.annotation.Nullable;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -55,6 +56,8 @@ public final class Underilla extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        new Metrics(this, 24393);
+
         // save default config
         this.saveDefaultConfig();
         reloadConfig();

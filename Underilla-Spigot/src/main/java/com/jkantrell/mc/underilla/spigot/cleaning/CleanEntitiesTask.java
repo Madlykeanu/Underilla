@@ -41,7 +41,7 @@ public class CleanEntitiesTask extends FollowableProgressTask {
                     printProgress(processedEntities, startTime);
                     String finishOrStop = stop ? "stopped" : "finished";
                     Underilla.info("Cleaning entities task " + taskID + " " + finishOrStop + " in "
-                            + Duration.ofMillis(System.currentTimeMillis() - startTime) + "ms");
+                            + Duration.ofMillis(System.currentTimeMillis() - startTime));
                     Underilla.info("Removed entities: " + removedEntity);
                     Underilla.info("Final entities: " + finalEntity);
                     cancel();

@@ -91,7 +91,7 @@ public class CleanBlocksTask extends FollowableProgressTask {
                     printProgress(processedBlocks, startTime);
 
                     Underilla.info("Cleaning blocks task " + taskID + " finished in "
-                            + Duration.ofMillis(System.currentTimeMillis() - startTime) + "ms");
+                            + Duration.ofMillis(System.currentTimeMillis() - startTime));
                     Underilla.info("Replaced blocks: " + replacedBlock);
                     Underilla.info("Final blocks: " + finalBlock);
                     cancel();

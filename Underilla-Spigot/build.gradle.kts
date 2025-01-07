@@ -35,6 +35,7 @@ dependencies {
     implementation("com.jkantrell:Yamlizer:main-SNAPSHOT")
     implementation("fr.formiko.mc.biomeutils:biomeutils:1.1.8")
     implementation("com.github.FormikoLudo:Utils:0.0.9")
+    implementation("org.bstats:bstats-bukkit:3.1.0")
     api("com.github.HydrolienF:KntNBT:2.2.2")
     compileOnly("fr.formiko.mc.voidworldgenerator:voidworldgenerator:$voidWorldGeneratorVersion")
     compileOnly("org.popcraft:chunky-common:$chunkyVersion")
@@ -73,7 +74,7 @@ tasks {
             "name" to project.name,
             "version" to project.version,
             "description" to project.description,
-            "apiVersion" to "1.21",
+            "apiVersion" to "1.21.3",
             "group" to project.group,
             "voidWorldGeneratorVersion" to voidWorldGeneratorVersion,
             "chunkyVersion" to chunkyVersion
