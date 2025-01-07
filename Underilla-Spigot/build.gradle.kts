@@ -11,10 +11,12 @@ plugins {
 }
 
 group = "com.jkantrell.mc.underilla"
-version = "1.8.0"
+version = "1.9.0"
 description="Generate vanilla cave in custom world."
 val mainMinecraftVersion = "1.21.4"
 val supportedMinecraftVersions = "1.21.3 - 1.21.4"
+val voidWorldGeneratorVersion = "1.3.2"
+val chunkyVersion = "1.4.28"
 
 repositories {
     mavenLocal()
@@ -32,12 +34,10 @@ dependencies {
     paperweight.paperDevBundle("$mainMinecraftVersion-R0.1-SNAPSHOT")
     implementation("com.jkantrell:Yamlizer:main-SNAPSHOT")
     implementation("fr.formiko.mc.biomeutils:biomeutils:1.1.8")
+    implementation("com.github.FormikoLudo:Utils:0.0.9")
     api("com.github.HydrolienF:KntNBT:2.2.2")
-    compileOnly("fr.formiko.mc.voidworldgenerator:voidworldgenerator:1.3.2")
-    // compileOnly("org.popcraft:chunky-bukkit:1.4.28")
-    compileOnly("org.popcraft:chunky-common:1.4.28")
-    // compileOnly("org.popcraft:chunky-paper:1.4.28")
-    // compileOnly("org.popcraft:chunky-folia:1.4.28")
+    compileOnly("fr.formiko.mc.voidworldgenerator:voidworldgenerator:$voidWorldGeneratorVersion")
+    compileOnly("org.popcraft:chunky-common:$chunkyVersion")
 }
 
 // tasks.build.dependsOn tasks.reobfJar // paperweight
@@ -58,7 +58,6 @@ tasks {
             "org.bstats",
             "jakarta.annotation",
             "fr.formiko.mc.biomeutils",
-            // "fr.formiko.mc.voidworldgenerator",
         ).forEach { pkg ->
             relocate(pkg, "$prefix.$pkg")
         }
@@ -75,10 +74,12 @@ tasks {
             "version" to project.version,
             "description" to project.description,
             "apiVersion" to "1.21",
-            "group" to project.group
+            "group" to project.group,
+            "voidWorldGeneratorVersion" to voidWorldGeneratorVersion,
+            "chunkyVersion" to chunkyVersion
         )
         inputs.properties(props)
-        filesMatching("paper-plugin.yml") {
+        filesMatching(listOf("paper-plugin.yml", "config.yml")) {
             expand(props)
         }
     }
@@ -88,10 +89,10 @@ tasks {
         // Your plugin's jar (or shadowJar if present) will be used automatically.
         minecraftVersion(mainMinecraftVersion)
         // https://hangar.papermc.io/pop4959/Chunky
-        downloadPlugins {
-            hangar("Chunky", "1.4.28")
-            github("HydrolienF", "VoidWorldGenerator", "1.3.2", "VoidWorldGenerator-1.3.2.jar")
-        }
+        // downloadPlugins {
+        //     hangar("Chunky", "$chunkyVersion")
+        //     github("HydrolienF", "VoidWorldGenerator", "$voidWorldGeneratorVersion", "VoidWorldGenerator-${voidWorldGeneratorVersion}.jar")
+        // }
     }
 }
 

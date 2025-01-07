@@ -1,4 +1,4 @@
-debug: fakse
+debug: false
 
 # For all the biome config option, biomes must be defined as Paper Biome or as biome resource key for example `minecraft:plains` or as a biome tag for example `#minecraft:is_ocean`. https://jd.papermc.io/paper/1.21.4/org/bukkit/block/Biome.html
 
@@ -9,10 +9,10 @@ printProgressEveryXSeconds: 10
 # steps can be "todo", "doing", "done", "failed" or "skip"
 # If you don't want a step to be done, set it to "skip"
 steps:
-  # setupPaperForQuickGeneration: "todo"
-  # downloadDependencyPlugins: "todo"
-  # generateSurfaceWorld: "todo"
-  # setUnderillaAsWorldGenerator: "todo"
+  downloadDependencyPlugins: "todo"
+  setupPaperForQuickGeneration: "todo"
+  # generateSurfaceWorld: "todo" # Might be added later
+  setUnderillaAsWorldGenerator: "todo"
   # Remove world folder if it already exists
   # Need a restart before running this step
   underillaGeneration: "todo"
@@ -211,3 +211,8 @@ clean:
 # 16 is enough to have 16 regions files loaded and as much chunk loaded as 1 full region can have.
 cache:
   size: 16
+
+# Dependencies versions -----------------------------------------------------------------------------------------------
+# No need to change this unless you know what you are doing.
+chunky: "$chunkyVersion"
+voidWorldGenerator: "$voidWorldGeneratorVersion"

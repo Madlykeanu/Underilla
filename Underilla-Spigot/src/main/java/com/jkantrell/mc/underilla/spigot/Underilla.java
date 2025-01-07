@@ -1,11 +1,11 @@
 package com.jkantrell.mc.underilla.spigot;
 
-import fr.formiko.mc.voidworldgenerator.VoidWorldGeneratorPlugin;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 import javax.annotation.Nullable;
+import org.bukkit.Bukkit;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.popcraft.chunky.Chunky;
@@ -15,6 +15,7 @@ import com.jkantrell.mc.underilla.core.generation.Generator;
 import com.jkantrell.mc.underilla.spigot.cleaning.CleanBlocksTask;
 import com.jkantrell.mc.underilla.spigot.cleaning.CleanEntitiesTask;
 import com.jkantrell.mc.underilla.spigot.cleaning.FollowableProgressTask;
+import com.jkantrell.mc.underilla.spigot.generation.GeneratorAccessor;
 import com.jkantrell.mc.underilla.spigot.generation.UnderillaChunkGenerator;
 import com.jkantrell.mc.underilla.spigot.impl.BukkitWorldReader;
 import com.jkantrell.mc.underilla.spigot.io.UnderillaConfig;
@@ -46,15 +47,7 @@ public final class Underilla extends JavaPlugin {
                     .warning("No world with name '" + Underilla.getUnderillaConfig().getString(StringKeys.SURFACE_WORLD_NAME) + "' found");
             return super.getDefaultWorldGenerator(worldName, id);
         }
-        String outOfTheSurfaceWorldGeneratorName = Underilla.getUnderillaConfig().getString(StringKeys.OUT_OF_THE_SURFACE_WORLD_GENERATOR);
-        ChunkGenerator outOfTheSurfaceWorldGenerator;
-        if (outOfTheSurfaceWorldGeneratorName == null || "VANILLA".equals(outOfTheSurfaceWorldGeneratorName)) {
-            outOfTheSurfaceWorldGenerator = null;
-        } else if ("VoidWorldGenerator".equals(outOfTheSurfaceWorldGeneratorName)) {
-            outOfTheSurfaceWorldGenerator = getProvidingPlugin(VoidWorldGeneratorPlugin.class).getDefaultWorldGenerator(worldName, id);
-        } else {
-            outOfTheSurfaceWorldGenerator = null;
-        }
+        ChunkGenerator outOfTheSurfaceWorldGenerator = GeneratorAccessor.getOutOfTheSurfaceWorldGenerator(worldName, id);
         getLogger().info(
                 "Using Underilla as main world generator (with " + outOfTheSurfaceWorldGenerator + " as outOfTheSurfaceWorldGenerator)!");
         return new UnderillaChunkGenerator(this.worldSurfaceReader, this.worldCavesReader, outOfTheSurfaceWorldGenerator);
@@ -65,6 +58,8 @@ public final class Underilla extends JavaPlugin {
         // save default config
         this.saveDefaultConfig();
         reloadConfig();
+
+        runStepsOnEnabled();
 
         // Loading reference world
         try {
@@ -94,8 +89,6 @@ public final class Underilla extends JavaPlugin {
             this.getServer().getPluginManager().registerEvents(structureEventListener, this);
         }
         this.getServer().getPluginManager().registerEvents(new WorldListener(), this);
-
-        runStepsOnEnabled();
     }
 
     @Override
@@ -158,9 +151,24 @@ public final class Underilla extends JavaPlugin {
 
 
     private void runStepsOnEnabled() {
-        // TODO If there is config steps todo:
-        ServerSetup.setupPaper();
-        // runChunky();
+        boolean needARestart = false;
+        
+        if(Underilla.getUnderillaConfig().getString(StringKeys.STEP_DOWNLOAD_DEPENDENCY_PLUGINS).equals("todo")){
+            needARestart = ServerSetup.downloadNeededDependencies() || needARestart;
+        }
+        if(Underilla.getUnderillaConfig().getString(StringKeys.STEP_SETUP_PAPER_FOR_QUICK_GENERATION).equals("todo")){
+            needARestart = ServerSetup.setupPaperWorkerthreads() || needARestart;
+        }
+        if(Underilla.getUnderillaConfig().getString(StringKeys.STEP_SET_UNDERILLA_AS_WORLD_GENERATOR).equals("todo")){
+            needARestart = ServerSetup.setupBukkitWorldGenerator() || needARestart;
+        }
+        if(needARestart) {
+            info("Underilla have done pre generation steps. Restarting server to apply changes.");
+            Bukkit.shutdownMessage();
+            // Bukkit.shutdown(); // It doesn't work before the world is loaded.
+            Bukkit.getServer().spigot().restart();
+            // System.exit(0);
+        }
     }
     public void runNextStepsAfterWorldInit() {
         if (Underilla.getUnderillaConfig().getString(StringKeys.STEP_UNDERILLA_GENERATION).equals("todo")) {
@@ -181,7 +189,11 @@ public final class Underilla extends JavaPlugin {
         getUnderillaConfig().saveNewValue(taskKey, done ? "done" : "failed");
         runNextStepsAfterWorldInit();
     }
+    public void validateInitServerTask(StringKeys taskKey, boolean done) {
+        getUnderillaConfig().saveNewValue(taskKey, done ? "done" : "failed");
+    }
     public void validateTask(StringKeys taskKey) { validateTask(taskKey, true); }
+    public void validateInitServerTask(StringKeys taskKey) { validateInitServerTask(taskKey, true); }
     public void setToDoingTask(StringKeys taskKey) { getUnderillaConfig().saveNewValue(taskKey, "doing"); }
 
     // run tasks ------------------------------------------------------------------------------------------------------

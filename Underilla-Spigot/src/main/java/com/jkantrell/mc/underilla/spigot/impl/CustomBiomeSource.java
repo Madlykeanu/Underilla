@@ -49,7 +49,7 @@ public class CustomBiomeSource {
             Underilla.getInstance().getLogger().warning("VanillaBiomeSource was null. It is now set to " + vanillaBiomeSource);
         }
 
-        if (vanillaBiomeSource != null && !Underilla.getUnderillaConfig().isBiomeInSet(SetBiomeStringKeys.SURFACE_WORLD_ONLY_ON_THIS_BIOMES,
+        if (vanillaBiomeSource != null && surfaceWorldBiome != null && !Underilla.getUnderillaConfig().isBiomeInSet(SetBiomeStringKeys.SURFACE_WORLD_ONLY_ON_THIS_BIOMES,
                 surfaceWorldBiome.getName())) {
             Biome vanillaBiome = vanillaBiomeSource.getBiome(worldInfo, x, y, z);
             String vanillaBiomeName = vanillaBiome == null ? "null" : vanillaBiome.getKey().asString();

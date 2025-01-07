@@ -111,8 +111,7 @@ buildNumber.properties
 .flattened-pom.xml
 
 # Common working directory
-run/
-run2/
+run*/
 
 # Gradle
 .gradle/

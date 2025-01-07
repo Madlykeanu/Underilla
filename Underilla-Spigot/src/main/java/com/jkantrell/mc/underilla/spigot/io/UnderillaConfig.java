@@ -404,6 +404,9 @@ public class UnderillaConfig {
     }
     public enum StringKeys {
         // @formatter:off
+        STEP_SETUP_PAPER_FOR_QUICK_GENERATION("steps.setupPaperForQuickGeneration", "skip"),
+        STEP_DOWNLOAD_DEPENDENCY_PLUGINS("steps.downloadDependencyPlugins", "skip"),
+        STEP_SET_UNDERILLA_AS_WORLD_GENERATOR("steps.setUnderillaAsWorldGenerator", "skip"),
         STEP_UNDERILLA_GENERATION("steps.underillaGeneration", "skip"),
         STEP_CLEANING_BLOCKS("steps.cleaningBlocks", "skip"),
         STEP_CLEANING_ENTITIES("steps.cleaingEntities", "skip"),

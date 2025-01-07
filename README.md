@@ -80,7 +80,7 @@ This steps are longer than the instalation steps, but will allow you to avoid al
 If you are strugeling with world generation, you can ask for help on the Discord: https://discord.gg/RPNbtRSFqG
 
 1. Download the last paper version [here](https://papermc.io/downloads/paper).
-2. Create a new repository for your server and move the paper .jar file incide.
+2. Create a new repository for your server and move the paper .jar file inside.
 3. Start paper with `java -jar paper-*replace by paper last version*.jar -nogui`
 4. Server stops because of eula, open eula.txt, set `eula=true` and restart the server.
 5. You know have a vanilla ready to work server. But we still want to do some config change to make it faster for world generation. Stop the server.
