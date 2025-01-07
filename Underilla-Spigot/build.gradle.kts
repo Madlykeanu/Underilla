@@ -4,7 +4,7 @@ plugins {
     `java-library`
     id("io.github.goooler.shadow") version "8.1.7"
     // paperweight.userdev 2.0.0-beta.8 isn't working to have a Underilla-Spigot-1.6.9.jar which is the reobf jar.
-    id("io.papermc.paperweight.userdev") version "2.0.0-beta.8" // paperweight // Check for new versions at https://plugins.gradle.org/plugin/io.papermc.paperweight.userdev
+    id("io.papermc.paperweight.userdev") version "2.0.0-beta.12" // paperweight // Check for new versions at https://plugins.gradle.org/plugin/io.papermc.paperweight.userdev
     `maven-publish` // Add ./gradlew publishToMavenLocal
     id("xyz.jpenilla.run-paper") version "2.3.1"
     id("io.papermc.hangar-publish-plugin") version "0.1.2"
