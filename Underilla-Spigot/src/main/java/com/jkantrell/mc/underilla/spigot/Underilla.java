@@ -43,6 +43,10 @@ public final class Underilla extends JavaPlugin {
 
     @Override
     public ChunkGenerator getDefaultWorldGenerator(String worldName, String id) {
+        if(allStepsDone()){
+            getLogger().info("Use the out of the surface world generator instead of Underilla because we have done all generation & cleaning steps.");
+            return GeneratorAccessor.getOutOfTheSurfaceWorldGenerator(worldName, id);
+        }
         if (this.worldSurfaceReader == null) {
             getLogger()
                     .warning("No world with name '" + Underilla.getUnderillaConfig().getString(StringKeys.SURFACE_WORLD_NAME) + "' found");
@@ -64,34 +68,36 @@ public final class Underilla extends JavaPlugin {
 
         runStepsOnEnabled();
 
-        // Loading reference world
-        try {
-            this.worldSurfaceReader = new BukkitWorldReader(Underilla.getUnderillaConfig().getString(StringKeys.SURFACE_WORLD_NAME));
-            getLogger().info("World '" + Underilla.getUnderillaConfig().getString(StringKeys.SURFACE_WORLD_NAME) + "' found.");
-        } catch (NoSuchFieldException e) {
-            getLogger()
-                    .warning("No world with name '" + Underilla.getUnderillaConfig().getString(StringKeys.SURFACE_WORLD_NAME) + "' found");
-            e.printStackTrace();
-        }
-        // Loading caves world if we should use it.
-        if (Underilla.getUnderillaConfig().getBoolean(BooleanKeys.TRANSFER_BLOCKS_FROM_CAVES_WORLD)
-                || Underilla.getUnderillaConfig().getBoolean(BooleanKeys.TRANSFER_BIOMES_FROM_CAVES_WORLD)) {
+        if(!allStepsDone()){
+            // Loading reference world
             try {
-                getLogger().info("Loading caves world");
-                this.worldCavesReader = new BukkitWorldReader(Underilla.getUnderillaConfig().getString(StringKeys.CAVES_WORLD_NAME));
+                this.worldSurfaceReader = new BukkitWorldReader(Underilla.getUnderillaConfig().getString(StringKeys.SURFACE_WORLD_NAME));
+                getLogger().info("World '" + Underilla.getUnderillaConfig().getString(StringKeys.SURFACE_WORLD_NAME) + "' found.");
             } catch (NoSuchFieldException e) {
-                getLogger().warning(
-                        "No world with name '" + Underilla.getUnderillaConfig().getString(StringKeys.CAVES_WORLD_NAME) + "' found");
+                getLogger()
+                        .warning("No world with name '" + Underilla.getUnderillaConfig().getString(StringKeys.SURFACE_WORLD_NAME) + "' found");
                 e.printStackTrace();
             }
+            // Loading caves world if we should use it.
+            if (Underilla.getUnderillaConfig().getBoolean(BooleanKeys.TRANSFER_BLOCKS_FROM_CAVES_WORLD)
+                    || Underilla.getUnderillaConfig().getBoolean(BooleanKeys.TRANSFER_BIOMES_FROM_CAVES_WORLD)) {
+                try {
+                    getLogger().info("Loading caves world");
+                    this.worldCavesReader = new BukkitWorldReader(Underilla.getUnderillaConfig().getString(StringKeys.CAVES_WORLD_NAME));
+                } catch (NoSuchFieldException e) {
+                    getLogger().warning(
+                            "No world with name '" + Underilla.getUnderillaConfig().getString(StringKeys.CAVES_WORLD_NAME) + "' found");
+                    e.printStackTrace();
+                }
+            }
+    
+            // Registering listeners
+            if (Underilla.getUnderillaConfig().getBoolean(BooleanKeys.STRUCTURES_ENABLED)) {
+                structureEventListener = new StructureEventListener();
+                this.getServer().getPluginManager().registerEvents(structureEventListener, this);
+            }
+            this.getServer().getPluginManager().registerEvents(new WorldListener(), this);
         }
-
-        // Registering listeners
-        if (Underilla.getUnderillaConfig().getBoolean(BooleanKeys.STRUCTURES_ENABLED)) {
-            structureEventListener = new StructureEventListener();
-            this.getServer().getPluginManager().registerEvents(structureEventListener, this);
-        }
-        this.getServer().getPluginManager().registerEvents(new WorldListener(), this);
     }
 
     @Override
@@ -123,6 +129,9 @@ public final class Underilla extends JavaPlugin {
             underillaConfig = new UnderillaConfig(getConfig());
         } else {
             underillaConfig.reload(getConfig());
+        }
+        if(!allStepsDone()){
+            Underilla.info("Config reloaded with values: " + underillaConfig);
         }
     }
 
@@ -187,6 +196,11 @@ public final class Underilla extends JavaPlugin {
         } else if (Underilla.getUnderillaConfig().getString(StringKeys.STEP_CLEANING_ENTITIES).equals("doing")) {
             restartCleanEntities();
         }
+    }
+    public boolean allStepsDone(){
+        return Underilla.getUnderillaConfig().getString(StringKeys.STEP_UNDERILLA_GENERATION).equals("done")
+            && Underilla.getUnderillaConfig().getString(StringKeys.STEP_CLEANING_BLOCKS).equals("done")
+            && Underilla.getUnderillaConfig().getString(StringKeys.STEP_CLEANING_ENTITIES).equals("done");
     }
     public void validateTask(StringKeys taskKey, boolean done) {
         getUnderillaConfig().saveNewValue(taskKey, done ? "done" : "failed");

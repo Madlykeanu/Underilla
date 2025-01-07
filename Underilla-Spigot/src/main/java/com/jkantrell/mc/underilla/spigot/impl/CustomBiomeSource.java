@@ -46,7 +46,7 @@ public class CustomBiomeSource {
         if (vanillaBiomeSource == null) {
             CraftWorld worldFinal = (CraftWorld) Bukkit.getWorld(Underilla.getUnderillaConfig().getString(StringKeys.FINAL_WORLD_NAME));
             vanillaBiomeSource = worldFinal == null ? null : worldFinal.vanillaBiomeProvider();
-            Underilla.getInstance().getLogger().warning("VanillaBiomeSource was null. It is now set to " + vanillaBiomeSource);
+            Underilla.getInstance().getLogger().info("VanillaBiomeSource was null. It is now set to " + vanillaBiomeSource);
         }
 
         if (vanillaBiomeSource != null && surfaceWorldBiome != null && !Underilla.getUnderillaConfig().isBiomeInSet(SetBiomeStringKeys.SURFACE_WORLD_ONLY_ON_THIS_BIOMES,

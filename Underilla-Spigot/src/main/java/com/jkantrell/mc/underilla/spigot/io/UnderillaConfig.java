@@ -171,9 +171,6 @@ public class UnderillaConfig {
         if (getInt(IntegerKeys.ADAPTATIVE_MIN_HIDDEN_BLOCKS_MERGE_DEPTH) > getInt(IntegerKeys.MERGE_DEPTH)) {
             integerMap.put(IntegerKeys.ADAPTATIVE_MIN_HIDDEN_BLOCKS_MERGE_DEPTH, getInt(IntegerKeys.MERGE_DEPTH));
         }
-
-
-        Underilla.info("Config reloaded with values: " + this);
     }
 
     public void initSetEntityType(FileConfiguration fileConfiguration) {
