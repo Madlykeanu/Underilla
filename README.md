@@ -123,3 +123,8 @@ rm Underilla-Spigot/run/world_surface/ -fr; cp testMap/world/ Underilla-Spigot/r
 ```
 
 Feature requests or pull requests are welcome. Concider create an issue 1st to talk about your new feature before sending a pull request.
+
+## Thanks
+
+Thanks a lot to [**Jeshuakrc**](https://github.com/Jeshuakrc) for creating this incredible project in 1.19.4 !
+Since Minecraft 1.20, I'm maintaining the project. If you have any issues or have found a bug, please let me know [here](https://github.com/HydrolienF/Underilla/issues).
