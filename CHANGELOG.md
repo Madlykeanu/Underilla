@@ -1,3 +1,6 @@
+# 2.0.3
+Dependency hotfix.
+
 # 2.0.0
 
 ## Features / Bug fix
