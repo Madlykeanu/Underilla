@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "com.jkantrell.mc.underilla"
-version = "2.0.0"
+version = "2.0.1"
 description="Generate vanilla cave in custom world."
 val mainMinecraftVersion = "1.21.4"
 val supportedMinecraftVersions = "1.21.3 - 1.21.4"
@@ -36,7 +36,7 @@ dependencies {
     implementation("fr.formiko.mc.biomeutils:biomeutils:1.1.8")
     implementation("com.github.FormikoLudo:Utils:0.0.9")
     implementation("org.bstats:bstats-bukkit:3.1.0")
-    api("com.github.HydrolienF:KntNBT:2.2.2")
+    implementation("com.github.HydrolienF:KntNBT:2.2.2")
     compileOnly("fr.formiko.mc.voidworldgenerator:voidworldgenerator:$voidWorldGeneratorVersion")
     compileOnly("org.popcraft:chunky-common:$chunkyVersion")
 }
@@ -57,11 +57,17 @@ tasks {
         sequenceOf(
             "co.aikar",
             "org.bstats",
-            "jakarta.annotation",
             "fr.formiko.mc.biomeutils",
+            "fr.formiko.utils",
         ).forEach { pkg ->
             relocate(pkg, "$prefix.$pkg")
         }
+        archiveFileName.set("${project.name}-${project.version}.jar")
+        exclude("javax/**")
+        exclude("assets/**")
+        exclude("com/google/**")
+        exclude("org/checkerframework/**")
+        exclude("org/apache/**")
     }
 
     assemble {
