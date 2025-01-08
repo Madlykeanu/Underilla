@@ -63,4 +63,4 @@ jobs:
         env:
           # Make sure you have added a repository secret in the repository's settings
           HANGAR_API_TOKEN: ${{ secrets.HANGAR_API_TOKEN }}
-        run: ./gradlew build publishPluginPublicationToHangar --stacktrace
+        run: ./gradlew assemble publishPluginPublicationToHangar --stacktrace
