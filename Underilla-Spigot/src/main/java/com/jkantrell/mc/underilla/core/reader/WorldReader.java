@@ -9,7 +9,9 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 import com.jkantrell.mc.underilla.core.api.Biome;
 import com.jkantrell.mc.underilla.core.api.Block;
 import com.jkantrell.mc.underilla.spigot.Underilla;
@@ -31,7 +33,7 @@ public abstract class WorldReader implements Reader {
     private final RLUCache<MCAFile> regionCache_;
     private final RLUCache<ChunkReader> chunkCache_;
     private final RLUCache<Integer> yLevelCache_;
-    private final RLUCache<String> biomeCache_;
+    private final RLUCacheTriple<String> biomeCache_;
 
     // CONSTRUCTORS
     protected WorldReader(String worldPath) throws NoSuchFieldException { this(new File(worldPath)); }
@@ -56,7 +58,7 @@ public abstract class WorldReader implements Reader {
         // Cache as many y levels as it can fit in all the loaded chunks.
         this.yLevelCache_ = new RLUCache<>(chunkCacheSize * Underilla.CHUNK_SIZE * Underilla.CHUNK_SIZE);
         // Cache as many biomes as it can fit in all the loaded chunks.
-        this.biomeCache_ = new RLUCache<>(chunkCacheSize * 4 * 4);
+        this.biomeCache_ = new RLUCacheTriple<>(chunkCacheSize * 4 * 4);
     }
 
 
@@ -158,20 +160,24 @@ public abstract class WorldReader implements Reader {
                 .map(Optional::get).filter(b -> !b.isSolid()).findAny().isPresent();
     }
 
-    public String getBiomeName(int globalX, int globalZ) {
+    public String getBiomeName(int globalX, int globalY, int globalZ) {
         // make globalX and globalZ multiple of BIOME_AREA_SIZE ot avoid storing duplicate data.
-        globalX = globalX - globalX % Underilla.CHUNK_SIZE;
-        globalZ = globalZ - globalZ % Underilla.CHUNK_SIZE;
+        globalX = globalX - globalX % Underilla.BIOME_AREA_SIZE;
+        globalY = globalY - globalY % Underilla.BIOME_AREA_SIZE;
+        globalZ = globalZ - globalZ % Underilla.BIOME_AREA_SIZE;
 
-        String cached = biomeCache_.get(globalX, globalZ);
+        String cached = biomeCache_.get(globalX, globalY, globalZ);
         if (cached != null) {
             return cached;
         }
 
-        Optional<Biome> optionalBiome = biomeAt(globalX, 0, globalZ);
+        Optional<Biome> optionalBiome = biomeAt(globalX, globalY, globalZ);
         String r = optionalBiome.isEmpty() ? null : optionalBiome.get().getName();
-        biomeCache_.put(globalX, globalZ, r);
+        biomeCache_.put(globalX, globalY, globalZ, r);
         return r;
+    }
+    public String getBiomeName(int globalX, int globalZ) {
+        return getBiomeName(globalX, Underilla.getUnderillaConfig().getInt(IntegerKeys.GENERATION_AREA_MAX_Y), globalZ);
     }
 
 
@@ -248,4 +254,44 @@ public abstract class WorldReader implements Reader {
             }
         }
     }
+
+    public static class RLUCacheTriple<T> {
+
+        // FIELDS
+        private final Map<Triple<Integer, Integer, Integer>, T> map_ = new HashMap<>();
+        private final Deque<Triple<Integer, Integer, Integer>> queue_ = new LinkedList<>();
+        private final int capacity_;
+
+
+        // CONSTRUCTOR
+        RLUCacheTriple(int capacity) { this.capacity_ = capacity; }
+
+
+        // UTIL
+        // We synchronized the methode to avoid concurrent access to the cache.
+        // Concurrent access cause queue_ and map_ to grow without never being reduced.
+        // We might win few ms by reducing the part of the code that is synchronized, but I don't think it's worth the potential bugs.
+        T get(int x, int y, int z) {
+            Triple<Integer, Integer, Integer> pair = ImmutableTriple.of(x, y, z);
+            synchronized (this) {
+                return this.map_.get(pair);
+            }
+        }
+        void put(int x, int y, int z, T file) {
+            Triple<Integer, Integer, Integer> pair = ImmutableTriple.of(x, y, z);
+            synchronized (this) {
+                if (map_.containsKey(pair)) {
+                    this.queue_.remove(pair);
+                } else if (this.queue_.size() >= this.capacity_) {
+                    try {
+                        Triple<Integer, Integer, Integer> temp = this.queue_.removeLast();
+                        this.map_.remove(temp);
+                    } catch (NoSuchElementException ignored) {}
+                }
+                this.map_.put(pair, file);
+                this.queue_.addFirst(pair);
+            }
+        }
+    }
+
 }

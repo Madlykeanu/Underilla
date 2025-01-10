@@ -348,6 +348,7 @@ public class UnderillaConfig {
     public enum BooleanKeys {
         // @formatter:off
         DEBUG("debug", false),
+        SURFACE_WORLD_BIOME_USE_TOP_Y_VALUE_ONLY("surfaceWorld.useTopYBiomeOnly", true),
         TRANSFER_BLOCKS_FROM_CAVES_WORLD("transferBlocksFromCavesWorld", false),
         TRANSFER_BIOMES_FROM_CAVES_WORLD("transferBiomesFromCavesWorld", false),
         ADAPTATIVE_MERGE_DEPTH_ENABLED("surface.adaptativeDepth.enabled", true),

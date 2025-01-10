@@ -5,12 +5,15 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
 import org.bukkit.block.Biome;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.generator.BiomeProvider;
 import org.bukkit.generator.WorldInfo;
 import org.jetbrains.annotations.NotNull;
 import com.jkantrell.mc.underilla.spigot.Underilla;
+import com.jkantrell.mc.underilla.spigot.io.UnderillaConfig.BooleanKeys;
+import com.jkantrell.mc.underilla.spigot.io.UnderillaConfig.IntegerKeys;
 import com.jkantrell.mc.underilla.spigot.io.UnderillaConfig.SetBiomeStringKeys;
 import com.jkantrell.mc.underilla.spigot.io.UnderillaConfig.StringKeys;
 
@@ -41,7 +44,11 @@ public class CustomBiomeSource {
      */
     public Biome getBiome(@NotNull WorldInfo worldInfo, int x, int y, int z) {
         // Needed to get surface biome & test if caves biome will override a preserved biome.
-        BukkitBiome surfaceWorldBiome = (BukkitBiome) worldSurfaceReader.biomeAt(x, y, z).orElse(null);
+        // Use the top biome from the surface world only if configured.
+        int surfaceWorldBiomeY = Underilla.getUnderillaConfig().getBoolean(BooleanKeys.SURFACE_WORLD_BIOME_USE_TOP_Y_VALUE_ONLY)
+                ? Underilla.getUnderillaConfig().getInt(IntegerKeys.GENERATION_AREA_MAX_Y)
+                : y;
+        String surfaceWorldBiomeName = worldSurfaceReader.getBiomeName(x, surfaceWorldBiomeY, z);
 
         if (vanillaBiomeSource == null) {
             CraftWorld worldFinal = (CraftWorld) Bukkit.getWorld(Underilla.getUnderillaConfig().getString(StringKeys.FINAL_WORLD_NAME));
@@ -49,8 +56,8 @@ public class CustomBiomeSource {
             Underilla.getInstance().getLogger().info("VanillaBiomeSource was null. It is now set to " + vanillaBiomeSource);
         }
 
-        if (vanillaBiomeSource != null && surfaceWorldBiome != null && !Underilla.getUnderillaConfig().isBiomeInSet(SetBiomeStringKeys.SURFACE_WORLD_ONLY_ON_THIS_BIOMES,
-                surfaceWorldBiome.getName())) {
+        if (vanillaBiomeSource != null && surfaceWorldBiomeName != null && !Underilla.getUnderillaConfig()
+                .isBiomeInSet(SetBiomeStringKeys.SURFACE_WORLD_ONLY_ON_THIS_BIOMES, surfaceWorldBiomeName)) {
             Biome vanillaBiome = vanillaBiomeSource.getBiome(worldInfo, x, y, z);
             String vanillaBiomeName = vanillaBiome == null ? "null" : vanillaBiome.getKey().asString();
             // info("Currently tested vanillaBiome: " + vanillaBiomeName + " at " + x + " " + y + " " + z);
@@ -83,11 +90,12 @@ public class CustomBiomeSource {
         // }
 
         // Get biome from surface world.
-        if (surfaceWorldBiome != null) {
-            debug("Use surfaceWorldBiome: " + surfaceWorldBiome.getName() + " at " + x + " " + y + " " + z);
-            biomesPlaced.put("surface:" + surfaceWorldBiome.getName(),
-                    biomesPlaced.getOrDefault("surface:" + surfaceWorldBiome.getName(), 0L) + 1);
-            return surfaceWorldBiome.getBiome();
+        if (surfaceWorldBiomeName != null) {
+            debug("Use surfaceWorldBiome: " + surfaceWorldBiomeName + " at " + x + " " + y + " " + z);
+            biomesPlaced.put("surface:" + surfaceWorldBiomeName, biomesPlaced.getOrDefault("surface:" + surfaceWorldBiomeName, 0L) + 1);
+            // return surfaceWorldBiome.getBiome();
+            return io.papermc.paper.registry.RegistryAccess.registryAccess().getRegistry(io.papermc.paper.registry.RegistryKey.BIOME)
+                    .get(NamespacedKey.fromString(surfaceWorldBiomeName));
         }
 
         // If no other biome found, use vanilla biome.
