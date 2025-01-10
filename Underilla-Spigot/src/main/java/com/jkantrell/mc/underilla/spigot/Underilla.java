@@ -43,8 +43,9 @@ public final class Underilla extends JavaPlugin {
 
     @Override
     public ChunkGenerator getDefaultWorldGenerator(String worldName, String id) {
-        if(allStepsDone()){
-            getLogger().info("Use the out of the surface world generator instead of Underilla because we have done all generation & cleaning steps.");
+        if (allStepsDone()) {
+            getLogger().info(
+                    "Use the out of the surface world generator instead of Underilla because we have done all generation & cleaning steps.");
             return GeneratorAccessor.getOutOfTheSurfaceWorldGenerator(worldName, id);
         }
         if (this.worldSurfaceReader == null) {
@@ -68,14 +69,14 @@ public final class Underilla extends JavaPlugin {
 
         runStepsOnEnabled();
 
-        if(!allStepsDone()){
+        if (!allStepsDone()) {
             // Loading reference world
             try {
                 this.worldSurfaceReader = new BukkitWorldReader(Underilla.getUnderillaConfig().getString(StringKeys.SURFACE_WORLD_NAME));
                 getLogger().info("World '" + Underilla.getUnderillaConfig().getString(StringKeys.SURFACE_WORLD_NAME) + "' found.");
             } catch (NoSuchFieldException e) {
-                getLogger()
-                        .warning("No world with name '" + Underilla.getUnderillaConfig().getString(StringKeys.SURFACE_WORLD_NAME) + "' found");
+                getLogger().warning(
+                        "No world with name '" + Underilla.getUnderillaConfig().getString(StringKeys.SURFACE_WORLD_NAME) + "' found");
                 e.printStackTrace();
             }
             // Loading caves world if we should use it.
@@ -90,7 +91,7 @@ public final class Underilla extends JavaPlugin {
                     e.printStackTrace();
                 }
             }
-    
+
             // Registering listeners
             if (Underilla.getUnderillaConfig().getBoolean(BooleanKeys.STRUCTURES_ENABLED)) {
                 structureEventListener = new StructureEventListener();
@@ -130,7 +131,7 @@ public final class Underilla extends JavaPlugin {
         } else {
             underillaConfig.reload(getConfig());
         }
-        if(!allStepsDone()){
+        if (!allStepsDone()) {
             Underilla.info("Config reloaded with values: " + underillaConfig);
         }
     }
@@ -164,17 +165,17 @@ public final class Underilla extends JavaPlugin {
 
     private void runStepsOnEnabled() {
         boolean needARestart = false;
-        
-        if(Underilla.getUnderillaConfig().getString(StringKeys.STEP_DOWNLOAD_DEPENDENCY_PLUGINS).equals("todo")){
+
+        if (Underilla.getUnderillaConfig().getString(StringKeys.STEP_DOWNLOAD_DEPENDENCY_PLUGINS).equals("todo")) {
             needARestart = ServerSetup.downloadNeededDependencies() || needARestart;
         }
-        if(Underilla.getUnderillaConfig().getString(StringKeys.STEP_SETUP_PAPER_FOR_QUICK_GENERATION).equals("todo")){
+        if (Underilla.getUnderillaConfig().getString(StringKeys.STEP_SETUP_PAPER_FOR_QUICK_GENERATION).equals("todo")) {
             needARestart = ServerSetup.setupPaperWorkerthreads() || needARestart;
         }
-        if(Underilla.getUnderillaConfig().getString(StringKeys.STEP_SET_UNDERILLA_AS_WORLD_GENERATOR).equals("todo")){
+        if (Underilla.getUnderillaConfig().getString(StringKeys.STEP_SET_UNDERILLA_AS_WORLD_GENERATOR).equals("todo")) {
             needARestart = ServerSetup.setupBukkitWorldGenerator() || needARestart;
         }
-        if(needARestart) {
+        if (needARestart) {
             info("Underilla have done pre generation steps. Restarting server to apply changes.");
             Bukkit.shutdownMessage();
             // Bukkit.shutdown(); // It doesn't work before the world is loaded.
@@ -197,10 +198,10 @@ public final class Underilla extends JavaPlugin {
             restartCleanEntities();
         }
     }
-    public boolean allStepsDone(){
+    public boolean allStepsDone() {
         return Underilla.getUnderillaConfig().getString(StringKeys.STEP_UNDERILLA_GENERATION).equals("done")
-            && Underilla.getUnderillaConfig().getString(StringKeys.STEP_CLEANING_BLOCKS).equals("done")
-            && Underilla.getUnderillaConfig().getString(StringKeys.STEP_CLEANING_ENTITIES).equals("done");
+                && Underilla.getUnderillaConfig().getString(StringKeys.STEP_CLEANING_BLOCKS).equals("done")
+                && Underilla.getUnderillaConfig().getString(StringKeys.STEP_CLEANING_ENTITIES).equals("done");
     }
     public void validateTask(StringKeys taskKey, boolean done) {
         getUnderillaConfig().saveNewValue(taskKey, done ? "done" : "failed");
@@ -246,7 +247,9 @@ public final class Underilla extends JavaPlugin {
 
         chunky.getApi().onGenerationComplete(generationCompleteEvent -> {
             info("Chunky task for world " + worldName + " has finished");
-            info("Structure generation: " + structureEventListener.getStructureCount());
+            if (structureEventListener != null) {
+                info("Structure generation: " + structureEventListener.getStructureCount());
+            }
             validateTask(StringKeys.STEP_UNDERILLA_GENERATION);
         });
 
