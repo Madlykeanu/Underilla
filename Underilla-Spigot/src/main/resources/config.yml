@@ -10,7 +10,7 @@ printProgressEveryXSeconds: 10
 # If you don't want a step to be done, set it to "skip"
 steps:
   downloadDependencyPlugins: "todo"
-  setupPaperForQuickGeneration: "todo"
+  setupPaperForQuickGeneration: "skip"
   # generateSurfaceWorld: "todo" # Might be added later
   setUnderillaAsWorldGenerator: "todo"
   # Remove world folder if it already exists
