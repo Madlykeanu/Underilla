@@ -19,9 +19,19 @@ public class StructureEventListener implements Listener {
     public void onStructureSpawn(AsyncStructureSpawnEvent e) {
         // If in the list of structure to keep then log & count else cancel the event.
         if (Underilla.getUnderillaConfig().isStructureInSet(SetStructureKeys.SURUCTURE_ONLY, e.getStructure())) {
-            Underilla.debug(() -> e.getStructure().key().asString() + " spawned at " + e.getChunkX() + " " + e.getChunkZ() + " in biome "
-                    + e.getWorld().getBiome(e.getChunkX() * 16, 0, e.getChunkZ() * 16));
-            String structureName = e.getStructure().key().asString();
+            // Cast double to int for Y coordinate
+            int structureY = (int) e.getBoundingBox().getMinY();
+            
+            // Convert chunk coordinates to block coordinates (multiply by 16)
+            int blockX = e.getChunkX() * 16;
+            int blockZ = e.getChunkZ() * 16;
+            
+            Underilla.debug(() -> e.getStructure().getKey().asString() + 
+                " spawned at block: " + blockX + " " + structureY + " " + blockZ + 
+                " (chunk: " + e.getChunkX() + " " + structureY + " " + e.getChunkZ() + ") in biome " +
+                e.getWorld().getBiome(blockX, structureY, blockZ));
+                
+            String structureName = e.getStructure().getKey().asString();
             structureCount.put(structureName, structureCount.getOrDefault(structureName, 0) + 1);
         } else {
             e.setCancelled(true);
