@@ -33,6 +33,8 @@ surfaceWorld:
     # You might use a world that you didn't build yourself in world painter. Often that world will contains some blocks that you don't want in your final world.
     # Must be define as Material from Paper API: https://jd.papermc.io/paper/1.21.4/org/bukkit/Material.html.
     toReplace: {}
+  # If true, only the top y biome value of the surface world will be copied. This increase performance a bit and remove any cave biome that might be in the surface world. If you have various biomes at the same x, z values with different y values, and want to keep them, set this to false.
+  useTopYBiomeOnly: true
 
 
 # Set this area to match the surface world coordinates if you want to merge the entire surface world.

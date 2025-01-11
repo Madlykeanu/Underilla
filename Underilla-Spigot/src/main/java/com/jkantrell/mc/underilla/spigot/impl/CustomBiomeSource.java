@@ -59,7 +59,7 @@ public class CustomBiomeSource {
                     .isBiomeInSet(SetBiomeStringKeys.BIOME_MERGING_FROM_CAVES_GENERATION_ONLY_ON_BIOMES, vanillaBiomeName)
                     && y < topYOfSurfaceWorld(worldSurfaceReader, x, z)) {
                 String key = "cavesGeneration:" + vanillaBiomeName;
-                //debug("Use vanillaBiome because it's a cavesGeneration biome: " + vanillaBiomeName + " at " + x + " " + y + " " + z);
+                debug("Use vanillaBiome because it's a cavesGeneration biome: " + vanillaBiomeName + " at " + x + " " + y + " " + z);
                 biomesPlaced.put(key, biomesPlaced.getOrDefault(key, 0L) + 1);
                 return vanillaBiome;
             }
@@ -84,7 +84,7 @@ public class CustomBiomeSource {
 
         // Get biome from surface world.
         if (surfaceWorldBiome != null) {
-            // debug("Use surfaceWorldBiome: " + surfaceWorldBiome.getName() + " at " + x + " " + y + " " + z);
+            debug("Use surfaceWorldBiome: " + surfaceWorldBiome.getName() + " at " + x + " " + y + " " + z);
             biomesPlaced.put("surface:" + surfaceWorldBiome.getName(),
                     biomesPlaced.getOrDefault("surface:" + surfaceWorldBiome.getName(), 0L) + 1);
             return surfaceWorldBiome.getBiome();

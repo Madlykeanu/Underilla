@@ -63,9 +63,10 @@ public class UnderillaChunkGenerator extends ChunkGenerator {
     // IMPLEMENTATIONS
     @Override
     public int getBaseHeight(WorldInfo worldInfo, Random random, int x, int z, HeightMap heightMap) {
-        if (outOfTheSurfaceWorldGenerator != null && isOutsideOfTheSurfaceWorld(x, z)) {
-            return outOfTheSurfaceWorldGenerator.getBaseHeight(worldInfo, random, x, z, heightMap);
-        }
+        // Do not use base height from VoidWorldGenerator if it is outside of the surface world, else it broke structures generation.
+        // if (outOfTheSurfaceWorldGenerator != null && isOutsideOfTheSurfaceWorld(x, z)) {
+        // return outOfTheSurfaceWorldGenerator.getBaseHeight(worldInfo, random, x, z, heightMap);
+        // }
 
         BukkitWorldInfo info = new BukkitWorldInfo(worldInfo);
         return this.delegate_.getBaseHeight(info, x, z, HEIGHTMAPS_MAP.get(heightMap));
