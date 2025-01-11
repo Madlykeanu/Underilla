@@ -28,7 +28,7 @@ public class StructureEventListener implements Listener {
             
             Underilla.debug(() -> e.getStructure().getKey().asString() + 
                 " spawned at block: " + blockX + " " + structureY + " " + blockZ + 
-                " (chunk: " + e.getChunkX() + " " + structureY + " " + e.getChunkZ() + ") in biome " +
+                " (chunk: " + e.getChunkX() + " " + e.getChunkZ() + ") in biome " +
                 e.getWorld().getBiome(blockX, structureY, blockZ));
                 
             String structureName = e.getStructure().getKey().asString();
